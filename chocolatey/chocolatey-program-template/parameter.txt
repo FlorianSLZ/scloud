@@ -1,0 +1,1 @@
+-params='"/licensekey:ABCD-EFGH-IJKL /licensename:""4net AG"" /nodesktopshortcut"'
