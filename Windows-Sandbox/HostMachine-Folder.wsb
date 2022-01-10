@@ -1,0 +1,11 @@
+<Configuration>
+  <MappedFolders>
+    <MappedFolder>
+      <HostFolder>C:\GitHub\scloud</HostFolder>
+      <ReadOnly>false</ReadOnly>
+    </MappedFolder>
+  </MappedFolders>
+  <LogonCommand>
+    <Command>powershell -executionpolicy unrestricted -command "start powershell {-noexit -file C:\Users\WDAGUtilityAccount\Desktop\scloud\Windows-Sandbox\HostMachine-Folder.ps1}"</Command>
+  </LogonCommand>
+</Configuration>

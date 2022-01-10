@@ -1,0 +1,11 @@
+<Configuration>
+  <MappedFolders>
+    <MappedFolder>
+      <HostFolder>C:\GitHub\scloud\Windows-Sandbox\CallFlowDoku</HostFolder>
+      <ReadOnly>true</ReadOnly>
+    </MappedFolder>
+  </MappedFolders>
+  <LogonCommand>
+    <Command>powershell -executionpolicy unrestricted -command "start powershell {-noexit -file C:\Users\WDAGUtilityAccount\Desktop\CallFlowDoku\CallFlowDoku.ps1}"</Command>
+  </LogonCommand>
+</Configuration>
