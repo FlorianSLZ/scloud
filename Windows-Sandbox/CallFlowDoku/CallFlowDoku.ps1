@@ -15,6 +15,5 @@ foreach($Module in $PSModules){
 
 
 # Microsft 365 Documentation Creation
-Unblock-File C:\Users\WDAGUtilityAccount\Desktop\CallFlowDoku\M365CallFlowVisualizerV2.ps1
-C:\Users\WDAGUtilityAccount\Desktop\CallFlowDoku\M365CallFlowVisualizerV2.ps1 -ExecutionPolicy bypass
+C:\Users\WDAGUtilityAccount\Desktop\CallFlowDoku\M365CallFlowVisualizerV2.ps1 
 
