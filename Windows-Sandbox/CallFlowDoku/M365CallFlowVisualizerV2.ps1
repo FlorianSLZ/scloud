@@ -7,7 +7,7 @@
     The call flow is then written into either a mermaid (*.mmd) or a markdown (*.md) file containing the mermaid syntax.
 
     Author:             Martin Heusser
-    Version:            2.1.1
+    Version:            2.4.2
     Revision:
         20.10.2021:     Creation
         21.10.2021:     Add comments and streamline code, add longer arrow links for default call flow desicion node
@@ -29,6 +29,17 @@
         05.01.2022      Add new parameters and support for displaying call queue agents opt in status and phone number
         05.01.2022      Fix clipboard content when markdown is selected, add support to display phone numbers assigned to voice apps in grid view selection
         05.01.2022      Change Markdown title from H1 to H2. Fix bug in phone number listing on voice app selection
+        07.01.2022      Add support for IVRs in an auto attendants default call flow. After Hours call flows and forward to announcements are not supported yet.
+        07.01.2022      Merge changes from default call flow to after hours call flow (IVR support), some optimizations regarding after hours call flow id (more robust way)
+        07.01.2022      Add support for announcements and operators in IVRs
+        08.01.2022      Start implementing custom HEX colors for nodes, borders, links and fonts
+        09.01.2022      Add support for custom hex colors
+        10.01.2022      fix bug where custom hex colors were not applied if auto attendant doesn't have business hours
+        10.01.2022      sometimes Teams PS fails to read leading + from OnlineApplicationInstance, added code to add + if not present
+        12.01.2022      Migrate from MSOnline Cmdlets to Microsoft.Graph. Add support to export call flows to *.htm files for easier access and sharing.
+        12.01.2022      Optimize some error messages / warnings.
+        13.01.2022      Add support to display if MS System Message is being played back in holidays, CQ time out, overflow or AA default or after horus call flow
+        13.01.2022      fixed a bug where operator AAs or CQs were added to nested voice apps even if not configured in call flows
 
     .PARAMETER Name
     -Identity
@@ -50,6 +61,12 @@
         Type:               boolean
         Default value:      true
 
+    -ExportHtml
+        Specifies if, in addition to the Markdown or Mermaid file, also a *.htm file should be exported
+        Required:           false
+        Type:               boolean
+        Default value:      false
+
     -CustomFilePath
         Specifies the file path for the output file. The directory must already exist.
         Required:           false
@@ -57,7 +74,7 @@
         Accepted values:    file paths e.g. "C:\Temp"
         Default value:      ".\" (current folder)
 
-    -DisplayNestedCallFlows
+    -ShowNestedCallFlows
         Specifies whether or not to also display the call flows of nested call queues or auto attendants. If set to false, only the name of nested voice apps will be rendered. Nested call flows won't be expanded.
         Required:           false
         Type:               boolean
@@ -83,11 +100,46 @@
         Default value:      Markdown
 
     -Theme
-        Specifies the mermaid theme in Markdown
+        Specifies the mermaid theme in Markdown. Custom will use the default hex color codes below if not specified otherwise. Themes are currently only supported for Markdown output.
         Required:           false
         Type:               string
-        Accepted values:    default, dark, neutral, forest
+        Accepted values:    default, dark, neutral, forest, custom
         Default value:      default
+
+    -NodeColor
+        Specifies a custom color for the node fill
+        Required:           false
+        Type:               string
+        Accepted values:    Hexadecimal color codes starting with # enclosed by ""
+        Default value:      "#00A4EF"
+
+    -NodeBorderColor
+        Specifies a custom color for the node border
+        Required:           false
+        Type:               string
+        Accepted values:    Hexadecimal color codes starting with # enclosed by ""
+        Default value:      "#7FBA00"
+
+    -FontColor
+        Specifies a custom color for the node border
+        Required:           false
+        Type:               string
+        Accepted values:    Hexadecimal color codes starting with # enclosed by ""
+        Default value:      "#737373"
+
+    -LinkColor
+        Specifies a custom color for links
+        Required:           false
+        Type:               string
+        Accepted values:    Hexadecimal color codes starting with # enclosed by ""
+        Default value:      "#FFB900"
+
+    -LinkTextColor
+        Specifies a custom color for text on links
+        Required:           false
+        Type:               string
+        Accepted values:    Hexadecimal color codes starting with # enclosed by ""
+        Default value:      "#F25022"
     
     -VoiceAppName
         If provided, you won't be provided with a selection of available voice apps. The script will search for a voice app with the specified name. This is the display name of a voice app, not a resource account. If you specify the VoiceAppName, VoiceAppType will become mandatory.
@@ -121,13 +173,16 @@
         .\M365CallFlowVisualizerV2.ps1 -Theme dark
 
     .EXAMPLE
+        .\M365CallFlowVisualizerV2.ps1 -Theme custom -NodeColor "#00A4EF" -NodeBorderColor "#7FBA00" -FontColor "#737373" -LinkColor "#FFB900" -LinkTextColor "#F25022"
+
+    .EXAMPLE
         .\M365CallFlowVisualizerV2.ps1 -Identity "6fb84b40-f045-45e8-8c1a-8fc18188exxx"
 
     .EXAMPLE
         .\M365CallFlowVisualizerV2.ps1 -VoiceAppName "PS Test AA" -VoiceAppType "Auto Attendant"
 
     .EXAMPLE
-        .\M365CallFlowVisualizerV2.ps1 -VoiceAppName "PS Test AA" -VoiceAppType "Auto Attendant" -DisplayNestedCallFlows $false
+        .\M365CallFlowVisualizerV2.ps1 -VoiceAppName "PS Test AA" -VoiceAppType "Auto Attendant" -ShowNestedCallFlows $false
 
     .EXAMPLE
         .\M365CallFlowVisualizerV2.ps1 -VoiceAppName "PS Test CQ" -VoiceAppType "Call Queue"
@@ -149,43 +204,49 @@
     
 #>
 
-#Requires -Modules MsOnline, MicrosoftTeams
+#Requires -Modules MicrosoftTeams, Microsoft.Graph.Users, Microsoft.Graph.Groups
 
 [CmdletBinding(DefaultParametersetName="None")]
 param(
     [Parameter(Mandatory=$false)][String]$Identity,
     [Parameter(Mandatory=$false)][Bool]$SetClipBoard = $true,
     [Parameter(Mandatory=$false)][Bool]$SaveToFile = $true,
+    [Parameter(Mandatory=$false)][Bool]$ExportHtml = $false,
     [Parameter(Mandatory=$false)][String]$CustomFilePath,
-    [Parameter(Mandatory=$false)][Bool]$DisplayNestedCallFlows = $true,
+    [Parameter(Mandatory=$false)][Bool]$ShowNestedCallFlows = $true,
     [Parameter(Mandatory=$false)][Bool]$ShowCqAgentPhoneNumbers = $false,
     [Parameter(Mandatory=$false)][Bool]$ShowCqAgentOptInStatus = $false,
     [Parameter(Mandatory=$false)][ValidateSet("Markdown","Mermaid")][String]$DocType = "Markdown",
-    [Parameter(Mandatory=$false)][ValidateSet("default","forest","dark","neutral")][String]$Theme = "default",
+    [Parameter(Mandatory=$false)][ValidateSet("default","forest","dark","neutral","custom")][String]$Theme = "default",
+    [Parameter(Mandatory=$false)][String]$NodeColor = "#00A4EF", # Microsoft Blue
+    [Parameter(Mandatory=$false)][String]$NodeBorderColor = "#7FBA00", # Microsoft Green
+    [Parameter(Mandatory=$false)][String]$FontColor = "#737373", # Microsoft Gray
+    [Parameter(Mandatory=$false)][String]$LinkColor = "#FFB900", # Microsoft Yellow
+    [Parameter(Mandatory=$false)][String]$LinkTextColor = "#F25022", # Microsoft Orange
     [Parameter(ParameterSetName="VoiceAppProperties",Mandatory=$false)][String]$VoiceAppName,
     [Parameter(ParameterSetName="VoiceAppProperties",Mandatory=$true)][ValidateSet("Auto Attendant","Call Queue")][String]$VoiceAppType
 )
 
-Write-Host "Warning: Some versions of the 'MicrosoftTeams' Module can take a very long time to load. Give it a few minutes before cancelling." -ForegroundColor Yellow
+if ($DocType -eq "Mermaid" -and $Theme -ne "default") {
 
-if ($SaveToFile -eq $false -and $CustomFilePath) {
-
-    Write-Host "Warning: Custom file path is specified but SaveToFile is set to false. The call flow won't be saved!" -ForegroundColor Yellow
+    Write-Warning -Message "A custom theme is specified but the document type is Mermaid. Custom themes are currently only supported for Markdown files."
 
 }
 
+if ($SaveToFile -eq $false -and $CustomFilePath) {
+
+    Write-Warning -Message "Warning: Custom file path is specified but SaveToFile is set to false. The call flow won't be saved!"
+
+}
+
+#This array stores information about the voice app's forwading targets.
+$nestedVoiceApps = @()
 $processedVoiceApps = @()
+$allMermaidNodes = @()
 
 function Connect-M365CFV {
     param (
     )
-
-    try {
-        Get-MsolDomain -ErrorAction Stop > $null
-    }
-    catch {
-        Connect-MsolService
-    }
 
     try {
         Get-CsOnlineSipDomain -ErrorAction Stop > $null
@@ -193,6 +254,13 @@ function Connect-M365CFV {
     catch {
         Connect-MicrosoftTeams
     }    
+
+    try {
+        Get-MgUser -Top 1 -ErrorAction Stop > $null
+    }
+    catch {
+        Connect-MgGraph -Scopes "User.Read.All","Group.Read.All"
+    }
     
 }
 
@@ -203,10 +271,20 @@ function Set-Mermaid {
 
     if ($DocType -eq "Markdown") {
 
-        $MarkdownTheme =@"
+        if ($Theme -eq "custom") {
+
+            $MarkdownTheme = ""
+
+        }
+
+        else {
+
+            $MarkdownTheme =@"
 %%{init: {'theme': '$($Theme)', "flowchart" : { "curve" : "basis" } } }%%
 
 "@ 
+
+        }
 
         $mdStart =@"
 ## CallFlowNamePlaceHolder
@@ -256,6 +334,55 @@ function Find-Holidays {
 
     else {
         $aaHasHolidays = $false
+    }
+
+    # Check if auto attendant has an operator
+    $Operator = $aa.Operator
+
+    if ($Operator) {
+
+        switch ($Operator.Type.Value) {
+
+            User { 
+                $OperatorTypeFriendly = "User"
+                $OperatorUser = (Get-MgUser -UserId $($Operator.Id))
+                $OperatorName = $OperatorUser.DisplayName
+                $OperatorIdentity = $OperatorUser.Id
+            }
+            ExternalPstn { 
+                $OperatorTypeFriendly = "External PSTN"
+                $OperatorName = ($Operator.Id).Replace("tel:","")
+                $OperatorIdentity = $OperatorName
+            }
+            ApplicationEndpoint {
+
+                # Check if application endpoint is auto attendant or call queue
+                $MatchingOperatorAa = Get-CsAutoAttendant | Where-Object {$_.ApplicationInstances -eq $Operator.Id}
+
+                if ($MatchingOperatorAa) {
+
+                    $OperatorTypeFriendly = "[Auto Attendant"
+                    $OperatorName = "$($MatchingOperatorAa.Name)]"
+                    $OperatorIdentity = $MatchingOperatorAa.Identity
+
+                }
+
+                else {
+
+                    $MatchingOperatorCq = Get-CsCallQueue | Where-Object {$_.ApplicationInstances -eq $Operator.Id}
+
+                    $OperatorTypeFriendly = "[Call Queue"
+                    $OperatorName = "$($MatchingOperatorCq.Name)]"
+                    $OperatorIdentity = $MatchingOperatorCq.Identity
+
+                }
+
+            }
+
+        }
+
+        
+
     }
     
 }
@@ -346,6 +473,10 @@ subgraph $holidaySubgraphName
 
                 $nodeElementHolidayAction = "elementAAHolidayAction$($aaObjectId)-$($HolidayCounter)(($holidayAction))"
 
+                $holidayVoicemailSystemGreeting = $null
+
+                $allMermaidNodes += "elementAAHolidayAction$($aaObjectId)-$($HolidayCounter)"
+
             }
 
             else {
@@ -355,13 +486,34 @@ subgraph $holidaySubgraphName
                 # Switch through different transfer call to target types
                 switch ($holidayActionTargetType) {
                     User { $holidayActionTargetTypeFriendly = "User" 
-                    $holidayActionTargetName = (Get-MsolUser -ObjectId $($holidayCallFlow.Menu.MenuOptions.CallTarget.Id)).DisplayName
+                    $holidayActionTargetName = (Get-MgUser -UserId $($holidayCallFlow.Menu.MenuOptions.CallTarget.Id)).DisplayName
+
+                    $holidayVoicemailSystemGreeting = $null
+
                 }
                     SharedVoicemail { $holidayActionTargetTypeFriendly = "Voicemail"
-                    $holidayActionTargetName = (Get-MsolGroup -ObjectId $($holidayCallFlow.Menu.MenuOptions.CallTarget.Id)).DisplayName
+                    $holidayActionTargetName = (Get-MgGroup -GroupId $($holidayCallFlow.Menu.MenuOptions.CallTarget.Id)).DisplayName
+
+                    if ($holidayCallFlow.Menu.MenuOptions.CallTarget.EnableSharedVoicemailSystemPromptSuppression -eq $false) {
+
+                        $holidayVoicemailSystemGreeting = "elementAAHolidayVoicemailSystemGreeting$($aaObjectId)-$($HolidayCounter)>Greeting <br> MS System Message] -->"
+
+                        $allMermaidNodes += "elementAAHolidayVoicemailSystemGreeting$($aaObjectId)-$($HolidayCounter)"
+
+                    }
+
+                    else {
+
+                        $holidayVoicemailSystemGreeting = $null
+
+                    }
+
                 }
                     ExternalPstn { $holidayActionTargetTypeFriendly = "External Number" 
                     $holidayActionTargetName =  ($holidayCallFlow.Menu.MenuOptions.CallTarget.Id).Replace("tel:","")
+
+                    $holidayVoicemailSystemGreeting = $null
+
                 }
                     # Check if the application endpoint is an auto attendant or a call queue
                     ApplicationEndpoint {                    
@@ -383,12 +535,16 @@ subgraph $holidaySubgraphName
 
                         }
 
+                        $holidayVoicemailSystemGreeting = $null
+
                     }
                 
                 }
 
                 # Create mermaid code for the holiday action node based on the variables created in the switch statemenet
                 $nodeElementHolidayAction = "elementAAHolidayAction$($aaObjectId)-$($HolidayCounter)($holidayAction) --> elementAAHolidayActionTargetType$($aaObjectId)-$($HolidayCounter)($holidayActionTargetTypeFriendly <br> $holidayActionTargetName)"
+
+                $allMermaidNodes += @("elementAAHolidayAction$($aaObjectId)-$($HolidayCounter)","elementAAHolidayActionTargetType$($aaObjectId)-$($HolidayCounter)")
 
             }
 
@@ -397,9 +553,11 @@ subgraph $holidaySubgraphName
 
 subgraph $($holidayCallFlow.Name)
 direction LR
-elementAAHoliday$($aaObjectId)-$($HolidayCounter)(Schedule <br> $($holidaySchedule.FixedSchedule.DateTimeRanges.Start) <br> $($holidaySchedule.FixedSchedule.DateTimeRanges.End)) --> elementAAHolidayGreeting$($aaObjectId)-$($HolidayCounter)>$holidayGreeting] --> $nodeElementHolidayAction
+elementAAHoliday$($aaObjectId)-$($HolidayCounter)(Schedule <br> $($holidaySchedule.FixedSchedule.DateTimeRanges.Start) <br> $($holidaySchedule.FixedSchedule.DateTimeRanges.End)) --> elementAAHolidayGreeting$($aaObjectId)-$($HolidayCounter)>$holidayGreeting] --> $holidayVoicemailSystemGreeting $nodeElementHolidayAction
     end
 "@
+
+            $allMermaidNodes += @("elementAAHoliday$($aaObjectId)-$($HolidayCounter)","elementAAHolidayGreeting$($aaObjectId)-$($HolidayCounter)")
 
             # Increase the counter by 1
             $HolidayCounter ++
@@ -420,6 +578,7 @@ elementAAHoliday$($aaObjectId)-$($HolidayCounter)(Schedule <br> $($holidaySchedu
 
         # Mermaid node holiday check
         $nodeElementHolidayCheck = "elementHolidayCheck$($aaObjectId){During Holiday?}"
+        $allMermaidNodes += "elementHolidayCheck$($aaObjectId)"
     } # End if aa has holidays
 
     # Check if auto attendant has after hours and holidays
@@ -722,9 +881,13 @@ elementAAHoliday$($aaObjectId)-$($HolidayCounter)(Schedule <br> $($holidaySchedu
         # Create the mermaid node for business hours check including the actual business hours
         $nodeElementAfterHoursCheck = "elementAfterHoursCheck$($aaObjectId){During Business Hours? <br> Time Zone: $aaTimeZone <br> $mondayHours <br> $tuesdayHours  <br> $wednesdayHours  <br> $thursdayHours <br> $fridayHours <br> $saturdayHours <br> $sundayHours}"
 
+        $allMermaidNodes += "elementAfterHoursCheck$($aaObjectId)"
+
     } # End if aa has after hours
 
     $nodeElementHolidayLink = "$($aa.Identity)([Auto Attendant <br> $($aa.Name)])"
+
+    $allMermaidNodes += "$($aa.Identity)"
 
     if ($aaHasHolidays -eq $true) {
 
@@ -789,7 +952,7 @@ $nodeElementHolidayLink --> $mdAutoAttendantDefaultCallFlow
 
     }
 
-
+    
 }
 
 function Get-AutoAttendantDefaultCallFlow {
@@ -812,101 +975,223 @@ function Get-AutoAttendantDefaultCallFlow {
         $defaultCallFlowGreeting = "Greeting <br> $($defaultCallFlow.Greetings.ActiveType.Value)"
     }
 
-    # Check if the default callflow action is transfer call to target
-    if ($defaultCallFlowAction -eq "TransferCallToTarget") {
+    # Check if default callflow action is disconnect call
+    if ($defaultCallFlowAction -eq "DisconnectCall") {
 
-        # Get transfer target type
-        $defaultCallFlowTargetType = $aa.DefaultCallFlow.Menu.MenuOptions.CallTarget.Type.Value
+        $mdAutoAttendantDefaultCallFlow = "defaultCallFlowGreeting$($aaDefaultCallFlowAaObjectId)>$defaultCallFlowGreeting] --> defaultCallFlow$($aaDefaultCallFlowAaObjectId)(($defaultCallFlowAction))`n"
 
-        # Switch through transfer target type and set variables accordingly
-        switch ($defaultCallFlowTargetType) {
-            User { 
-                $defaultCallFlowTargetTypeFriendly = "User"
-                $defaultCallFlowTargetUser = (Get-MsolUser -ObjectId $($aa.DefaultCallFlow.Menu.MenuOptions.CallTarget.Id))
-                $defaultCallFlowTargetName = $defaultCallFlowTargetUser.DisplayName
-                $defaultCallFlowTargetIdentity = $defaultCallFlowTargetUser.ObjectId
-            }
-            ExternalPstn { 
-                $defaultCallFlowTargetTypeFriendly = "External PSTN"
-                $defaultCallFlowTargetName = ($aa.DefaultCallFlow.Menu.MenuOptions.CallTarget.Id).Replace("tel:","")
-                $defaultCallFlowTargetIdentity = $defaultCallFlowTargetName
-            }
-            ApplicationEndpoint {
-
-                # Check if application endpoint is auto attendant or call queue
-                $MatchingAaDefaultCallFlowAa = Get-CsAutoAttendant | Where-Object {$_.ApplicationInstances -eq $aa.DefaultCallFlow.Menu.MenuOptions.CallTarget.Id}
-
-                if ($MatchingAaDefaultCallFlowAa) {
-
-                    $defaultCallFlowTargetTypeFriendly = "[Auto Attendant"
-                    $defaultCallFlowTargetName = "$($MatchingAaDefaultCallFlowAa.Name)]"
-
-                }
-
-                else {
-
-                    $MatchingCqAaDefaultCallFlow = Get-CsCallQueue | Where-Object {$_.ApplicationInstances -eq $aa.DefaultCallFlow.Menu.MenuOptions.CallTarget.Id}
-
-                    $defaultCallFlowTargetTypeFriendly = "[Call Queue"
-                    $defaultCallFlowTargetName = "$($MatchingCqAaDefaultCallFlow.Name)]"
-
-                }
-
-            }
-            SharedVoicemail {
-
-                $defaultCallFlowTargetTypeFriendly = "Voicemail"
-                $defaultCallFlowTargetGroup = (Get-MsolGroup -ObjectId $aa.DefaultCallFlow.Menu.MenuOptions.CallTarget.Id)
-                $defaultCallFlowTargetName = $defaultCallFlowTargetGroup.DisplayName
-                $defaultCallFlowTargetIdentity = $defaultCallFlowTargetGroup.ObjectId
-
-            }
-        }
-
-        ### move this part to switch statement!
-
-        # Check if transfer target type is call queue
-        if ($defaultCallFlowTargetTypeFriendly -eq "[Call Queue") {
-
-            $MatchingCQIdentity = (Get-CsCallQueue | Where-Object {$_.ApplicationInstances -eq $aa.DefaultCallFlow.Menu.MenuOptions.CallTarget.Id}).Identity
-
-            $mdAutoAttendantDefaultCallFlow = "defaultCallFlowGreeting$($aaDefaultCallFlowAaObjectId)>$defaultCallFlowGreeting] --> defaultCallFlow$($aaDefaultCallFlowAaObjectId)($defaultCallFlowAction) --> $($MatchingCQIdentity)($defaultCallFlowTargetTypeFriendly <br> $defaultCallFlowTargetName)"
-            
-            if ($nestedVoiceApps -notcontains $MatchingCQIdentity) {
-
-                $nestedVoiceApps += $MatchingCQIdentity
-
-            }
-
-        
-        } # End if transfer target type is call queue
-
-        elseif ($defaultCallFlowTargetTypeFriendly -eq "[Auto Attendant") {
-
-            $mdAutoAttendantDefaultCallFlow = "defaultCallFlowGreeting$($aaDefaultCallFlowAaObjectId)>$defaultCallFlowGreeting] --> defaultCallFlow$($aaDefaultCallFlowAaObjectId)($defaultCallFlowAction) --> $($MatchingAaDefaultCallFlowAa.Identity)($defaultCallFlowTargetTypeFriendly <br> $defaultCallFlowTargetName)"
-
-            if ($nestedVoiceApps -notcontains $MatchingAaDefaultCallFlowAa.Identity) {
-
-                $nestedVoiceApps += $MatchingAaDefaultCallFlowAa.Identity
-
-            }
-
-        }
-
-        # Check if default callflow action target is trasnfer call to target but something other than call queue
-        else {
-
-            $mdAutoAttendantDefaultCallFlow = "defaultCallFlowGreeting$($aaDefaultCallFlowAaObjectId)>$defaultCallFlowGreeting] --> defaultCallFlow$($aaDefaultCallFlowAaObjectId)($defaultCallFlowAction) --> $($defaultCallFlowTargetIdentity)($defaultCallFlowTargetTypeFriendly <br> $defaultCallFlowTargetName)"
-
-        }
+        $allMermaidNodes += @("defaultCallFlowGreeting$($aaDefaultCallFlowAaObjectId)","defaultCallFlow$($aaDefaultCallFlowAaObjectId)")
 
     }
 
-    # Check if default callflow action is disconnect call
-    elseif ($defaultCallFlowAction -eq "DisconnectCall") {
+    # Check if the default callflow action is transfer call to target
+    else {
 
-        $mdAutoAttendantDefaultCallFlow = "defaultCallFlowGreeting$($aaDefaultCallFlowAaObjectId)>$defaultCallFlowGreeting] --> defaultCallFlow$($aaDefaultCallFlowAaObjectId)(($defaultCallFlowAction))"
+        $defaultCallFlowMenuOptions = $aa.DefaultCallFlow.Menu.MenuOptions
 
+        if ($defaultCallFlowMenuOptions.Count -lt 2 -and !$defaultCallFlow.Menu.Prompts.ActiveType.Value) {
+
+            $mdDefaultCallFlowGreeting = "defaultCallFlowGreeting$($aaDefaultCallFlowAaObjectId)>$defaultCallFlowGreeting] --> "
+
+            $allMermaidNodes += @("defaultCallFlowGreeting$($aaDefaultCallFlowAaObjectId)")
+
+            $defaultCallFlowMenuOptionsKeyPress = $null
+
+            $mdAutoAttendantDefaultCallFlowMenuOptions = $null
+
+        }
+
+        else {
+
+            $defaultCallFlowMenuOptionsKeyPress = @"
+
+defaultCallFlowMenuOptions$($aaDefaultCallFlowAaObjectId){Key Press}
+"@
+
+            $mdDefaultCallFlowGreeting =@"
+defaultCallFlowGreeting$($aaDefaultCallFlowAaObjectId)>$defaultCallFlowGreeting] --> defaultCallFlowMenuOptionsGreeting$($aaDefaultCallFlowAaObjectId)>IVR Greeting <br> $($aa.DefaultCallFlow.Menu.Prompts.ActiveType.Value)] --> $defaultCallFlowMenuOptionsKeyPress
+
+"@
+
+            $mdAutoAttendantDefaultCallFlowMenuOptions =@"
+
+"@
+
+            $allMermaidNodes += @("defaultCallFlowMenuOptions$($aaDefaultCallFlowAaObjectId)","defaultCallFlowGreeting$($aaDefaultCallFlowAaObjectId)","defaultCallFlowMenuOptionsGreeting$($aaDefaultCallFlowAaObjectId)")
+
+        }
+
+        foreach ($MenuOption in $defaultCallFlowMenuOptions) {
+
+            if ($defaultCallFlowMenuOptions.Count -lt 2 -and !$defaultCallFlow.Menu.Prompts.ActiveType.Value) {
+
+                $mdDtmfLink = $null
+                $DtmfKey = $null
+
+            }
+
+            else {
+
+                $DtmfKey = ($MenuOption.DtmfResponse.Value).Replace("Tone","")
+
+                $mdDtmfLink = "$defaultCallFlowMenuOptionsKeyPress --> |$DtmfKey|"
+
+            }
+
+            # Get transfer target type
+            $defaultCallFlowTargetType = $MenuOption.CallTarget.Type.Value
+            $defaultCallFlowAction = $MenuOption.Action.Value
+
+            if ($defaultCallFlowAction -eq "TransferCallToOperator") {
+
+                $mdAutoAttendantdefaultCallFlow = "$mdDtmfLink defaultCallFlow$($aadefaultCallFlowAaObjectId)$DtmfKey($defaultCallFlowAction) --> $($OperatorIdentity)($OperatorTypeFriendly <br> $OperatorName)`n"
+
+                $allMermaidNodes += @("defaultCallFlow$($aadefaultCallFlowAaObjectId)$DtmfKey","$($OperatorIdentity)")
+
+                $defaultCallFlowVoicemailSystemGreeting = $null
+
+                if ($nestedVoiceApps -notcontains $OperatorIdentity) {
+
+                    $nestedVoiceApps += $OperatorIdentity
+
+                }
+
+
+            }
+
+            elseif ($defaultCallFlowAction -eq "Announcement") {
+                
+                $voiceMenuOptionAnnouncementType = $MenuOption.Prompt.ActiveType.Value
+
+                $mdAutoAttendantdefaultCallFlow = "$mdDtmfLink defaultCallFlow$($aadefaultCallFlowAaObjectId)$DtmfKey($defaultCallFlowAction <br> $voiceMenuOptionAnnouncementType) ---> defaultCallFlowMenuOptionsGreeting$($aaDefaultCallFlowAaObjectId)`n"
+
+                $allMermaidNodes += @("defaultCallFlow$($aadefaultCallFlowAaObjectId)$DtmfKey","defaultCallFlowMenuOptionsGreeting$($aaDefaultCallFlowAaObjectId)")
+
+                $defaultCallFlowVoicemailSystemGreeting = $null
+
+            }
+
+            else {
+
+                # Switch through transfer target type and set variables accordingly
+                switch ($defaultCallFlowTargetType) {
+                    User { 
+                        $defaultCallFlowTargetTypeFriendly = "User"
+                        $defaultCallFlowTargetUser = (Get-MgUser -UserId $($MenuOption.CallTarget.Id))
+                        $defaultCallFlowTargetName = $defaultCallFlowTargetUser.DisplayName
+                        $defaultCallFlowTargetIdentity = $defaultCallFlowTargetUser.Id
+
+                        $defaultCallFlowVoicemailSystemGreeting = $null
+
+                    }
+                    ExternalPstn { 
+                        $defaultCallFlowTargetTypeFriendly = "External PSTN"
+                        $defaultCallFlowTargetName = ($MenuOption.CallTarget.Id).Replace("tel:","")
+                        $defaultCallFlowTargetIdentity = $defaultCallFlowTargetName
+
+                        $defaultCallFlowVoicemailSystemGreeting = $null
+
+                    }
+                    ApplicationEndpoint {
+
+                        # Check if application endpoint is auto attendant or call queue
+                        $MatchingAaDefaultCallFlowAa = Get-CsAutoAttendant | Where-Object {$_.ApplicationInstances -eq $MenuOption.CallTarget.Id}
+
+                        if ($MatchingAaDefaultCallFlowAa) {
+
+                            $defaultCallFlowTargetTypeFriendly = "[Auto Attendant"
+                            $defaultCallFlowTargetName = "$($MatchingAaDefaultCallFlowAa.Name)]"
+
+                        }
+
+                        else {
+
+                            $MatchingCqAaDefaultCallFlow = Get-CsCallQueue | Where-Object {$_.ApplicationInstances -eq $MenuOption.CallTarget.Id}
+
+                            $defaultCallFlowTargetTypeFriendly = "[Call Queue"
+                            $defaultCallFlowTargetName = "$($MatchingCqAaDefaultCallFlow.Name)]"
+
+                        }
+
+                        $defaultCallFlowVoicemailSystemGreeting = $null
+
+                    }
+                    SharedVoicemail {
+
+                        $defaultCallFlowTargetTypeFriendly = "Voicemail"
+                        $defaultCallFlowTargetGroup = (Get-MgGroup -GroupId $MenuOption.CallTarget.Id)
+                        $defaultCallFlowTargetName = $defaultCallFlowTargetGroup.DisplayName
+                        $defaultCallFlowTargetIdentity = $defaultCallFlowTargetGroup.Id
+
+                        if ($MenuOption.CallTarget.EnableSharedVoicemailSystemPromptSuppression -eq $false) {
+                            
+                            $defaultCallFlowVoicemailSystemGreeting = "defaultCallFlowSystemGreeting$($aaDefaultCallFlowAaObjectId)>Greeting <br> MS System Message] -->"
+
+                        }
+
+                        else {
+                            
+                            $defaultCallFlowVoicemailSystemGreeting = $null
+
+                        }
+
+                        $allMermaidNodes += "defaultCallFlowSystemGreeting$($aaDefaultCallFlowAaObjectId)"
+
+                    }
+                }
+
+                # Check if transfer target type is call queue
+                if ($defaultCallFlowTargetTypeFriendly -eq "[Call Queue") {
+
+                    $MatchingCQIdentity = (Get-CsCallQueue | Where-Object {$_.ApplicationInstances -eq $MenuOption.CallTarget.Id}).Identity
+
+                    $mdAutoAttendantDefaultCallFlow = "$mdDtmfLink defaultCallFlow$($aaDefaultCallFlowAaObjectId)$DtmfKey($defaultCallFlowAction) --> $($MatchingCQIdentity)($defaultCallFlowTargetTypeFriendly <br> $defaultCallFlowTargetName)`n"
+                    
+                    if ($nestedVoiceApps -notcontains $MatchingCQIdentity) {
+
+                        $nestedVoiceApps += $MatchingCQIdentity
+
+                    }
+
+                    $allMermaidNodes += @("defaultCallFlow$($aadefaultCallFlowAaObjectId)$DtmfKey","$($MatchingCQIdentity)")
+
+                
+                } # End if transfer target type is call queue
+
+                elseif ($defaultCallFlowTargetTypeFriendly -eq "[Auto Attendant") {
+
+                    $mdAutoAttendantDefaultCallFlow = "$mdDtmfLink defaultCallFlow$($aaDefaultCallFlowAaObjectId)$DtmfKey($defaultCallFlowAction) --> $($MatchingAaDefaultCallFlowAa.Identity)($defaultCallFlowTargetTypeFriendly <br> $defaultCallFlowTargetName)`n"
+
+                    if ($nestedVoiceApps -notcontains $MatchingAaDefaultCallFlowAa.Identity) {
+
+                        $nestedVoiceApps += $MatchingAaDefaultCallFlowAa.Identity
+
+                    }
+
+                    $allMermaidNodes += @("defaultCallFlow$($aadefaultCallFlowAaObjectId)$DtmfKey","$($MatchingAaDefaultCallFlowAa.Identity)")
+
+                }
+
+                # Check if default callflow action target is trasnfer call to target but something other than call queue
+                else {
+
+                    $mdAutoAttendantDefaultCallFlow = "$mdDtmfLink$defaultCallFlowVoicemailSystemGreeting defaultCallFlow$($aaDefaultCallFlowAaObjectId)$DtmfKey($defaultCallFlowAction) --> $($defaultCallFlowTargetIdentity)($defaultCallFlowTargetTypeFriendly <br> $defaultCallFlowTargetName)`n"
+
+                    $allMermaidNodes += @("defaultCallFlow$($aadefaultCallFlowAaObjectId)$DtmfKey","$($defaultCallFlowTargetIdentity)")
+
+                }
+
+            }
+
+            $mdAutoAttendantDefaultCallFlowMenuOptions += $mdAutoAttendantDefaultCallFlow
+
+        }
+
+        # Greeting can only exist once. Add greeting before call flow and set mdAutoAttendantDefaultCallFlow to the new variable.
+
+            $mdDefaultCallFlowGreeting += $mdAutoAttendantDefaultCallFlowMenuOptions
+            $mdAutoAttendantDefaultCallFlow = $mdDefaultCallFlowGreeting
+    
     }
     
     
@@ -920,8 +1205,9 @@ function Get-AutoAttendantAfterHoursCallFlow {
     $aaAfterHoursCallFlowAaObjectId = $aa.Identity
 
     # Get after hours call flow
-    $afterHoursCallFlow = ($aa.CallFlows | Where-Object {$_.Name -Match "after hours"})
-    $afterHoursCallFlowAction = ($aa.CallFlows | Where-Object {$_.Name -Match "after hours"}).Menu.MenuOptions.Action.Value
+    $afterHoursAssociatedCallFlowId = ($aa.CallHandlingAssociations | Where-Object {$_.Type.Value -eq "AfterHours"}).CallFlowId
+    $afterHoursCallFlow = ($aa.CallFlows | Where-Object {$_.Id -eq $afterHoursAssociatedCallFlowId})
+    $afterHoursCallFlowAction = ($aa.CallFlows | Where-Object {$_.Id -eq $afterHoursAssociatedCallFlowId}).Menu.MenuOptions.Action.Value
 
     # Get after hours greeting
     if (!$afterHoursCallFlow.Greetings.ActiveType.Value){
@@ -932,102 +1218,225 @@ function Get-AutoAttendantAfterHoursCallFlow {
         $afterHoursCallFlowGreeting = "Greeting <br> $($afterHoursCallFlow.Greetings.ActiveType.Value)"
     }
 
-    # Check if after hours action is transfer call to target
-    if ($afterHoursCallFlowAction -eq "TransferCallToTarget") {
+    # Check if the after hours callflow action is disconnect call
+    if ($afterHoursCallFlowAction -eq "DisconnectCall") {
 
-        $afterHoursCallFlowTargetType = $afterHoursCallFlow.Menu.MenuOptions.CallTarget.Type.Value
+        $mdAutoAttendantAfterHoursCallFlow = "afterHoursCallFlowGreeting$($aaAfterHoursCallFlowAaObjectId)>$AfterHoursCallFlowGreeting] --> afterHoursCallFlow$($aaAfterHoursCallFlowAaObjectId)(($afterHoursCallFlowAction))`n"
 
-        # Switch through after hours call flow target type
-        switch ($afterHoursCallFlowTargetType) {
-            User { 
-                $afterHoursCallFlowTargetTypeFriendly = "User"
-                $afterHoursCallFlowTargetUser = (Get-MsolUser -ObjectId $($afterHoursCallFlow.Menu.MenuOptions.CallTarget.Id))
-                $afterHoursCallFlowTargetName = $afterHoursCallFlowTargetUser.DisplayName
-                $afterHoursCallFlowTargetIdentity = $afterHoursCallFlowTargetUser.ObjectId            
-            }
-            ExternalPstn { 
-                $afterHoursCallFlowTargetTypeFriendly = "External PSTN"
-                $afterHoursCallFlowTargetName = ($afterHoursCallFlow.Menu.MenuOptions.CallTarget.Id).Replace("tel:","")
-                $afterHoursCallFlowTargetIdentity = $afterHoursCallFlowTargetName
-            }
-            ApplicationEndpoint {
+        $allMermaidNodes += @("afterHoursCallFlowGreeting$($aaAfterHoursCallFlowAaObjectId)","afterHoursCallFlow$($aaAfterHoursCallFlowAaObjectId)")
 
-                # Check if application endpoint is an auto attendant or a call queue
-                $MatchingAaAfterHoursCallFlowAa = Get-CsAutoAttendant | Where-Object {$_.ApplicationInstances -match $afterHoursCallFlow.Menu.MenuOptions.CallTarget.Id}
+    }
+    
+    # if after hours action is not disconnect call
+    else  {
 
-                if ($MatchingAaAfterHoursCallFlowAa) {
+        $afterHoursCallFlowMenuOptions = $afterHoursCallFlow.Menu.MenuOptions
 
-                    $afterHoursCallFlowTargetTypeFriendly = "[Auto Attendant"
-                    $afterHoursCallFlowTargetName = "$($MatchingAaAfterHoursCallFlowAa.Name)]"
+        # Check if IVR is disabled
+        if ($afterHoursCallFlowMenuOptions.Count -lt 2 -and !$afterHoursCallFlow.Menu.Prompts.ActiveType.Value) {
 
-                }
+            $mdafterHoursCallFlowGreeting = "afterHoursCallFlowGreeting$($aaafterHoursCallFlowAaObjectId)>$afterHoursCallFlowGreeting] --> "
 
-                else {
+            $allMermaidNodes += @("afterHoursCallFlowGreeting$($aaAfterHoursCallFlowAaObjectId)")
 
-                    $MatchingCqAaAfterHoursCallFlow = Get-CsCallQueue | Where-Object {$_.ApplicationInstances -eq $afterHoursCallFlow.Menu.MenuOptions.CallTarget.Id}
+            $afterHoursCallFlowMenuOptionsKeyPress = $null
 
-                    $afterHoursCallFlowTargetTypeFriendly = "[Call Queue"
-                    $afterHoursCallFlowTargetName = "$($MatchingCqAaAfterHoursCallFlow.Name)]"
-
-                }
-
-            }
-            SharedVoicemail {
-
-                $afterHoursCallFlowTargetTypeFriendly = "Voicemail"
-                $afterHoursCallFlowTargetGroup = (Get-MsolGroup -ObjectId $afterHoursCallFlow.Menu.MenuOptions.CallTarget.Id)
-                $afterHoursCallFlowTargetName = $afterHoursCallFlowTargetGroup.DisplayName
-                $afterHoursCallFlowTargetIdentity = $afterHoursCallFlowTargetGroup.ObjectId
-
-            }
-        }
-
-        # Check if transfer target type is call queue
-        if ($afterHoursCallFlowTargetTypeFriendly -eq "[Call Queue") {
-
-            $MatchingCQIdentity = (Get-CsCallQueue | Where-Object {$_.ApplicationInstances -eq ($aa.CallFlows.Menu | Where-Object {$_.Name -match "After hours"}).MenuOptions.CallTarget.Id}).Identity
-
-            $mdAutoAttendantAfterHoursCallFlow = "afterHoursCallFlowGreeting$($aaAfterHoursCallFlowAaObjectId)>$AfterHoursCallFlowGreeting] --> AfterHoursCallFlow$($aaAfterHoursCallFlowAaObjectId)($AfterHoursCallFlowAction) --> $($MatchingCQIdentity)($AfterHoursCallFlowTargetTypeFriendly <br> $AfterHoursCallFlowTargetName)"
-
-            if ($nestedVoiceApps -notcontains $MatchingCQIdentity -and $aaHasAfterHours -eq $true) {
-
-                $nestedVoiceApps += $MatchingCQIdentity
-
-            }
-
-            
-        } # End if transfer target type is call queue
-
-        elseif ($afterHoursCallFlowTargetTypeFriendly -eq "[Auto Attendant") {
-
-            $mdAutoAttendantAfterHoursCallFlow = "afterHoursCallFlowGreeting$($aaAfterHoursCallFlowAaObjectId)>$AfterHoursCallFlowGreeting] --> AfterHoursCallFlow$($aaAfterHoursCallFlowAaObjectId)($AfterHoursCallFlowAction) --> $($MatchingAaAfterHoursCallFlowAa.Identity)($AfterHoursCallFlowTargetTypeFriendly <br> $AfterHoursCallFlowTargetName)"
-
-            if ($nestedVoiceApps -notcontains $MatchingAaAfterHoursCallFlowAa.Identity -and $aaHasAfterHours -eq $true) {
-
-                $nestedVoiceApps += $MatchingAaAfterHoursCallFlowAa.Identity
-
-            }
+            $mdAutoAttendantafterHoursCallFlowMenuOptions = $null
 
         }
 
-        # Check if AfterHours callflow action target is trasnfer call to target but something other than call queue
         else {
 
-            $mdAutoAttendantAfterHoursCallFlow = "afterHoursCallFlowGreeting$($aaAfterHoursCallFlowAaObjectId)>$AfterHoursCallFlowGreeting] --> AfterHoursCallFlow$($aaAfterHoursCallFlowAaObjectId)($AfterHoursCallFlowAction) --> $($afterHoursCallFlowTargetIdentity)($AfterHoursCallFlowTargetTypeFriendly <br> $AfterHoursCallFlowTargetName)"
-            
+            $afterHoursCallFlowMenuOptionsKeyPress = @"
+
+afterHoursCallFlowMenuOptions$($aaAfterHoursCallFlowAaObjectId){Key Press}
+"@
+
+            $mdafterHoursCallFlowGreeting =@"
+afterHoursCallFlowGreeting$($aaafterHoursCallFlowAaObjectId)>$afterHoursCallFlowGreeting] --> afterHoursCallFlowMenuOptionsGreeting$($aaAfterHoursCallFlowAaObjectId)>IVR Greeting <br> $($afterHoursCallFlow.Menu.Prompts.ActiveType.Value)] --> $afterHoursCallFlowMenuOptionsKeyPress
+
+"@
+
+            $mdAutoAttendantafterHoursCallFlowMenuOptions =@"
+
+"@
+
+            $allMermaidNodes += @("afterHoursCallFlowMenuOptions$($aaafterHoursCallFlowAaObjectId)","afterHoursCallFlowGreeting$($aaafterHoursCallFlowAaObjectId)","afterHoursCallFlowMenuOptionsGreeting$($aaafterHoursCallFlowAaObjectId)")
+
         }
 
+        foreach ($MenuOption in $afterHoursCallFlowMenuOptions) {
+
+            if ($afterHoursCallFlowMenuOptions.Count -lt 2 -and !$afterHoursCallFlow.Menu.Prompts.ActiveType.Value) {
+
+                $mdDtmfLink = $null
+                $DtmfKey = $null
+
+            }
+
+            else {
+
+                $DtmfKey = ($MenuOption.DtmfResponse.Value).Replace("Tone","")
+
+                $mdDtmfLink = "$afterHoursCallFlowMenuOptionsKeyPress --> |$DtmfKey|"
+
+            }
+
+            # Get transfer target type
+            $afterHoursCallFlowTargetType = $MenuOption.CallTarget.Type.Value
+            $afterHoursCallFlowAction = $MenuOption.Action.Value
+
+            if ($afterHoursCallFlowAction -eq "TransferCallToOperator") {
+
+                $mdAutoAttendantafterHoursCallFlow = "$mdDtmfLink afterHoursCallFlow$($aaafterHoursCallFlowAaObjectId)$DtmfKey($afterHoursCallFlowAction) --> $($OperatorIdentity)($OperatorTypeFriendly <br> $OperatorName)`n"
+
+                $allMermaidNodes += @("afterHoursCallFlow$($aaafterHoursCallFlowAaObjectId)$DtmfKey","$($OperatorIdentity)")
+
+                $afterHoursCallFlowVoicemailSystemGreeting = $null
+
+                if ($nestedVoiceApps -notcontains $OperatorIdentity) {
+
+                    $nestedVoiceApps += $OperatorIdentity
+
+                }
+
+            }
+
+            elseif ($afterHoursCallFlowAction -eq "Announcement") {
+                
+                $voiceMenuOptionAnnouncementType = $MenuOption.Prompt.ActiveType.Value
+
+                $mdAutoAttendantafterHoursCallFlow = "$mdDtmfLink afterHoursCallFlow$($aaafterHoursCallFlowAaObjectId)$DtmfKey($afterHoursCallFlowAction <br> $voiceMenuOptionAnnouncementType) ---> afterHoursCallFlowMenuOptionsGreeting$($aaafterHoursCallFlowAaObjectId)`n"
+
+                $allMermaidNodes += @("afterHoursCallFlow$($aaafterHoursCallFlowAaObjectId)$DtmfKey","afterHoursCallFlowMenuOptionsGreeting$($aaafterHoursCallFlowAaObjectId)")
+
+                $afterHoursCallFlowVoicemailSystemGreeting = $null
+
+            }
+
+            else {
+
+                # Switch through transfer target type and set variables accordingly
+                switch ($afterHoursCallFlowTargetType) {
+                    User { 
+                        $afterHoursCallFlowTargetTypeFriendly = "User"
+                        $afterHoursCallFlowTargetUser = (Get-MgUser -UserId $($MenuOption.CallTarget.Id))
+                        $afterHoursCallFlowTargetName = $afterHoursCallFlowTargetUser.DisplayName
+                        $afterHoursCallFlowTargetIdentity = $afterHoursCallFlowTargetUser.Id
+
+                        $afterHoursCallFlowVoicemailSystemGreeting = $null
+
+                    }
+                    ExternalPstn { 
+                        $afterHoursCallFlowTargetTypeFriendly = "External PSTN"
+                        $afterHoursCallFlowTargetName = ($MenuOption.CallTarget.Id).Replace("tel:","")
+                        $afterHoursCallFlowTargetIdentity = $afterHoursCallFlowTargetName
+
+                        $afterHoursCallFlowVoicemailSystemGreeting = $null
+
+                    }
+                    ApplicationEndpoint {
+
+                        # Check if application endpoint is auto attendant or call queue
+                        $MatchingAaafterHoursCallFlowAa = Get-CsAutoAttendant | Where-Object {$_.ApplicationInstances -eq $MenuOption.CallTarget.Id}
+
+                        if ($MatchingAaafterHoursCallFlowAa) {
+
+                            $afterHoursCallFlowTargetTypeFriendly = "[Auto Attendant"
+                            $afterHoursCallFlowTargetName = "$($MatchingAaafterHoursCallFlowAa.Name)]"
+
+                        }
+
+                        else {
+
+                            $MatchingCqAaafterHoursCallFlow = Get-CsCallQueue | Where-Object {$_.ApplicationInstances -eq $MenuOption.CallTarget.Id}
+
+                            $afterHoursCallFlowTargetTypeFriendly = "[Call Queue"
+                            $afterHoursCallFlowTargetName = "$($MatchingCqAaafterHoursCallFlow.Name)]"
+
+                        }
+
+                        $afterHoursCallFlowVoicemailSystemGreeting = $null
+
+                    }
+                    SharedVoicemail {
+
+                        $afterHoursCallFlowTargetTypeFriendly = "Voicemail"
+                        $afterHoursCallFlowTargetGroup = (Get-MgGroup -GroupId $MenuOption.CallTarget.Id)
+                        $afterHoursCallFlowTargetName = $afterHoursCallFlowTargetGroup.DisplayName
+                        $afterHoursCallFlowTargetIdentity = $afterHoursCallFlowTargetGroup.Id
+
+                        if ($MenuOption.CallTarget.EnableSharedVoicemailSystemPromptSuppression -eq $false) {
+                            
+                            $afterHoursCallFlowVoicemailSystemGreeting = "afterHoursCallFlowSystemGreeting$($aaafterHoursCallFlowAaObjectId)>Greeting <br> MS System Message] -->"
+
+                        }
+
+                        else {
+                            
+                            $afterHoursCallFlowVoicemailSystemGreeting = $null
+
+                        }
+
+                        $allMermaidNodes += "afterHoursCallFlowSystemGreeting$($aaafterHoursCallFlowAaObjectId)"
+
+                    }
+                }
+
+                # Check if transfer target type is call queue
+                if ($afterHoursCallFlowTargetTypeFriendly -eq "[Call Queue") {
+
+                    $MatchingCQIdentity = (Get-CsCallQueue | Where-Object {$_.ApplicationInstances -eq $MenuOption.CallTarget.Id}).Identity
+
+                    $mdAutoAttendantafterHoursCallFlow = "$mdDtmfLink afterHoursCallFlow$($aaafterHoursCallFlowAaObjectId)$DtmfKey($afterHoursCallFlowAction) --> $($MatchingCQIdentity)($afterHoursCallFlowTargetTypeFriendly <br> $afterHoursCallFlowTargetName)`n"
+                    
+                    if ($nestedVoiceApps -notcontains $MatchingCQIdentity) {
+
+                        $nestedVoiceApps += $MatchingCQIdentity
+
+                    }
+
+                    $allMermaidNodes += @("afterHoursCallFlow$($aaafterHoursCallFlowAaObjectId)$DtmfKey","$($MatchingCQIdentity)")
+
+                
+                } # End if transfer target type is call queue
+
+                elseif ($afterHoursCallFlowTargetTypeFriendly -eq "[Auto Attendant") {
+
+                    $mdAutoAttendantafterHoursCallFlow = "$mdDtmfLink afterHoursCallFlow$($aaafterHoursCallFlowAaObjectId)$DtmfKey($afterHoursCallFlowAction) --> $($MatchingAaafterHoursCallFlowAa.Identity)($afterHoursCallFlowTargetTypeFriendly <br> $afterHoursCallFlowTargetName)`n"
+
+                    if ($nestedVoiceApps -notcontains $MatchingAaafterHoursCallFlowAa.Identity) {
+
+                        $nestedVoiceApps += $MatchingAaafterHoursCallFlowAa.Identity
+
+                    }
+
+                    $allMermaidNodes += @("afterHoursCallFlow$($aaafterHoursCallFlowAaObjectId)$DtmfKey","$($MatchingAaafterHoursCallFlowAa.Identity)")
+
+                }
+
+                # Check if afterHours callflow action target is trasnfer call to target but something other than call queue
+                else {
+
+                    $mdAutoAttendantafterHoursCallFlow = "$mdDtmfLink$afterHoursCallFlowVoicemailSystemGreeting afterHoursCallFlow$($aaafterHoursCallFlowAaObjectId)$DtmfKey($afterHoursCallFlowAction) --> $($afterHoursCallFlowTargetIdentity)($afterHoursCallFlowTargetTypeFriendly <br> $afterHoursCallFlowTargetName)`n"
+                    
+                    $allMermaidNodes += @("afterHoursCallFlow$($aaafterHoursCallFlowAaObjectId)$DtmfKey","$($afterHoursCallFlowTargetIdentity)")
+
+                }
+
+            }
+
+            $mdAutoAttendantafterHoursCallFlowMenuOptions += $mdAutoAttendantafterHoursCallFlow
+
+        }
+
+        # Greeting can only exist once. Add greeting before call flow and set mdAutoAttendantafterHoursCallFlow to the new variable.
+
+            $mdafterHoursCallFlowGreeting += $mdAutoAttendantafterHoursCallFlowMenuOptions
+            $mdAutoAttendantafterHoursCallFlow = $mdafterHoursCallFlowGreeting
+    
     }
 
-    #Maybe combine all disconnect calls into one node...
-    elseif ($afterHoursCallFlowAction -eq "DisconnectCall") {
-
-        $mdAutoAttendantAfterHoursCallFlow = "afterHoursCallFlowGreeting$($aaAfterHoursCallFlowAaObjectId)>$AfterHoursCallFlowGreeting] --> afterHoursCallFlow$($aaAfterHoursCallFlowAaObjectId)(($afterHoursCallFlowAction))"
-
-    }
-    
-
-    
 
 }
 
@@ -1059,6 +1468,7 @@ function Get-CallQueueCallFlow {
     $CqDistributionList = $MatchingCQ.DistributionLists
     $CqDefaultMusicOnHold = $MatchingCQ.UseDefaultMusicOnHold
     $CqWelcomeMusicFileName = $MatchingCQ.WelcomeMusicFileName
+    $CqLanguageId = $MatchingCQ.LanguageId
 
     # Check if call queue uses default music on hold
     if ($CqDefaultMusicOnHold -eq $true) {
@@ -1107,16 +1517,20 @@ function Get-CallQueueCallFlow {
         DisconnectWithBusy {
             $CqOverFlowActionFriendly = "cqOverFlowAction$($cqCallFlowObjectId)((Disconnect Call))"
 
+            $allMermaidNodes += "cqOverFlowAction$($cqCallFlowObjectId)"
+
         }
         Forward {
 
             if ($MatchingCQ.OverflowActionTarget.Type -eq "User") {
 
-                $MatchingOverFlowUserProperties = (Get-MsolUser -ObjectId $MatchingCQ.OverflowActionTarget.Id)
+                $MatchingOverFlowUserProperties = (Get-MgUser -UserId $MatchingCQ.OverflowActionTarget.Id)
                 $MatchingOverFlowUser = $MatchingOverFlowUserProperties.DisplayName
-                $MatchingOverFlowIdentity = $MatchingOverFlowUserProperties.ObjectId
+                $MatchingOverFlowIdentity = $MatchingOverFlowUserProperties.Id
 
                 $CqOverFlowActionFriendly = "cqOverFlowAction$($cqCallFlowObjectId)(TransferCallToTarget) --> $($MatchingOverFlowIdentity)(User <br> $MatchingOverFlowUser)"
+
+                $allMermaidNodes += @("cqOverFlowAction$($cqCallFlowObjectId)","$($MatchingOverFlowIdentity)")
 
             }
 
@@ -1125,6 +1539,8 @@ function Get-CallQueueCallFlow {
                 $cqOverFlowPhoneNumber = ($MatchingCQ.OverflowActionTarget.Id).Replace("tel:","")
 
                 $CqOverFlowActionFriendly = "cqOverFlowAction$($cqCallFlowObjectId)(TransferCallToTarget) --> $($cqOverFlowPhoneNumber)(External Number <br> $cqOverFlowPhoneNumber)"
+
+                $allMermaidNodes += @("cqOverFlowAction$($cqCallFlowObjectId)","$($cqOverFlowPhoneNumber)")
                 
             }
 
@@ -1141,6 +1557,8 @@ function Get-CallQueueCallFlow {
                         $nestedVoiceApps += $MatchingOverFlowAA.Identity
         
                     }
+
+                    $allMermaidNodes += @("cqOverFlowAction$($cqCallFlowObjectId)","$($MatchingOverFlowAA.Identity)")
         
 
                 }
@@ -1157,29 +1575,37 @@ function Get-CallQueueCallFlow {
         
                     }
 
+                    $allMermaidNodes += @("cqOverFlowAction$($cqCallFlowObjectId)","$($MatchingOverFlowCQ.Identity)")
+
                 }
 
             }
 
         }
         SharedVoicemail {
-            $MatchingOverFlowVoicemailProperties = (Get-MsolGroup -ObjectId $MatchingCQ.OverflowActionTarget.Id)
+            $MatchingOverFlowVoicemailProperties = (Get-MgGroup -GroupId $MatchingCQ.OverflowActionTarget.Id)
             $MatchingOverFlowVoicemail = $MatchingOverFlowVoicemailProperties.DisplayName
-            $MatchingOverFlowIdentity = $MatchingOverFlowVoicemailProperties.ObjectId
+            $MatchingOverFlowIdentity = $MatchingOverFlowVoicemailProperties.Id
 
             if ($MatchingCQ.OverflowSharedVoicemailTextToSpeechPrompt) {
 
                 $CqOverFlowVoicemailGreeting = "TextToSpeech"
+                $CQOverFlowVoicemailSystemGreeting = "cqOverFlowVoicemailSystemGreeting$($cqCallFlowObjectId)>Greeting <br> MS System Message] -->"
+
+                $allMermaidNodes += "cqOverFlowVoicemailSystemGreeting$($cqCallFlowObjectId)"
 
             }
 
             else {
 
                 $CqOverFlowVoicemailGreeting = "AudioFile"
+                $CQOverFlowVoicemailSystemGreeting = $null
 
             }
 
-            $CqOverFlowActionFriendly = "cqOverFlowAction$($cqCallFlowObjectId)(TransferCallToTarget) --> cqOverFlowVoicemailGreeting$($cqCallFlowObjectId)>Greeting <br> $CqOverFlowVoicemailGreeting] --> $($MatchingOverFlowIdentity)(Shared Voicemail <br> $MatchingOverFlowVoicemail)"
+            $CqOverFlowActionFriendly = "cqOverFlowAction$($cqCallFlowObjectId)(TransferCallToTarget) --> cqOverFlowVoicemailGreeting$($cqCallFlowObjectId)>Greeting <br> $CqOverFlowVoicemailGreeting] --> $CQOverFlowVoicemailSystemGreeting $($MatchingOverFlowIdentity)(Shared Voicemail <br> $MatchingOverFlowVoicemail)"
+
+            $allMermaidNodes += @("cqOverFlowAction$($cqCallFlowObjectId)","cqOverFlowVoicemailGreeting$($cqCallFlowObjectId)","$($MatchingOverFlowIdentity)")
 
         }
 
@@ -1190,16 +1616,20 @@ function Get-CallQueueCallFlow {
         Disconnect {
             $CqTimeoutActionFriendly = "cqTimeoutAction$($cqCallFlowObjectId)((Disconnect Call))"
 
+            $allMermaidNodes += "cqTimeoutAction$($cqCallFlowObjectId)"
+
         }
         Forward {
     
             if ($MatchingCQ.TimeoutActionTarget.Type -eq "User") {
 
-                $MatchingTimeoutUserProperties = (Get-MsolUser -ObjectId $MatchingCQ.TimeoutActionTarget.Id)
+                $MatchingTimeoutUserProperties = (Get-MgUser -UserId $MatchingCQ.TimeoutActionTarget.Id)
                 $MatchingTimeoutUser = $MatchingTimeoutUserProperties.DisplayName
-                $MatchingTimeoutIdentity = $MatchingTimeoutUserProperties.ObjectId
+                $MatchingTimeoutIdentity = $MatchingTimeoutUserProperties.Id
     
                 $CqTimeoutActionFriendly = "cqTimeoutAction$($cqCallFlowObjectId)(TransferCallToTarget) --> $($MatchingTimeoutIdentity)(User <br> $MatchingTimeoutUser)"
+
+                $allMermaidNodes += @("cqTimeoutAction$($cqCallFlowObjectId)","$($MatchingTimeoutIdentity)")
     
             }
     
@@ -1208,6 +1638,8 @@ function Get-CallQueueCallFlow {
                 $cqTimeoutPhoneNumber = ($MatchingCQ.TimeoutActionTarget.Id).Replace("tel:","")
     
                 $CqTimeoutActionFriendly = "cqTimeoutAction$($cqCallFlowObjectId)(TransferCallToTarget) --> $($cqTimeoutPhoneNumber)(External Number <br> $cqTimeoutPhoneNumber)"
+
+                $allMermaidNodes += @("cqTimeoutAction$($cqCallFlowObjectId)","$($cqTimeoutPhoneNumber)")
                 
             }
     
@@ -1225,14 +1657,13 @@ function Get-CallQueueCallFlow {
         
                     }
 
+                    $allMermaidNodes += @("cqTimeoutAction$($cqCallFlowObjectId)","$($MatchingTimeoutAA.Identity)")
     
                 }
     
                 else {
     
                     $MatchingTimeoutCQ = (Get-CsCallQueue | Where-Object {$_.ApplicationInstances -eq $MatchingCQ.TimeoutActionTarget.Id})
-
-                    Write-Host "Matching Time Out CQ Name: $($MatchingTimeoutCQ.Name)"
 
                     $CqTimeoutActionFriendly = "cqTimeoutAction$($cqCallFlowObjectId)(TransferCallToTarget) --> $($MatchingTimeoutCQ.Identity)([Call Queue <br> $($MatchingTimeoutCQ.Name)])"
 
@@ -1241,6 +1672,8 @@ function Get-CallQueueCallFlow {
                         $nestedVoiceApps += $MatchingTimeoutCQ.Identity
         
                     }
+
+                    $allMermaidNodes += @("cqTimeoutAction$($cqCallFlowObjectId)","$($MatchingTimeoutCQ.Identity)")
     
                 }
     
@@ -1248,24 +1681,30 @@ function Get-CallQueueCallFlow {
     
         }
         SharedVoicemail {
-            $MatchingTimeoutVoicemailProperties = (Get-MsolGroup -ObjectId $MatchingCQ.TimeoutActionTarget.Id)
+            $MatchingTimeoutVoicemailProperties = (Get-MgGroup -GroupId $MatchingCQ.TimeoutActionTarget.Id)
             $MatchingTimeoutVoicemail = $MatchingTimeoutVoicemailProperties.DisplayName
-            $MatchingTimeoutIdentity = $MatchingTimeoutVoicemailProperties.ObjectId
+            $MatchingTimeoutIdentity = $MatchingTimeoutVoicemailProperties.Id
     
             if ($MatchingCQ.TimeoutSharedVoicemailTextToSpeechPrompt) {
     
                 $CqTimeoutVoicemailGreeting = "TextToSpeech"
-    
+                $CQTimeoutVoicemailSystemGreeting = "cqTimeoutVoicemailSystemGreeting$($cqCallFlowObjectId)>Greeting <br> MS System Message] -->"
+
+                $allMermaidNodes += "cqTimeoutVoicemailSystemGreeting$($cqCallFlowObjectId)"
+
             }
     
             else {
     
                 $CqTimeoutVoicemailGreeting = "AudioFile"
+                $CQTimeoutVoicemailSystemGreeting = $null
     
             }
     
-            $CqTimeoutActionFriendly = "cqTimeoutAction$($cqCallFlowObjectId)(TransferCallToTarget) --> cqTimeoutVoicemailGreeting$($cqCallFlowObjectId)>Greeting <br> $CqTimeoutVoicemailGreeting] --> $($MatchingTimeoutIdentity)(Shared Voicemail <br> $MatchingTimeoutVoicemail)"
+            $CqTimeoutActionFriendly = "cqTimeoutAction$($cqCallFlowObjectId)(TransferCallToTarget) --> cqTimeoutVoicemailGreeting$($cqCallFlowObjectId)>Greeting <br> $CqTimeoutVoicemailGreeting] --> $CQTimeoutVoicemailSystemGreeting $($MatchingTimeoutIdentity)(Shared Voicemail <br> $MatchingTimeoutVoicemail)"
     
+            $allMermaidNodes += @("cqTimeoutAction$($cqCallFlowObjectId)","cqTimeoutVoicemailGreeting$($cqCallFlowObjectId)","$($MatchingTimeoutIdentity)")
+
         }
     
     }
@@ -1279,7 +1718,7 @@ function Get-CallQueueCallFlow {
 
     # add each agent to the empty agents mermaid element
     foreach ($CqAgent in $CqAgents) {
-        $AgentDisplayName = (Get-MsolUser -ObjectId $CqAgent.ObjectId).DisplayName
+        $AgentDisplayName = (Get-MgUser -UserId $CqAgent.ObjectId).DisplayName
 
         if ($ShowCqAgentPhoneNumbers -eq $true) {
 
@@ -1298,12 +1737,17 @@ function Get-CallQueueCallFlow {
 
         $AgentDisplayNames = "agentListType$($cqCallFlowObjectId) --> agent$($cqCallFlowObjectId)$($AgentCounter)($AgentDisplayName) --> timeOut$($cqCallFlowObjectId)`n"
 
+        $allMermaidNodes += @("agentListType$($cqCallFlowObjectId)","agent$($cqCallFlowObjectId)$($AgentCounter)","timeOut$($cqCallFlowObjectId)")
+
         $mdCqAgentsDisplayNames += $AgentDisplayNames
 
         $AgentCounter ++
+
     }
 
     $lastCallFlowAction = "$($MatchingCQIdentity)([Call Queue <br> $($CqName)])"
+
+    $allMermaidNodes += "$($MatchingCQIdentity)"
 
     
     # Create default callflow mermaid code
@@ -1313,16 +1757,11 @@ $lastCallFlowAction --> cqGreeting$($cqCallFlowObjectId)>Greeting <br> $CqGreeti
 overFlow$($cqCallFlowObjectId) ---> |Yes| $CqOverFlowActionFriendly
 overFlow$($cqCallFlowObjectId) ---> |No| routingMethod$($cqCallFlowObjectId)
 
-$nestedCallQueueTopLevelNumbers
-
 subgraph Call Distribution
 subgraph CQ Settings
 routingMethod$($cqCallFlowObjectId)[(Routing Method: $CqRoutingMethod)] --> agentAlertTime$($cqCallFlowObjectId)
-agentAlertTime$($cqCallFlowObjectId)[(Agent Alert Time: $CqAgentAlertTime)] -.- cqMusicOnHold$($cqCallFlowObjectId)
-cqMusicOnHold$($cqCallFlowObjectId)[(Music On Hold: $CqMusicOnHold)] -.- conferenceMode$($cqCallFlowObjectId)
-conferenceMode$($cqCallFlowObjectId)[(Conference Mode Enabled: $CqConferenceMode)] -.- agentOptOut$($cqCallFlowObjectId)
-agentOptOut$($cqCallFlowObjectId)[(Agent Opt Out Allowed: $CqAgentOptOut)] -.- presenceBasedRouting$($cqCallFlowObjectId)
-presenceBasedRouting$($cqCallFlowObjectId)[(Presence Based Routing: $CqPresenceBasedRouting)] -.- timeOut$($cqCallFlowObjectId)
+agentAlertTime$($cqCallFlowObjectId)[(Agent Alert Time: $CqAgentAlertTime)] -.- cqSettingsContainer$($cqCallFlowObjectId)
+cqSettingsContainer$($cqCallFlowObjectId)[(Music On Hold: $CqMusicOnHold <br> Conference Mode Enabled: $CqConferenceMode <br> Agent Opt Out Allowed: $CqAgentOptOut <br> Presence Based Routing: $CqPresenceBasedRouting <br> TTS Greeting Language: $CqLanguageId)] -.- timeOut$($cqCallFlowObjectId)
 timeOut$($cqCallFlowObjectId)[(Timeout: $CqTimeOut Seconds)]
 end
 subgraph Agents $($MatchingCQ.Name)
@@ -1336,6 +1775,8 @@ cqResult$($cqCallFlowObjectId) --> |Yes| cqEnd$($cqCallFlowObjectId)((Call Conne
 cqResult$($cqCallFlowObjectId) --> |No| $CqTimeoutActionFriendly
 
 "@
+
+$allMermaidNodes += @("cqGreeting$($cqCallFlowObjectId)","overFlow$($cqCallFlowObjectId)","routingMethod$($cqCallFlowObjectId)","agentAlertTime$($cqCallFlowObjectId)","cqSettingsContainer$($cqCallFlowObjectId)","timeOut$($cqCallFlowObjectId)","agentListType$($cqCallFlowObjectId)","cqResult$($cqCallFlowObjectId)","cqEnd$($cqCallFlowObjectId)")
 
 if ($mermaidCode -notcontains $mdCallQueueCallFlow) {
 
@@ -1351,9 +1792,6 @@ if ($mermaidCode -notcontains $mdCallQueueCallFlow) {
 
 #This is needed to determine if the Get-CallFlow function is running for the first time or not.
 $mdNodePhoneNumbersCounter = 0
-
-#This array stores information about the voice app's forwading targets.
-$nestedVoiceApps = @()
 
 function Get-CallFlow {
     param (
@@ -1386,6 +1824,13 @@ function Get-CallFlow {
                 if ($ResourceAccountPhoneNumber) {
 
                     $ResourceAccountPhoneNumber = $ResourceAccountPhoneNumber.Replace("tel:","")
+
+                    # Add leading + if PS fails to read it from online application
+                    if ($ResourceAccountPhoneNumber -notmatch "\+") {
+
+                        $ResourceAccountPhoneNumber = "+$ResourceAccountPhoneNumber"
+
+                    }
 
                     $ResourceAccountPhoneNumbers += "$ResourceAccountPhoneNumber, "
 
@@ -1430,6 +1875,13 @@ function Get-CallFlow {
                 if ($ResourceAccountPhoneNumber) {
 
                     $ResourceAccountPhoneNumber = $ResourceAccountPhoneNumber.Replace("tel:","")
+
+                    # Add leading + if PS fails to read it from online application
+                    if ($ResourceAccountPhoneNumber -notmatch "\+") {
+
+                        $ResourceAccountPhoneNumber = "+$ResourceAccountPhoneNumber"
+
+                    }
 
                     $ResourceAccountPhoneNumbers += "$ResourceAccountPhoneNumber, "
 
@@ -1526,11 +1978,19 @@ function Get-CallFlow {
 
         if ($ApplicationInstancePhoneNumber) {
 
+            if ($ApplicationInstancePhoneNumber -notmatch "\+") {
+            
+                $ApplicationInstancePhoneNumber = "+$ApplicationInstancePhoneNumber"
+    
+            }
+
             $mdNodeNumber = "start$($ApplicationInstancePhoneNumber)((Incoming Call at <br> $ApplicationInstancePhoneNumber)) $mdPhoneNumberLinkType $($VoiceApp.Identity)([$($voiceAppType) <br> $($VoiceApp.Name)])"
 
             $mdNodePhoneNumbers += $mdNodeNumber
     
             $mdNodePhoneNumbersCounter ++
+
+            $allMermaidNodes += "start$($ApplicationInstancePhoneNumber)"
 
         }
 
@@ -1567,6 +2027,8 @@ function Get-CallFlow {
             $nodeElementHolidayLink --> $mdAutoAttendantDefaultCallFlow
             
 "@
+
+            $allMermaidNodes += "$($aa.Identity)"
 
             if ($mermaidCode -notcontains $mdHolidayAndAfterHoursCheck) {
 
@@ -1621,7 +2083,7 @@ function Get-NestedCallFlow {
 
 }
 
-if ($DisplayNestedCallFlows -eq $true) {
+if ($ShowNestedCallFlows -eq $true) {
 
     . Get-NestedCallFlow
 
@@ -1631,7 +2093,7 @@ else {
     
     if ($nestedVoiceApps) {
 
-        Write-Host "Your call flow contains nested call queues or auto attendants. They won't be expanded because 'DisplayNestedCallFlows' is set to false." -ForegroundColor Yellow
+        Write-Warning -Message "Your call flow contains nested call queues or auto attendants. They won't be expanded because 'ShowNestedCallFlows' is set to false."
         Write-Host "Nested Voice App Ids:" -ForegroundColor Yellow
         $nestedVoiceApps
 
@@ -1645,6 +2107,57 @@ $mermaidCode = $mermaidCode.Replace(";",",")
 
 #Add H1 Title to Markdown code
 $mermaidCode = $mermaidCode.Replace("## CallFlowNamePlaceHolder","# Call Flow $VoiceAppFileName")
+
+# Custom Mermaid Color Themes
+function Set-CustomMermaidTheme {
+    param (
+        [Parameter(Mandatory=$false)][String]$NodeColor,
+        [Parameter(Mandatory=$false)][String]$NodeBorderColor,
+        [Parameter(Mandatory=$false)][String]$FontColor,
+        [Parameter(Mandatory=$false)][String]$LinkColor,
+        [Parameter(Mandatory=$false)][String]$LinkTextColor
+    )
+
+
+    $themedNodes = "classDef customTheme fill:$NodeColor,stroke:$NodeBorderColor,stroke-width:3px,color:$FontColor`n`nclass "
+
+    $allMermaidNodes = $allMermaidNodes | Sort-Object -Unique
+
+    foreach ($node in $allMermaidNodes) {
+
+        $themedNodes += "$node,"
+
+    }
+
+    $mermaidString = ($mermaidCode | Out-String)
+    $NumberOfMermaidLinks = (Select-String -InputObject $mermaidString -Pattern '(--)|(-.-)' -AllMatches).Matches.Count
+
+    $themedNodes = ($themedNodes += " customTheme").Replace(", customTheme", " customTheme")
+
+    $themedLinks = "`nlinkStyle "
+
+    $currentMermaidLink = 0
+
+    do {
+        $themedLinks += "$currentMermaidLink,"
+
+        $currentMermaidLink ++
+
+    } until ($currentMermaidLink -eq ($NumberOfMermaidLinks))
+
+    $themedLinks = ($themedLinks += " stroke:$LinkColor,stroke-width:2px,color:$LinkTextColor").Replace(", stroke:"," stroke:")
+
+    $mermaidCode += @($themedNodes,$themedLinks)
+    
+}
+
+if ($Theme -eq "custom") {
+
+    . Set-CustomMermaidTheme -NodeColor $NodeColor -NodeBorderColor $NodeBorderColor -FontColor $FontColor -LinkColor $LinkColor -LinkTextColor $LinkTextColor
+
+}
+
+
 
 if ($SaveToFile -eq $true) {
 
@@ -1673,4 +2186,43 @@ if ($SetClipBoard -eq $true) {
     -Replace($MarkdownTheme,"") | Set-Clipboard
 
     Write-Host "Mermaid code copied to clipboard. Paste it on https://mermaid.live" -ForegroundColor Cyan
+}
+
+if ($ExportHtml -eq $true) {
+
+    $HtmlOutput = Get-Content -Path .\HtmlTemplate.html | Out-String
+
+    if ($DocType -eq "Markdown") {
+
+        if ($Theme -eq "custom") {
+
+            $MarkdownTheme = '<div class="mermaid">'
+            
+        }
+
+        else {
+
+            $MarkdownTheme = '<div class="mermaid">' + $MarkdownTheme 
+
+        }
+
+        $HtmlOutput -Replace "VoiceAppNamePlaceHolder","Call Flow $VoiceAppFileName" `
+        -Replace "VoiceAppNameHtmlIdPlaceHolder",($($VoiceAppFileName).Replace(" ","-")) `
+        -Replace '<div class="mermaid">ThemePlaceHolder',$MarkdownTheme `
+        -Replace "MermaidPlaceHolder",($mermaidCode | Out-String).Replace($MarkdownTheme,"") `
+        -Replace "# Call Flow $VoiceAppFileName","" `
+        -Replace('```mermaid','') `
+        -Replace('```','') | Set-Content -Path "$FilePath\$(($VoiceAppFileName).Replace(" ","_"))_CallFlow.htm" -Encoding UTF8
+
+    }
+
+    else {
+
+        $HtmlOutput -Replace "VoiceAppNamePlaceHolder","Call Flow $VoiceAppFileName" `
+        -Replace "VoiceAppNameHtmlIdPlaceHolder",($($VoiceAppFileName).Replace(" ","-")) `
+        -Replace '<div class="mermaid">ThemePlaceHolder','<div class="mermaid">' `
+        -Replace "MermaidPlaceHolder",($mermaidCode | Out-String).Replace($MarkdownTheme,"") ` | Set-Content -Path "$FilePath\$(($VoiceAppFileName).Replace(" ","_"))_CallFlow.htm" -Encoding UTF8
+
+    }
+
 }

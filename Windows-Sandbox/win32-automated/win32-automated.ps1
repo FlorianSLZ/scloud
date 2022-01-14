@@ -1,6 +1,5 @@
-#$PSModules = "MSOnline","ExchangeOnlineManagement", "AzureADPreview", "Microsoft.Online.SharePoint.PowerShell", "MicrosoftTeams", "SharePointPnPPowerShellOnline", "MSCommerce"
 # Array of the PowerShell Modules
-$PSModules = "IntuneWin32App"
+$PSModules = "IntuneWin32App", "Microsoft.Graph"
 
 # ExecutionPolicy and NuGet
 Set-ExecutionPolicy Unrestricted -Force

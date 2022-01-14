@@ -1,5 +1,5 @@
 # Array of the PowerShell Modules
-$PSModules = "MSOnline", "MicrosoftTeams"
+$PSModules = "Microsoft.Graph", "MicrosoftTeams"
 
 # ExecutionPolicy and NuGet
 Set-ExecutionPolicy Unrestricted -Force
