@@ -5,7 +5,7 @@
       <ReadOnly>true</ReadOnly>
     </MappedFolder>
     <MappedFolder>
-      <HostFolder>C:\GitHub\scloud\intune-app-deployment</HostFolder>
+      <HostFolder>C:\GitHub\scloud\intune-win32-deployment</HostFolder>
       <ReadOnly>false</ReadOnly>
     </MappedFolder>
   </MappedFolders>
