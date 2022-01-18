@@ -1,5 +1,10 @@
 $ErrorActionpreference = "stop"
 
+<# Prerequirements
+Install-Module IntuneWin32App -Force
+Install-Module Microsoft.Graph.Intune -Force
+#>
+
 # Functions
 function Add-TheWin32App([Array] $App2upload){
 
@@ -40,12 +45,12 @@ function Add-TheWin32App([Array] $App2upload){
     try{
         # Check dependency
         if($App2upload.Dependency){
-            Write-Host "  Adding dependency $($App2upload.Dependency) to $($App2upload.Name)" -ForegroundColor Cyan
+            Write-Host "  Processing dependency $($App2upload.Dependency) to $($App2upload.Name)" -ForegroundColor Cyan
             $UploadedApp = Get-IntuneWin32App | where {$_.DisplayName -eq $App2upload.Name} | select name, id
             $DependendProgram = Get-IntuneWin32App | where {$_.DisplayName -eq $App2upload.Dependency} | select name, id
             if(!$DependendProgram){
                 $DependendProgram_install = $Applications | where {$_.Name -eq $App2upload.Dependency}
-                Write-Host "    dependent program $($DependendProgram.Name) is now being uploaded" -ForegroundColor Cyan
+                Write-Host "    dependent program $($App2upload.Dependency) is now being uploaded" -ForegroundColor Cyan
                 Add-TheWin32App -App2upload $DependendProgram_install
                 Start-Sleep -s 15
                 $DependendProgram = Get-IntuneWin32App | where {$_.DisplayName -eq $App2upload.Dependency} | select name, id
@@ -53,6 +58,7 @@ function Add-TheWin32App([Array] $App2upload){
             $DependendProgram = Get-IntuneWin32App | where {$_.DisplayName -eq $App2upload.Dependency} | select name, id
             $Dependency = New-IntuneWin32AppDependency -id $DependendProgram.id -DependencyType AutoInstall
             $UploadProcess = Add-IntuneWin32AppDependency -id $UploadedApp.id -Dependency $Dependency
+            Write-Host "  Added dependency $($App2upload.Dependency) to $($App2upload.Name)" -ForegroundColor Cyan
         }
     }catch{
         Write-Host "Error adding dependency for $($App2upload.Name)" -ForegroundColor Red
@@ -65,10 +71,6 @@ function Select-TheWin32Apps{
     $global:selectedApplications =  $Applications | Out-GridView -OutputMode Multiple -Title "Select Applications to create"
 }
 
-<# Prerequirements
-Install-Module -Name IntuneWin32App -Force
-Install-Module Microsoft.Graph -Force
-#>
 Import-Module -Name IntuneWin32App
 
 # Initial Variables
