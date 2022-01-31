@@ -1,5 +1,5 @@
 $ProgramName = "PROGRAMNAME"
-$ProgramPath = "C:\Program Files\PRPOGRAM\start.exe"
+$ProgramPath = "C:\Program Files\PROGRAMNAME\start.exe"
 $ProgramVersion_target = '10.1'
 $ProgramVersion_current = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($ProgramPath).FileVersion
 
