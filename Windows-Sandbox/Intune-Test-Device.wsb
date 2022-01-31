@@ -1,0 +1,13 @@
+<Configuration>
+  <MappedFolders>
+    <MappedFolder>
+      <HostFolder>C:\GitHub\scloud\Windows-Sandbox</HostFolder>
+      <ReadOnly>true</ReadOnly>
+    </MappedFolder>
+  </MappedFolders>
+  <LogonCommand>
+    <Command>powershell -executionpolicy unrestricted -command "Start-Process ms-device-enrollment:?mode=mdm'&'username=username""</Command>
+  </LogonCommand>
+</Configuration>
+
+
