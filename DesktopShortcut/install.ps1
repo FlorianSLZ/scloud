@@ -20,6 +20,15 @@ foreach($OLD_Item in $OLD_Items){
 }
 Remove-Item "$DesktopTMP\*" -Force
 
+# Icons from list
+$icons = import-csv link-list.csv
+foreach($icon in $icons){
+    $WshShell = New-Object -comObject WScript.Shell
+    $Shortcut = $WshShell.CreateShortcut("$DesktopTMP\$($icon.name).lnk")
+    $Shortcut.TargetPath = $icon.link
+    $Shortcut.Save()
+}
+
 # Copy New icons
 Copy-Item -Path ".\Desktop\*" -Destination $DesktopTMP -Recurse
 Copy-Item -Path ".\icons\*" -Destination $DesktopIcons -Recurse
