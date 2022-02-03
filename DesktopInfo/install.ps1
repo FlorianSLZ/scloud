@@ -13,9 +13,9 @@ $scriptSavePath = "C:\Program Files\4net\EndpointManager\Program\DesktopInfo"
 $scriptSavePathName = "DesktopInfo.ps1"
 $scriptPath = "$scriptSavePath\$scriptSavePathName"
 New-item -itemtype directory -force -path "$Path_4netIntune\Program\DesktopInfo"
-Copy-item -path "DesktopInfo64.exe" -destination "$Path_4netIntune\Program\DesktopInfo\DesktopInfo64.exe"
-Copy-item -path "hostname.ini" -destination "$Path_4netIntune\Program\DesktopInfo\hostname.ini"
-Copy-item -path "DesktopInfo.ps1" -destination $scriptPath
+Copy-item -path ".\DesktopInfo64.exe" -destination "$Path_4netIntune\Program\DesktopInfo\DesktopInfo64.exe"
+Copy-item -path ".\hostname.ini" -destination "$Path_4netIntune\Program\DesktopInfo\hostname.ini"
+Copy-item -path ".\DesktopInfo.ps1" -destination $scriptPath
 
 ###########################################################################################
 # Create dummy vbscript to hide PowerShell Window popping up at logon
