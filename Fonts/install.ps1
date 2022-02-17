@@ -1,11 +1,12 @@
-﻿$PackageName = "Fonts"
+﻿$PackageName = "Company-Fonts"
+$Version = "1"
 
 $Path_4netIntune = "$Env:Programfiles\4net\EndpointManager"
 Start-Transcript -Path "$Path_4netIntune\Log\$PackageName-install.log" -Force
 
 $WorkingPath = "$Path_4netIntune\Data\Fonts"
 New-Item -ItemType "directory" -Path $WorkingPath -Force
-Copy-Item -Path ".\Schriften\*" -Destination $WorkingPath -Recurse
+Copy-Item -Path ".\Fonts\*" -Destination $WorkingPath -Recurse
 
 $AllFonts = Get-ChildItem -Path "$WorkingPath\*.ttf"
 $AllFonts += Get-ChildItem -Path "$WorkingPath\*.otf"
@@ -19,6 +20,8 @@ foreach($FontFile in $AllFonts){
     }
 }
 
-New-Item -Path "$Path_4netIntune\Log\Validation\$PackageName" -ItemType "file" -Force
+Remove-Item $WorkingPath -Force -Recurse
+
+New-Item -Path "$Path_4netIntune\Validation\$PackageName" -ItemType "file" -Force -Value $Version
 
 Stop-Transcript
