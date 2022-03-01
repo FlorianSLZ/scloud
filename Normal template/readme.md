@@ -1,4 +1,4 @@
-# win32 App Deployment automated
+# Normal.dotm with Intune (Word template)
 
 Compliance with the CI/CD in an organization is very important. Among other things, new Word documents must come with the right fonts, sizes and colors. A good way to do this is to replace the Normal.dotm file in the "C:\Users\%username%\AppData\Roaming\Microsoft\Templates" directory. In order to distribute the Normal.dotm file with Intune, I have prepared a PowerShell script, which you can easily distribute as a Win32 app with Intune.
 
