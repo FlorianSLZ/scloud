@@ -1,7 +1,6 @@
 # win32 App Deployment automated
 
-I have many different customers who basically need the same / similar base of win32 apps in Endpoint Manager. Maintaining the apps every time with the intunewin file, the name, the publisher, installation commands etc. is not a very satisfying job. That's why I created a repository with a software list and a PowerShell script that automates the win32 app deployment.
+Compliance with the CI/CD in an organization is very important. Among other things, new Word documents must come with the right fonts, sizes and colors. A good way to do this is to replace the Normal.dotm file in the "C:\Users\%username%\AppData\Roaming\Microsoft\Templates" directory. In order to distribute the Normal.dotm file with Intune, I have prepared a PowerShell script, which you can easily distribute as a Win32 app with Intune.
 
-[![](https://img.youtube.com/vi/RnYJl2QdiPk/0.jpg)](https://youtu.be/RnYJl2QdiPk)
-
-More explanation at: https://scloud.work/en/win32-app-deployment-automated/
+More explanation at: https://scloud.work/en/normal-dotm-intune/
+[![](https://scloud.work/wp-content/uploads/2022/03/normal-dotm.jpg)](https://scloud.work/en/normal-dotm-intune/)
