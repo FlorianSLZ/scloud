@@ -10,7 +10,7 @@ try{
     New-Item -Path "$env:localAPPDATA\4net\EndpointManager\Validation\$PackageName" -ItemType "file" -Force -Value $Version
 }catch{
     Write-Host "_____________________________________________________________________"
-    Write-Host "FEHLER"
+    Write-Host "ERROR"
     Write-Host "$_"
     Write-Host "_____________________________________________________________________"
 }
