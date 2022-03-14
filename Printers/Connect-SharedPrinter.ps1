@@ -4,9 +4,9 @@ $Path_4netIntune = "$Env:Programfiles\4net\EndpointManager"
 Start-Transcript -Path "$Path_4netIntune\Log\$PackageName-mapping.log" -Force
 
 # Input values 
-$PrtServer = "S-PRT01.scloud.work"
-$Printers_Shares = "Printer 1. OG","Printer 2. OG"
-$Printers_REMOVE = "Printer 1 OG SW"
+$Prt_Server = "S-PRT01.scloud.work"
+$Prt_Shares = "Printer 1. OG","Printer 2. OG"
+$Prt_REMOVEs = "Printer 1 OG SW"
 
 # check if running as system
 function Test-RunningAsSystem {
@@ -22,9 +22,9 @@ Write-Output "Running as SYSTEM: $(Test-RunningAsSystem)"
 # Removing/Mapping printers (as User / no system context)
 if (-not (Test-RunningAsSystem)) {
 
-	# Process printers from $Printers_REMOVE
-	foreach ($PrinterRemove in $Printers_REMOVE) {
-		$PrinterShareName = "\\$PrtServer\$PrinterRemove"
+	# Process printers from $Prt_REMOVEs
+	foreach ($PrinterRemove in $Prt_REMOVEs) {
+		$PrinterShareName = "\\$Prt_Server\$PrinterRemove"
 		# Check if Printer exists
 		$checkPrinterExists = Get-Printer -Name $PrinterRemove -ErrorAction SilentlyContinue
 		if (!$checkPrinterExists) {
@@ -42,8 +42,8 @@ if (-not (Test-RunningAsSystem)) {
 
 
 	# process all Printers
-	foreach ($Printer in $Printers_Shares) {
-		$PrinterShareName = "\\$PrtServer\$Printer"
+	foreach ($Printer in $Prt_Shares) {
+		$PrinterShareName = "\\$Prt_Server\$Printer"
 		# Check if Printer exists
 		$checkPrinterExists = Get-Printer -Name $PrinterShareName -ErrorAction SilentlyContinue
 		if ($checkPrinterExists) {
@@ -72,21 +72,21 @@ if (Test-RunningAsSystem) {
 
 	$schtaskScript = $currentScript[(0) .. ($currentScript.IndexOf("#!SCHTASKCOMESHERE!#") - 1)]
 
-	$scriptSavePath = $(Join-Path -Path "$Path_4netIntune\Data" -ChildPath "intune-printer-mapping")
+	$scriptSavePath = $(Join-Path -Path "$Path_4netIntune\Data" -ChildPath "printer-mapping")
 
 	if (-not (Test-Path $scriptSavePath)) {
 
 		New-Item -ItemType Directory -Path $scriptSavePath -Force
 	}
 
-	$scriptSavePathName = "$PackageName.ps1"
+	$PS_PathName = "$PackageName.ps1"
 
-	$scriptPath = $(Join-Path -Path $scriptSavePath -ChildPath $scriptSavePathName)
+	$ps_ScriptPath = $(Join-Path -Path $scriptSavePath -ChildPath $PS_PathName)
 
-	$schtaskScript | Out-File -FilePath $scriptPath -Force
+	$schtaskScript | Out-File -FilePath $ps_ScriptPath -Force
 
 	# Dummy vbscript to hide PowerShell Window popping up at task execution
-	$vbsDummyScript = "
+	$vbsHiddenPS = "
 	Dim shell,fso,file
 
 	Set shell=CreateObject(`"WScript.Shell`")
@@ -102,17 +102,17 @@ if (Test-RunningAsSystem) {
 	End If
 	"
 
-	$scriptSavePathName = "$PackageName-VBSHelper.vbs"
+	$vbs_Name = "run-ps-hidden.vbs"
 
-	$dummyScriptPath = $(Join-Path -Path $scriptSavePath -ChildPath $scriptSavePathName)
+	$vbs_ScriptPath = $(Join-Path -Path $scriptSavePath -ChildPath $vbs_Name)
 
-	$vbsDummyScript | Out-File -FilePath $dummyScriptPath -Force
+	$vbsHiddenPS | Out-File -FilePath $vbs_ScriptPath -Force
 
 	$wscriptPath = Join-Path $env:SystemRoot -ChildPath "System32\wscript.exe"
 
 	# Register a scheduled task to run for all users and execute the script on logon
 	$schtaskName = "$PackageName"
-	$schtaskDescription = "Map network printers. Task created with intune."
+	$schtaskDescription = "Map network printers on logon and network change. "
 
 	$trigger = New-ScheduledTaskTrigger -AtLogOn
 
@@ -129,7 +129,7 @@ if (Test-RunningAsSystem) {
 	$principal= New-ScheduledTaskPrincipal -GroupId "S-1-5-32-545" -Id "Author"
 	
 	# call the vbscript helper and pass the PosH script as argument
-	$action = New-ScheduledTaskAction -Execute $wscriptPath -Argument "`"$dummyScriptPath`" `"$scriptPath`""
+	$action = New-ScheduledTaskAction -Execute $wscriptPath -Argument "`"$vbsScriptPath`" `"$scriptPath`""
 	
 	$settings= New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
 	
