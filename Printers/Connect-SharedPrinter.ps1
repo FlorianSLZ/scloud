@@ -79,21 +79,15 @@ if (Test-RunningAsSystem) {
 	Start-Transcript -Path $(Join-Path -Path "$Path_4netIntune\Log" -ChildPath "$global:PackageName-ScheduledTask.log")
 	Write-Output "Running as System --> creating scheduled task which will run on user logon and network changes"
 
+	# get this script content
 	$currentScript = Get-Content -Path $($PSCommandPath)
-
 	$schtaskScript = $currentScript[(0) .. ($currentScript.IndexOf("#!SCHTASKCOMESHERE!#") - 1)]
-
 	$scriptSavePath = $(Join-Path -Path "$Path_4netIntune\Data" -ChildPath "printer-mapping")
-
-	if (-not (Test-Path $scriptSavePath)) {
-
-		New-Item -ItemType Directory -Path $scriptSavePath -Force
-	}
-
+	# Create Path if not exists
+	if (-not (Test-Path $scriptSavePath)) {New-Item -ItemType Directory -Path $scriptSavePath -Force}
+	# Save this file on local computer
 	$PS_PathName = "$global:PackageName.ps1"
-
 	$ps_ScriptPath = $(Join-Path -Path $scriptSavePath -ChildPath $PS_PathName)
-
 	$schtaskScript | Out-File -FilePath $ps_ScriptPath -Force
 
 	# Dummy vbscript to hide PowerShell Window popping up at task execution
@@ -112,20 +106,15 @@ if (Test-RunningAsSystem) {
 		shell.Run strCMD,0
 	End If
 	"
-
 	$vbs_Name = "run-ps-hidden.vbs"
-
 	$vbs_ScriptPath = $(Join-Path -Path $scriptSavePath -ChildPath $vbs_Name)
-
 	$vbsHiddenPS | Out-File -FilePath $vbs_ScriptPath -Force
 
-	$wscriptPath = Join-Path $env:SystemRoot -ChildPath "System32\wscript.exe"
-
-	# Register a scheduled task to run for all users and execute the script on logon
+	# Register scheduled task to run for all users, trigers: logon and network changes
 	$schtaskName = "$global:PackageName"
 	$schtaskDescription = "Map network printers on logon and network change. "
 
-	$trigger = New-ScheduledTaskTrigger -AtLogOn
+	$trigger1 = New-ScheduledTaskTrigger -AtLogOn
 
 	$class = cimclass MSFT_TaskEventTrigger root/Microsoft/Windows/TaskScheduler
 	$trigger2 = $class | New-CimInstance -ClientOnly
@@ -140,14 +129,14 @@ if (Test-RunningAsSystem) {
 	$principal= New-ScheduledTaskPrincipal -GroupId "S-1-5-32-545" -Id "Author"
 	
 	# call the vbscript helper and pass the PosH script as argument
-	$action = New-ScheduledTaskAction -Execute $wscriptPath -Argument "`"$vbsScriptPath`" `"$scriptPath`""
+	$action = New-ScheduledTaskAction -Execute $(Join-Path $env:SystemRoot -ChildPath "System32\wscript.exe") -Argument "`"$vbsScriptPath`" `"$scriptPath`""
 	
 	$settings= New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
 	
-	$null = Register-ScheduledTask -TaskName $schtaskName -Trigger $trigger,$trigger2,$trigger3 -Action $action  -Principal $principal -Settings $settings -Description $schtaskDescription -Force
+	$null = Register-ScheduledTask -TaskName $schtaskName -Trigger $trigger1,$trigger2,$trigger3 -Action $action -Principal $principal -Settings $settings -Description $schtaskDescription -Force
 	
 	Start-ScheduledTask -TaskName $schtaskName
 	
 	Stop-transcript
 
-	}
+}
