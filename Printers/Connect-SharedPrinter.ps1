@@ -1,12 +1,13 @@
-$PackageName = "SharedPrinters"
+$global:PackageName = "SharedPrinters"
 
 $Path_4netIntune = "$Env:Programfiles\4net\EndpointManager"
-Start-Transcript -Path "$Path_4netIntune\Log\$PackageName-mapping.log" -Force
+Start-Transcript -Path "$Path_4netIntune\Log\$global:PackageName-mapping.log" -Force
 
 # Input values 
 $Prt_Server = "S-PRT01.scloud.work"
 $Prt_Shares = "Printer 1. OG","Printer 2. OG"
 $Prt_REMOVEs = "Printer 1 OG SW"
+$REMOVE_fromServer = $true #	$true: removes only printers from targeted Server, $false: remove all printer declared string in name
 
 # check if running as system
 function Test-RunningAsSystem {
@@ -17,31 +18,8 @@ function Test-RunningAsSystem {
 	}
 }
 
-Write-Output "Running as SYSTEM: $(Test-RunningAsSystem)"
-
-# Removing/Mapping printers (as User / no system context)
-if (-not (Test-RunningAsSystem)) {
-
-	# Process printers from $Prt_REMOVEs
-	foreach ($PrinterRemove in $Prt_REMOVEs) {
-		$PrinterShareName = "\\$Prt_Server\$PrinterRemove"
-		# Check if Printer exists
-		$checkPrinterExists = Get-Printer -Name $PrinterRemove -ErrorAction SilentlyContinue
-		if (!$checkPrinterExists) {
-			Write-Host "$PrinterRemove, already removed!"
-		}else{
-			# try/catch removing printer
-			try{
-				Remove-Printer -Name $PrinterRemove -ErrorAction Stop
-			}catch{
-				Write-Host "Error removing $PrinterRemove:" -ForegroundColor Red
-				Write-Host $_
-			}
-		}
-	}
-
-
-	# process all Printers
+function Mapping-Printer ($Prt_Server, $Prt_Shares) {
+	# process all Printers from $Prt_Server
 	foreach ($Printer in $Prt_Shares) {
 		$PrinterShareName = "\\$Prt_Server\$Printer"
 		# Check if Printer exists
@@ -60,12 +38,45 @@ if (-not (Test-RunningAsSystem)) {
 	}
 }
 
-Stop-transcript
+function Remove-Printer ($Prt_Server, $Prt_REMOVEs){
+	# Process printers from $Prt_REMOVEs
+	foreach ($Prt_2remove in $Prt_REMOVEs) {
 
-# If this script running as system scheduled task is created
+		if($REMOVE_fromServer -eq $true){$PrinterName = "\\$Prt_Server\$Prt_2remove"}
+		else{$PrinterName = "*$Prt_2remove*"}
+		# Check if Printer exists
+		$checkPrinterExists = Get-Printer -Name $PrinterName -ErrorAction SilentlyContinue
+		if (!$checkPrinterExists) {
+			Write-Host "$PrinterName, already removed!"
+		}else{
+			# try/catch removing printer
+			try{
+				Remove-Printer -Name $PrinterName -ErrorAction Stop
+			}catch{
+				Write-Host "Error removing $PrinterName:" -ForegroundColor Red
+				Write-Host $_
+			}
+		}
+	}
+} 
+
+Write-Output "Running as SYSTEM: $(Test-RunningAsSystem)"
+
+# Processing Printers in user context
+if (-not (Test-RunningAsSystem)) {
+
+	Remove-Printer $Prt_Server $Prt_REMOVEs
+
+	Mapping-Printer $Prt_Server $Prt_Shares
+	
+}
+
+Stop-Transcript
+
+# Create Sceduled Task as System
 if (Test-RunningAsSystem) {
 
-	Start-Transcript -Path $(Join-Path -Path "$Path_4netIntune\Log" -ChildPath "$PackageName-ScheduledTask.log")
+	Start-Transcript -Path $(Join-Path -Path "$Path_4netIntune\Log" -ChildPath "$global:PackageName-ScheduledTask.log")
 	Write-Output "Running as System --> creating scheduled task which will run on user logon and network changes"
 
 	$currentScript = Get-Content -Path $($PSCommandPath)
@@ -79,7 +90,7 @@ if (Test-RunningAsSystem) {
 		New-Item -ItemType Directory -Path $scriptSavePath -Force
 	}
 
-	$PS_PathName = "$PackageName.ps1"
+	$PS_PathName = "$global:PackageName.ps1"
 
 	$ps_ScriptPath = $(Join-Path -Path $scriptSavePath -ChildPath $PS_PathName)
 
@@ -111,7 +122,7 @@ if (Test-RunningAsSystem) {
 	$wscriptPath = Join-Path $env:SystemRoot -ChildPath "System32\wscript.exe"
 
 	# Register a scheduled task to run for all users and execute the script on logon
-	$schtaskName = "$PackageName"
+	$schtaskName = "$global:PackageName"
 	$schtaskDescription = "Map network printers on logon and network change. "
 
 	$trigger = New-ScheduledTaskTrigger -AtLogOn
