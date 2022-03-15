@@ -3,11 +3,17 @@ $global:PackageName = "SharedPrinters"
 $Path_4netIntune = "$Env:Programfiles\4net\EndpointManager"
 Start-Transcript -Path "$Path_4netIntune\Log\$global:PackageName-mapping.log" -Force
 
+###########################################################################################
 # Input values 
 $Prt_Server = "S-PRT01.scloud.work"
-$Prt_Shares = "Printer 1. OG","Printer 2. OG"
+$Prt_Shares = "Printer 1. OG",
+"Printer 2. OG",
+"Printer 3. OG"
+
 $Prt_REMOVEs = "Printer 1 OG SW"
 $REMOVE_fromServer = $true #	$true: removes only printers from targeted Server, $false: remove all printer declared string in name
+###########################################################################################
+
 
 # check if running as system
 function Test-RunningAsSystem {
@@ -130,9 +136,7 @@ if (Test-RunningAsSystem) {
 	
 	# call the vbscript helper and pass the PosH script as argument
 	$action = New-ScheduledTaskAction -Execute $(Join-Path $env:SystemRoot -ChildPath "System32\wscript.exe") -Argument "`"$vbsScriptPath`" `"$scriptPath`""
-	
 	$settings= New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
-	
 	$null = Register-ScheduledTask -TaskName $schtaskName -Trigger $trigger1,$trigger2,$trigger3 -Action $action -Principal $principal -Settings $settings -Description $schtaskDescription -Force
 	
 	Start-ScheduledTask -TaskName $schtaskName
