@@ -5,13 +5,13 @@ Start-Transcript -Path "$Path_4netIntune\Log\$global:PackageName-mapping.log" -F
 
 ###########################################################################################
 # Input values 
-$Prt_Server = "S-PRT01.scloud.work"
-$Prt_Shares = "Printer 1. OG",
-"Printer 2. OG",
-"Printer 3. OG"
+$Prt_Server = "S-SLZ-APP08.schulegl.ch"
+$Prt_Shares = "PRT Home EG",
+"PRT Home OG"
 
-$Prt_REMOVEs = "Printer 1 OG SW"
+#$Prt_REMOVEs = ""
 $REMOVE_fromServer = $true #	$true: removes only printers from targeted Server, $false: remove all printer declared string in name
+
 ###########################################################################################
 
 
@@ -24,20 +24,26 @@ function Test-RunningAsSystem {
 	}
 }
 
-function Mapping-Printer ($Prt_Server, $Prt_Shares) {
+function Mapping-Printer{
+	Param
+    (
+        [Parameter(Mandatory = $true)] [string] $Prt_Server,
+        [Parameter(Mandatory = $true)] [string[]] $Prt_Shares
+    )
 	# process all Printers from $Prt_Server
 	foreach ($Printer in $Prt_Shares) {
 		$PrinterShareName = "\\$Prt_Server\$Printer"
+		Write-Host "Processing: $PrinterShareName" -ForegroundColor Cyan
 		# Check if Printer exists
 		$checkPrinterExists = Get-Printer -Name $PrinterShareName -ErrorAction SilentlyContinue
 		if ($checkPrinterExists) {
-			Write-Host "Already installed!"
+			Write-Host "$Printer, already installed!"
 		}else{
 			# try/catch adding printer
 			try{
 				Add-Printer -ConnectionName $PrinterShareName -ErrorAction Stop
 			}catch{
-				Write-Host "Error adding $PrinterRemove:" -ForegroundColor Red
+				Write-Host "Error adding $PrinterShareName" -ForegroundColor Red
 				Write-Host $_
 			}
 		}
@@ -59,7 +65,7 @@ function Remove-Printer ($Prt_Server, $Prt_REMOVEs){
 			try{
 				Remove-Printer -Name $PrinterName -ErrorAction Stop
 			}catch{
-				Write-Host "Error removing $PrinterName:" -ForegroundColor Red
+				Write-Host "Error removing $PrinterName" -ForegroundColor Red
 				Write-Host $_
 			}
 		}
@@ -70,14 +76,16 @@ Write-Output "Running as SYSTEM: $(Test-RunningAsSystem)"
 
 # Processing Printers in user context
 if (-not (Test-RunningAsSystem)) {
-
-	Remove-Printer $Prt_Server $Prt_REMOVEs
-
-	Mapping-Printer $Prt_Server $Prt_Shares
-	
+	$testConnection = Test-Connection $Prt_Server -Count 1 -Quiet
+	if($testConnection -eq $true){
+		Remove-Printer $Prt_Server $Prt_REMOVEs
+		Mapping-Printer $Prt_Server $Prt_Shares
+	}
 }
 
 Stop-Transcript
+
+#!ENDUSERCONTEXT!#
 
 # Create Sceduled Task as System
 if (Test-RunningAsSystem) {
@@ -87,14 +95,14 @@ if (Test-RunningAsSystem) {
 
 	# get this script content
 	$currentScript = Get-Content -Path $($PSCommandPath)
-	$schtaskScript = $currentScript[(0) .. ($currentScript.IndexOf("#!SCHTASKCOMESHERE!#") - 1)]
+	$schtaskScript = $currentScript[(0) .. ($currentScript.IndexOf("#!ENDUSERCONTEXT!#") - 1)]
 	$scriptSavePath = $(Join-Path -Path "$Path_4netIntune\Data" -ChildPath "printer-mapping")
 	# Create Path if not exists
 	if (-not (Test-Path $scriptSavePath)) {New-Item -ItemType Directory -Path $scriptSavePath -Force}
 	# Save this file on local computer
 	$PS_PathName = "$global:PackageName.ps1"
-	$ps_ScriptPath = $(Join-Path -Path $scriptSavePath -ChildPath $PS_PathName)
-	$schtaskScript | Out-File -FilePath $ps_ScriptPath -Force
+	$PS_ScriptPath = $(Join-Path -Path $scriptSavePath -ChildPath $PS_PathName)
+	$schtaskScript | Out-File -FilePath $PS_ScriptPath -Force
 
 	# Dummy vbscript to hide PowerShell Window popping up at task execution
 	$vbsHiddenPS = "
@@ -135,7 +143,7 @@ if (Test-RunningAsSystem) {
 	$principal= New-ScheduledTaskPrincipal -GroupId "S-1-5-32-545" -Id "Author"
 	
 	# call the vbscript helper and pass the PosH script as argument
-	$action = New-ScheduledTaskAction -Execute $(Join-Path $env:SystemRoot -ChildPath "System32\wscript.exe") -Argument "`"$vbsScriptPath`" `"$scriptPath`""
+	$action = New-ScheduledTaskAction -Execute $(Join-Path $env:SystemRoot -ChildPath "System32\wscript.exe") -Argument "`"$vbs_ScriptPath`" `"$PS_ScriptPath`""
 	$settings= New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
 	$null = Register-ScheduledTask -TaskName $schtaskName -Trigger $trigger1,$trigger2,$trigger3 -Action $action -Principal $principal -Settings $settings -Description $schtaskDescription -Force
 	
