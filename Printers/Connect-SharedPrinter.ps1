@@ -9,8 +9,8 @@ $Prt_Server = "S-SLZ-APP08.schulegl.ch"
 $Prt_Shares = "PRT Home EG",
 "PRT Home OG"
 
-#$Prt_REMOVEs = ""
 $REMOVE_fromServer = $true #	$true: removes only printers from targeted Server, $false: remove all printer declared string in name
+#$Prt_REMOVEs = ""
 
 ###########################################################################################
 
