@@ -8,7 +8,8 @@ $WorkingPath = "$Path_4netIntune\Data\Fonts"
 New-Item -ItemType "directory" -Path $WorkingPath -Force
 Copy-Item -Path ".\Fonts\*" -Destination $WorkingPath -Recurse
 
-$AllFonts = Get-ChildItem -Path "$WorkingPath\*.ttf"
+$AllFonts = @()
+$AllFonts += Get-ChildItem -Path "$WorkingPath\*.ttf"
 $AllFonts += Get-ChildItem -Path "$WorkingPath\*.otf"
 
 foreach($FontFile in $AllFonts){
