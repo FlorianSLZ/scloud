@@ -1,0 +1,199 @@
+  <RuleCollection Type="Exe" EnforcementMode="Enabled">
+    <FilePublisherRule Id="0d57d25c-5993-4fdf-991d-5ffe865263e2" Name="Signiert von O=LOGMEIN, INC., L=BOSTON, S=MASSACHUSETTS, C=US" Description="" UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePublisherCondition PublisherName="O=LOGMEIN, INC., L=BOSTON, S=MASSACHUSETTS, C=US" ProductName="*" BinaryName="*">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+      </Conditions>
+    </FilePublisherRule>
+    <FilePublisherRule Id="3de8ec77-379e-415a-8aa0-731729f75a06" Name="OneDrive (Win10 v1803 initial state): MICROSOFT ONEDRIVE" Description="Product: MICROSOFT ONEDRIVE&#xA;Publisher: O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US&#xA;File(s) found in: %OSDRIVE%\USERS\testuser\APPDATA\LOCAL\MICROSOFT\ONEDRIVE" UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="MICROSOFT ONEDRIVE" BinaryName="*">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+      </Conditions>
+    </FilePublisherRule>
+    <FilePublisherRule Id="53ac688a-eb52-403b-81e7-ca7c9e1b3298" Name="Signed by O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" Description="" UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="*" BinaryName="*">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+      </Conditions>
+    </FilePublisherRule>
+    <FilePublisherRule Id="6d953a6e-fa47-4561-afde-1dd100ba8732" Name="Signed by O=AGILEBITS INC., L=TORONTO, S=ONTARIO, C=CA" Description="" UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePublisherCondition PublisherName="O=AGILEBITS INC., L=TORONTO, S=ONTARIO, C=CA" ProductName="*" BinaryName="*">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+      </Conditions>
+    </FilePublisherRule>
+    <FilePublisherRule Id="7f3659c6-c870-4587-9d86-b7c608d1191b" Name="Microsoft Teams: Signer/product rule for O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US/MICROSOFT TEAMS" Description="Information acquired from TrustedSigners.ps1" UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="MICROSOFT TEAMS" BinaryName="*">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+      </Conditions>
+    </FilePublisherRule>
+    <FilePublisherRule Id="8f7ccf65-1a4b-4369-af3d-05f3a1cf9268" Name="OneDrive (Win10 v1809 initial state): MICROSOFT ONEDRIVE" Description="Product: MICROSOFT ONEDRIVE&#xA;Publisher: O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US&#xA;File(s) found in: %OSDRIVE%\USERS\ABBY\APPDATA\LOCAL\MICROSOFT\ONEDRIVE" UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="MICROSOFT ONEDRIVE" BinaryName="*">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+      </Conditions>
+    </FilePublisherRule>
+    <FilePublisherRule Id="a26434e0-c078-49c8-abd3-a061a5f5c19d" Name="Signed by O=TEAMVIEWER GERMANY GMBH, L=GÖPPINGEN, S=BADEN-WÜRTTEMBERG, C=DE" Description="" UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePublisherCondition PublisherName="O=TEAMVIEWER GERMANY GMBH, L=GÖPPINGEN, S=BADEN-WÜRTTEMBERG, C=DE" ProductName="*" BinaryName="*">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+      </Conditions>
+    </FilePublisherRule>
+    <FilePublisherRule Id="cc281084-bd23-40ce-b9ca-28ae5a9a4bb0" Name="OneDrive (Win10 v1803 initial state): ONEDRIVESETUP.EXE" Description="Product: WINDOWS LIVE&#xA;Publisher: O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US&#xA;Original path: %OSDRIVE%\USERS\testuser\APPDATA\LOCAL\MICROSOFT\ONEDRIVE\17.3.6816.0313\ONEDRIVESETUP.EXE" UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="WINDOWS LIVE" BinaryName="ONEDRIVESETUP.EXE">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+      </Conditions>
+    </FilePublisherRule>
+    <FilePublisherRule Id="d5aa26d0-1bfa-4d27-8af8-ed546847dfd3" Name="Signed by O=BARCO N.V., L=KORTRIJK, S=WEST-VLAANDEREN, C=BE" Description="" UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePublisherCondition PublisherName="O=BARCO N.V., L=KORTRIJK, S=WEST-VLAANDEREN, C=BE" ProductName="*" BinaryName="*">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+      </Conditions>
+    </FilePublisherRule>
+    <FilePublisherRule Id="f493e22c-63a9-4811-ab94-c5d8a8a968f5" Name="BgInfo: Disallow old versions of Sysinternals Bginfo.exe" Description="Disallow Sysinternals Bginfo.exe versions 4.25 and earlier that aren't AppLocker-aware" UserOrGroupSid="S-1-1-0" Action="Deny">
+      <Conditions>
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="BGINFO" BinaryName="BGINFO.EXE">
+          <BinaryVersionRange LowSection="*" HighSection="4.25.0.0" />
+        </FilePublisherCondition>
+      </Conditions>
+    </FilePublisherRule>
+    <FilePublisherRule Id="b62d0eb3-44e6-4763-8244-38e92ea4e542" Name="Signiert von O=OEBB-BUSINESS COMPETENCE CENTER GMBH, L=WIEN, C=AT" Description="" UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePublisherCondition PublisherName="O=OEBB-BUSINESS COMPETENCE CENTER GMBH, L=WIEN, C=AT" ProductName="*" BinaryName="*">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+      </Conditions>
+    </FilePublisherRule>
+    <FilePathRule Id="222f7522-eff3-48d9-bdc2-8fbdca4494e5" Name="C:\Users\*\Toporail\" Description="" UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePathCondition Path="C:\Users\*\Toporail\" />
+      </Conditions>
+    </FilePathRule>
+    <FilePathRule Id="38080c1b-54bc-4f7e-804d-fafb70bf781b" Name="All files located in the Windows folder" Description="Allows members of the Everyone group to run applications that are located in the Windows folder." UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePathCondition Path="%WINDIR%\*" />
+      </Conditions>
+      <Exceptions>
+        <FilePathCondition Path="%WINDIR%\ccm\logs\*" />
+        <FilePathCondition Path="%WINDIR%\debug\wia\*" />
+        <FilePathCondition Path="%WINDIR%\debug\wia:*" />
+        <FilePathCondition Path="%WINDIR%\pchealth\errorrep\qheadles\*" />
+        <FilePathCondition Path="%WINDIR%\pchealth\errorrep\qsignoff\*" />
+        <FilePathCondition Path="%WINDIR%\registration\crmlog\*" />
+        <FilePathCondition Path="%WINDIR%\serviceprofiles\localservice\appdata\local\microsoft\dlna\deviceicons\*" />
+        <FilePathCondition Path="%WINDIR%\serviceprofiles\localservice\appdata\local\microsoft\dlna\deviceicons:*" />
+        <FilePathCondition Path="%WINDIR%\servicestate\helloface\data\*" />
+        <FilePathCondition Path="%WINDIR%\servicestate\helloface\data:*" />
+        <FilePathCondition Path="%WINDIR%\servicestate\hidtelephony\data\*" />
+        <FilePathCondition Path="%WINDIR%\servicestate\hidtelephony\data:*" />
+        <FilePathCondition Path="%WINDIR%\servicestate\iddcx0102\data\*" />
+        <FilePathCondition Path="%WINDIR%\servicestate\iddcx0102\data:*" />
+        <FilePathCondition Path="%WINDIR%\servicestate\vidd\data\*" />
+        <FilePathCondition Path="%WINDIR%\servicestate\vidd\data:*" />
+        <FilePathCondition Path="%SYSTEM32%\com\dmp\*" />
+        <FilePathCondition Path="%SYSTEM32%\drivers\driverdata\*" />
+        <FilePathCondition Path="%SYSTEM32%\drivers\driverdata:*" />
+        <FilePathCondition Path="%SYSTEM32%\fxstmp\*" />
+        <FilePathCondition Path="%SYSTEM32%\microsoft\crypto\rsa\machinekeys\*" />
+        <FilePathCondition Path="%SYSTEM32%\microsoft\crypto\rsa\machinekeys:*" />
+        <FilePathCondition Path="%SYSTEM32%\spool\drivers\color\*" />
+        <FilePathCondition Path="%SYSTEM32%\spool\printers\*" />
+        <FilePathCondition Path="%SYSTEM32%\spool\servers\*" />
+        <FilePathCondition Path="%SYSTEM32%\tasks\*" />
+        <FilePathCondition Path="%SYSTEM32%\tasks_migrated\*" />
+        <FilePathCondition Path="%WINDIR%\tasks\*" />
+        <FilePathCondition Path="%WINDIR%\temp\*" />
+        <FilePathCondition Path="%WINDIR%\tracing\*" />
+        <FilePathCondition Path="%WINDIR%\tracing:*" />
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="MICROSOFT® .NET FRAMEWORK" BinaryName="MSBUILD.EXE">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="MICROSOFT® WINDOWS® OPERATING SYSTEM" BinaryName="RUNAS.EXE">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="MICROSOFT® .NET FRAMEWORK" BinaryName="REGSVCS.EXE">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="MICROSOFT® WINDOWS® OPERATING SYSTEM" BinaryName="WMIC.EXE">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="MICROSOFT® WINDOWS® OPERATING SYSTEM" BinaryName="PRESENTATIONHOST.EXE">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="INTERNET EXPLORER" BinaryName="MSHTA.EXE">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="MICROSOFT® WINDOWS® OPERATING SYSTEM" BinaryName="CIPHER.EXE">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="MICROSOFT® .NET FRAMEWORK" BinaryName="INSTALLUTIL.EXE">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="MICROSOFT® .NET FRAMEWORK" BinaryName="MICROSOFT.WORKFLOW.COMPILER.EXE">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="MICROSOFT® .NET FRAMEWORK" BinaryName="IEEXEC.EXE">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="MICROSOFT® .NET FRAMEWORK" BinaryName="REGASM.EXE">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+      </Exceptions>
+    </FilePathRule>
+    <FilePathRule Id="6a45dce1-ea16-422c-b905-5b95dd7a44be" Name="Additional allowed path: %OSDRIVE%\PROGRAMDATA\MICROSOFT\WINDOWS DEFENDER\*" Description="Allows Everyone to execute from %OSDRIVE%\PROGRAMDATA\MICROSOFT\WINDOWS DEFENDER\*" UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePathCondition Path="%OSDRIVE%\PROGRAMDATA\MICROSOFT\WINDOWS DEFENDER\*" />
+      </Conditions>
+    </FilePathRule>
+    <FilePathRule Id="cdfd5d1c-828f-4bd6-9542-1395c6088f82" Name="All files located in the Program Files folder" Description="Allows members of the Everyone group to run applications that are located in the Program Files folder." UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePathCondition Path="%PROGRAMFILES%\*" />
+      </Conditions>
+      <Exceptions>
+        <FilePathCondition Path="%PROGRAMFILES%\google\chrome\application\setupmetrics\*" />
+        <FilePathCondition Path="%PROGRAMFILES%\microsoft onedrive\update\*" />
+        <FilePathCondition Path="%PROGRAMFILES%\microsoft sql server\140\dts\datadumps\*" />
+        <FilePathCondition Path="%PROGRAMFILES%\microsoft sql server\140\shared\errordumps\*" />
+        <FilePathCondition Path="%PROGRAMFILES%\microsoft\edge beta\application\setupmetrics\*" />
+        <FilePathCondition Path="%PROGRAMFILES%\microsoft\edge\application\setupmetrics\*" />
+      </Exceptions>
+    </FilePathRule>
+    <FilePathRule Id="fd686d83-a829-4351-8ff4-27c7de5755d2" Name="(Default Rule) All files" Description="Allows members of the local Administrators group to run all applications." UserOrGroupSid="S-1-5-32-544" Action="Allow">
+      <Conditions>
+        <FilePathCondition Path="*" />
+      </Conditions>
+    </FilePathRule>
+    <FileHashRule Id="456bd77c-5528-4a93-8ab8-51c6b950c541" Name="Rule set created 2020-03-30 17:10" Description="Never-applicable rule to document that this AppLocker rule set was created via AaronLocker at 2020-03-30 17:10" UserOrGroupSid="S-1-3-0" Action="Deny">
+      <Conditions>
+        <FileHashCondition>
+          <FileHash Type="SHA256" Data="0x0000000000000000000000000000000000000000000000000020200330171034" SourceFileName="DateTimeInfo" SourceFileLength="1" />
+        </FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="8bc0f6c1-91cc-495a-9abf-ee4a76be4f40" Name="LABORA.EXE" Description="" UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FileHashCondition>
+          <FileHash Type="SHA256" Data="0x3865F722596C2D3AEE09ACDE0ECCCDC3C75C79495177B78D9D1F795C94C0FC4E" SourceFileName="LABORA.EXE" SourceFileLength="3877376" />
+        </FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+    <FileHashRule Id="e29e5c74-ec86-45ea-9e85-e7d8acac55ca" Name="PACOMP.EXE" Description="" UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FileHashCondition>
+          <FileHash Type="SHA256" Data="0xD9C19A4C309FEC88BA2E6F4C55DB0E1E5D2F46DEC6CD0E3A85FA53E9A333E55A" SourceFileName="PACOMP.EXE" SourceFileLength="275968" />
+        </FileHashCondition>
+      </Conditions>
+    </FileHashRule>
+  </RuleCollection>
