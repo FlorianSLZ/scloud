@@ -5,7 +5,7 @@ Start-Transcript -Path "$Path_4netIntune\Log\$global:PackageName-$env:UserName.l
 
 ###########################################################################################
 # Input values 
-$Prt_Server = "S-SLZ-APP08.schulegl.ch"
+$Prt_Server = "S-SLZ-APP08.scloud.work"
 $Prt_Shares = "PRT Home EG",
 "PRT Home OG"
 
