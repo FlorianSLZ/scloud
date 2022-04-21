@@ -1,7 +1,7 @@
 ﻿$PackageName = "DesktopIcon_SLZ"
 
 $Path_4netIntune = "$Env:Programfiles\4net\EndpointManager"
-Start-Transcript -Path "$Path_4netIntune\Log\uninstall\$ProgramName-uninstall.log" -Force
+Start-Transcript -Path "$Path_4netIntune\Log\uninstall\$PackageName-uninstall.log" -Force
 
 # remove old icons form package
 $DesktopTMP = "$Path_4netIntune\Data\Desktop\$PackageName"
