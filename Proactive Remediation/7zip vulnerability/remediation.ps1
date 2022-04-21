@@ -1,0 +1,8 @@
+$vulnerability = "C:\Program Files\7-Zip\7-zip.chm"
+
+try{
+    Remove-Item $vulnerability -Force
+    Write-Host "Vulnerability removed."
+}catch{
+    Write-Error "Error removing Vulnerability"
+}
