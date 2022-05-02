@@ -10,7 +10,7 @@ try{
 
 
         ############################################################################################
-        #   YOUR CODE TO RUN ONCE
+        #   CODE TO RUN ONCE
 
         # clear Teams cache for all Users
         if(Get-Process Teams -ErrorAction SilentlyContinue){Get-Process Teams | Stop-Process -Force}
