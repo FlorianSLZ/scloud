@@ -8,7 +8,7 @@ if($ProgramPath){
 }
 
 ######################################################################################################################
-# Program File exists with content
+# Validation File exists with content
 ######################################################################################################################
 $PackageName = "PackageXY"
 $Version = "1"
@@ -17,6 +17,10 @@ $ProgramVersion_current = Get-Content -Path "$Env:Programfiles\scloud\EndpointMa
 if($ProgramVersion_current -eq $Version){
     Write-Host "Found it!"
 }
+
+# command to create a validation file:
+New-Item -Path "$Env:Programfiles\scloud\EndpointManager\Validation\$PackageName" -ItemType "file" -Force -Value $Version
+
 
 ######################################################################################################################
 # Program EXE with target Version
@@ -36,7 +40,7 @@ $ProgramPath = "C:\Program Files\XXXXX\XXXXXX.exe"
 $ProgramVersion_target = '1.0.2' 
 $ProgramVersion_current = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($ProgramPath).FileVersion
 
-if($ProgramVersion_current -gt $ProgramVersion_target){
+if($ProgramVersion_current -gt [System.Version]$ProgramVersion_target){
     Write-Host "Found it!"
 }
 
