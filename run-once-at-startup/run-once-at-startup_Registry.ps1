@@ -23,8 +23,8 @@ try{
         ############################################################################################
 
 
-        # Delete Script
-        Remove-Item -Path $MyInvocation.MyCommand.Source
+        # Delete Script > currently not, cause could be needed from multiple users
+        # Remove-Item -Path $MyInvocation.MyCommand.Source 
 
     }else{
         # script path
