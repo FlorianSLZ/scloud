@@ -40,7 +40,7 @@ $ProgramPath = "C:\Program Files\XXXXX\XXXXXX.exe"
 $ProgramVersion_target = '1.0.2' 
 $ProgramVersion_current = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($ProgramPath).FileVersion
 
-if($ProgramVersion_current -gt [System.Version]$ProgramVersion_target){
+if($ProgramVersion_current -ge [System.Version]$ProgramVersion_target){
     Write-Host "Found it!"
 }
 
