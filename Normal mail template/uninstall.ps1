@@ -16,6 +16,8 @@ try{
     Start-Process Outlook
 }
 
+Remove-Item -Path "HKCU:\Software\Policies\Microsoft\Office\16.0\Common\MailSettings" -Force -Verbose
+
 Remove-Item -Path "$env:localAPPDATA\4net\EndpointManager\Validation\$PackageName" -Force
 
 Stop-Transcript
