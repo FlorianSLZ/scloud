@@ -1,34 +1,34 @@
 $PackageName = "Teams_open-in-background"
 $Version = "1"
 
-$Path_4netIntune = "$Env:Programfiles\4net\EndpointManager"
+$Path_4netIntune = "$env:LOCALAPPDATA\4net\EndpointManager"
 Start-Transcript -Path "$Path_4netIntune\Log\$PackageName.log" -Force
 try{
     # registry key
-    $KeyPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\RunOnce"}
+    $KeyPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\RunOnce"
     
     # Check if Property exist with correct version
     $PropertyName = "$PackageName - V$Version"
     $Property_existing = Get-ItemProperty $KeyPath -Name $PropertyName -ErrorAction SilentlyContinue
     if($Property_existing){
 
+        try{
+            ############################################################################################
+            #   CODE TO RUN ONCE
 
-        ############################################################################################
-        #   CODE TO RUN ONCE
+            # End acitve Teams process
+            if(Get-Process Teams -ErrorAction SilentlyContinue){Get-Process Teams | Stop-Process -Force}
+            # Replace/Set "openAsHidden" option to true
+            (Get-Content $ENV:APPDATA\Microsoft\Teams\desktop-config.json -ErrorAction Stop).replace('"openAsHidden":false', '"openAsHidden":true') | Set-Content $ENV:APPDATA\Microsoft\Teams\desktop-config.json
+            # STart Teams in background
+            Start-Process -File $env:LOCALAPPDATA\Microsoft\Teams\Update.exe -ArgumentList '--processStart "Teams.exe" --process-start-args "--system-initiated"'
 
-        # End acitve Teams process
-        if(Get-Process Teams -ErrorAction SilentlyContinue){Get-Process Teams | Stop-Process -Force}
-        # Replace/Set "openAsHidden" option to true
-        (Get-Content $ENV:APPDATA\Microsoft\Teams\desktop-config.json).replace('"openAsHidden":false', '"openAsHidden":true') | Set-Content $ENV:APPDATA\Microsoft\Teams\desktop-config.json
-        # STart Teams in background
-        Start-Process -File $env:LOCALAPPDATA\Microsoft\Teams\Update.exe -ArgumentList '--processStart "Teams.exe" --process-start-args "--system-initiated"'
-
-        #   END CODE TO RUN ONCE
-        ############################################################################################
-
+            #   END CODE TO RUN ONCE
+            ############################################################################################
 
         # Delete Script
         Remove-Item -Path $MyInvocation.MyCommand.Source 
+        }catch{$_}
 
     }else{
         # script path
