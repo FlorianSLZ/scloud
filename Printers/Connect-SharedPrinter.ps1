@@ -83,26 +83,20 @@ if (-not (Test-RunningAsSystem)) {
 	}
 }
 
-Stop-Transcript
-
-#!ENDUSERCONTEXT!#
-
 # Create Sceduled Task as System
 if (Test-RunningAsSystem) {
 
-	Start-Transcript -Path $(Join-Path -Path "$Path_4netIntune\Log" -ChildPath "$global:PackageName-ScheduledTask.log")
-	Write-Output "Running as System --> creating scheduled task which will run on user logon and network changes"
+	Write-Output "Creating scheduled task which will run on user logon and network changes"
 
 	# get this script content
 	$currentScript = Get-Content -Path $($PSCommandPath)
-	$schtaskScript = $currentScript[(0) .. ($currentScript.IndexOf("#!ENDUSERCONTEXT!#") - 1)]
 	$scriptSavePath = $(Join-Path -Path "$Path_4netIntune\Data" -ChildPath "printer-mapping")
 	# Create Path if not exists
 	if (-not (Test-Path $scriptSavePath)) {New-Item -ItemType Directory -Path $scriptSavePath -Force}
 	# Save this file on local computer
 	$PS_PathName = "$global:PackageName.ps1"
 	$PS_ScriptPath = $(Join-Path -Path $scriptSavePath -ChildPath $PS_PathName)
-	$schtaskScript | Out-File -FilePath $PS_ScriptPath -Force
+	$currentScript | Out-File -FilePath $PS_ScriptPath -Force
 
 	# Dummy vbscript to hide PowerShell Window popping up at task execution
 	$vbsHiddenPS = "
@@ -149,6 +143,7 @@ if (Test-RunningAsSystem) {
 	
 	Start-ScheduledTask -TaskName $schtaskName
 	
-	Stop-transcript
 
 }
+
+Stop-transcript
