@@ -1,5 +1,5 @@
 ﻿$PackageName = "PR4Business"
-$Version = 2
+$Version = 1
 
 $Path_4Log = "$Env:Programfiles\4net\EndpointManager"
 Start-Transcript -Path "$Path_4Log\Log\$PackageName-install.log" -Force
