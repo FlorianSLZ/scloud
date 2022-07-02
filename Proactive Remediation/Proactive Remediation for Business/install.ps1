@@ -25,7 +25,7 @@ try{
             Write-Host "Detection positiv, remediation starts now"
             .\remediation.ps1
             }else{
-                Write-Host "Detection negativ, now further action needed"
+                Write-Host "Detection negativ, no further action needed"
             }
     }else{
         # path declaration / creation
