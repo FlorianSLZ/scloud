@@ -1,0 +1,1 @@
+Remove-Item "C:\Users\*\Desktop\*- Copy*" -Force
