@@ -8,20 +8,19 @@ Start-Transcript -Path "$Path_4Log\Log\$PackageName-install.log" -Force
 #   Recurence Data
 ##########################################################################
 
-$Schedule_Frequency = "Daily" # Once, Hourly, Daily, AtLogon
-$Schedule_RepeatInterval = "7" # Number
-$Schedule_StartDate = "2023-01-30" # YYYY.MM.DD
-$Schedule_StartTime = "8am" # ex 8am or 5pm
+$Schedule_Frequency = "Daily"       # Once, Hourly, Daily, AtLogon
+$Schedule_RepeatInterval = "7"      # Number            (for Daily and Hourly)
+$Schedule_StartDate = "2023-01-30"  # YYYY.MM.DD        (for Once)
+$Schedule_StartTime = "8am"         # ex 8am or 5pm     (for Once, Hourly, Daily)
 
 ##########################################################################
-
 
 try{
     # Check if Task exist with correct version
     $task_existing = Get-ScheduledTask -TaskName $PackageName -ErrorAction SilentlyContinue
     if($task_existing.Description -like "Version $Version*"){
         $detection = .\detection.ps1
-        if($detection -eq 1){
+        if($LASTEXITCODE -ne 0){
             Write-Host "Detection positiv, remediation starts now"
             .\remediation.ps1
             }else{
@@ -43,7 +42,7 @@ try{
         switch ($Schedule_Frequency)                         
         {                        
             "Once"      {$trigger = New-ScheduledTaskTrigger -Once -At $(Get-Date "$Schedule_StartDate $Schedule_StartTime")}                        
-            "Hourly"    {$trigger = New-ScheduledTaskTrigger -Once -At 1am -RepetitionDuration  (New-TimeSpan -Days 1)  -RepetitionInterval  (New-TimeSpan -Hours 1)}                     
+            "Hourly"    {$trigger = New-ScheduledTaskTrigger -Once -At $Schedule_StartTime -RepetitionDuration  (New-TimeSpan -Days 1)  -RepetitionInterval  (New-TimeSpan -Hours $Schedule_RepeatInterval)}                     
             "Daily"     {$trigger = New-ScheduledTaskTrigger -Daily -DaysInterval $Schedule_RepeatInterval -At $Schedule_StartTime}
             "AtLogon"   {$trigger = New-ScheduledTaskTrigger -AtLogon}   
             Default     {Write-Error "Wrong frequency declaration."}                        
