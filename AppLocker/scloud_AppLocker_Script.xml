@@ -1,0 +1,64 @@
+<RuleCollection Type="Script" EnforcementMode="Enabled">
+    <FilePathRule Id="06dce67b-934c-454f-a263-2515c8796a5d" Name="(Default) Alle scripts in de map Program Files" Description="Hiermee kunnen leden van de groep Iedereen scripts in de map Program Files uitvoeren." UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePathCondition Path="%PROGRAMFILES%\*" />
+      </Conditions>
+    </FilePathRule>
+    <FilePathRule Id="b970501f-60da-478c-a27b-5f39199d25b7" Name="Alle scripts in de map Windows" Description="Hiermee kunnen leden van de groep Iedereen scripts in de map Windows uitvoeren." UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePathCondition Path="%WINDIR%\*" />
+      </Conditions>
+      <Exceptions>
+        <FilePathCondition Path="%SYSTEM32%\com\dmp\*" />
+        <FilePathCondition Path="%SYSTEM32%\FxsTmp\*" />
+        <FilePathCondition Path="%SYSTEM32%\icacls.exe" />
+        <FilePathCondition Path="%SYSTEM32%\microsoft\crypto\rsa\machinekeys\*" />
+        <FilePathCondition Path="%SYSTEM32%\spool\drivers\color\*" />
+        <FilePathCondition Path="%SYSTEM32%\Spool\PRINTERS\*" />
+        <FilePathCondition Path="%SYSTEM32%\Spool\SERVERS\*" />
+        <FilePathCondition Path="%SYSTEM32%\Tasks:*" />
+        <FilePathCondition Path="%SYSTEM32%\tasks\*" />
+        <FilePathCondition Path="%WINDIR%\debug\wia\*" />
+        <FilePathCondition Path="%WINDIR%\diagnostics\system\AERO\CL_Invocation.ps1" />
+        <FilePathCondition Path="%WINDIR%\servicing\packages\*" />
+        <FilePathCondition Path="%WINDIR%\servicing\sessions\*" />
+        <FilePathCondition Path="%WINDIR%\TASKS*" />
+        <FilePathCondition Path="%WINDIR%\Tasks:*" />
+        <FilePathCondition Path="%WINDIR%\tasks\*" />
+        <FilePathCondition Path="%WINDIR%\TEMP*" />
+        <FilePathCondition Path="%WINDIR%\Temp:*" />
+        <FilePathCondition Path="%WINDIR%\temp\*" />
+        <FilePathCondition Path="%WINDIR%\tracing*" />
+        <FilePathCondition Path="%WINDIR%\tracing\*" />
+        <FilePathCondition Path="C:\Windows\diagnostics\system\Audio\CL_Invocation.ps1" />
+        <FilePathCondition Path="C:\Windows\diagnostics\system\WindowsUpdate\CL_Invocation.ps1" />
+        <FilePathCondition Path="C:\windows\PCHEALTH\ERRORREP\*" />
+        <FilePathCondition Path="C:\windows\Registration\CRMLog\*" />
+        <FilePathCondition Path="C:\Windows\System32\manage-bde.wsf" />
+        <FilePathCondition Path="C:\Windows\System32\Printing_Admin_Scripts\en-US\pubprn.vbs" />
+        <FilePathCondition Path="C:\Windows\System32\Printing_Admin_Scripts\nl-NL\*" />
+        <FilePathCondition Path="C:\Windows\System32\slmgr.vbs" />
+        <FilePathCondition Path="C:\Windows\System32\SyncAppvPublishingServer.vbs" />
+        <FilePathCondition Path="C:\windows\System32\winevt\*" />
+        <FilePathCondition Path="C:\Windows\System32\winrm.cmd" />
+        <FilePathCondition Path="C:\Windows\SysWOW64\Printing_Admin_Scripts\en-US\pubprn.vbs" />
+        <FilePathCondition Path="C:\Windows\SysWOW64\slmgr.vbs" />
+        <FilePathCondition Path="C:\windows\SysWOW64\Tasks\*" />
+      </Exceptions>
+    </FilePathRule>
+    <FilePathRule Id="c904df6b-f079-4a1c-bafb-64c250a8f338" Name="Alle scripts in de map Program Files" Description="Hiermee kunnen leden van de groep Iedereen scripts in de map Program Files uitvoeren." UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePathCondition Path="%PROGRAMFILES%\*" />
+      </Conditions>
+      <Exceptions>
+        <FilePathCondition Path="C:\Program Files\Common Files\microsoft shared\MSInfo\*" />
+        <FilePathCondition Path="c:\Program Files\WindowsPowerShell\Modules\Pester\*\bin\Pester.bat" />
+        <FilePathCondition Path="c:\Program Files\WindowsPowerShell\Modules\Pester\3.4.0\bin\Pester.bat" />
+      </Exceptions>
+    </FilePathRule>
+    <FilePathRule Id="ed97d0cb-15ff-430f-b82c-8d7832957725" Name="(Default) Alle scripts" Description="Hiermee kunnen leden van de lokale groep Administrators alle scripts uitvoeren." UserOrGroupSid="S-1-5-32-544" Action="Allow">
+      <Conditions>
+        <FilePathCondition Path="*" />
+      </Conditions>
+    </FilePathRule>
+  </RuleCollection>

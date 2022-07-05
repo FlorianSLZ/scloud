@@ -1,0 +1,17 @@
+<RuleCollection Type="DLL" EnforcementMode="AuditOnly">
+    <FilePathRule Id="bac4b0bf-6f1b-40e8-8627-8545fa89c8b6" Name="(Default) Microsoft Windows-DLL's" Description="Hiermee kunnen leden van de groep Iedereen DLL-bestanden in de map Windows laden." UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePathCondition Path="%WINDIR%\*" />
+      </Conditions>
+    </FilePathRule>
+    <FilePathRule Id="3737732c-99b7-41d4-9037-9cddfb0de0d0" Name="(Default) Alle DLL's in de map Program Files" Description="Hiermee kunnen leden van de groep Iedereen DLL-bestanden in de map Program Files laden." UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePathCondition Path="%PROGRAMFILES%\*" />
+      </Conditions>
+    </FilePathRule>
+    <FilePathRule Id="fe64f59f-6fca-45e5-a731-0f6715327c38" Name="(Default) Alle DLL's" Description="Hiermee kunnen leden van de lokale groep Administrators alle DLL-bestanden laden." UserOrGroupSid="S-1-5-32-544" Action="Allow">
+      <Conditions>
+        <FilePathCondition Path="*" />
+      </Conditions>
+    </FilePathRule>
+  </RuleCollection>

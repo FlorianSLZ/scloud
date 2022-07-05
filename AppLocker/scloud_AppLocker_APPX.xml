@@ -1,0 +1,16 @@
+<RuleCollection Type="Appx" EnforcementMode="Enabled">
+    <FilePublisherRule Id="4a92ab5d-787a-41b0-b2e1-a36154ce327c" Name="windows.immersivecontrolpanel, versie 6.2.0.0 en hoger van Microsoft Corporation" Description="" UserOrGroupSid="S-1-5-32-544" Action="Allow">
+      <Conditions>
+        <FilePublisherCondition PublisherName="CN=Microsoft Windows, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" ProductName="windows.immersivecontrolpanel" BinaryName="*">
+          <BinaryVersionRange LowSection="6.2.0.0" HighSection="*" />
+        </FilePublisherCondition>
+      </Conditions>
+    </FilePublisherRule>
+    <FilePublisherRule Id="a9e18c21-ff8f-43cf-b9fc-db40eed693ba" Name="(Default) All signed packaged apps" Description="Allows members of the Everyone group to run packaged apps that are signed." UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePublisherCondition PublisherName="*" ProductName="*" BinaryName="*">
+          <BinaryVersionRange LowSection="0.0.0.0" HighSection="*" />
+        </FilePublisherCondition>
+      </Conditions>
+    </FilePublisherRule>
+</RuleCollection>

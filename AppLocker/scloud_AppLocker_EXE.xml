@@ -1,0 +1,236 @@
+<RuleCollection Type="Exe" EnforcementMode="Enabled">
+    <FilePathRule Id="518409ed-32b3-48d9-b1fb-08f3aa404934" Name="All files in the Windows folder" Description="Allows members of the Everyone group to run applications in the Windows folder." UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePathCondition Path="%WINDIR%\*" />
+      </Conditions>
+      <Exceptions>
+        <FilePathCondition Path="%SYSTEM32%\at.exe" />
+        <FilePathCondition Path="%SYSTEM32%\auditpol.exe" />
+        <FilePathCondition Path="%SYSTEM32%\bash.exe" />
+        <FilePathCondition Path="%SYSTEM32%\bitsadmin.exe" />
+        <FilePathCondition Path="%SYSTEM32%\catroot2\*" />
+        <FilePathCondition Path="%SYSTEM32%\cipher.exe" />
+        <FilePathCondition Path="%SYSTEM32%\cmstp.exe" />
+        <FilePathCondition Path="%SYSTEM32%\cmd.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\cmd.exe" />
+	<FilePathCondition Path="%SYSTEM32%\com\dmp\*" />
+        <FilePathCondition Path="%SYSTEM32%\cscript.exe" />
+        <FilePathCondition Path="%SYSTEM32%\curl.exe" />
+        <FilePathCondition Path="%SYSTEM32%\diskshadow.exe" />
+        <FilePathCondition Path="%SYSTEM32%\fsutil.exe" />
+        <FilePathCondition Path="%SYSTEM32%\ftp.exe" />
+	<FilePathCondition Path="%SYSTEM32%\windowspowershell\v1.0\powershell_ise.exe" />
+        <FilePathCondition Path="%SYSTEM32%\FxsTmp\*" />
+        <FilePathCondition Path="%SYSTEM32%\gpresult.exe" />
+        <FilePathCondition Path="%SYSTEM32%\icalcs.exe" />
+        <FilePathCondition Path="%SYSTEM32%\mmc.exe" />
+        <FilePathCondition Path="%SYSTEM32%\msdt.exe" />
+        <FilePathCondition Path="%SYSTEM32%\mshta.exe" />
+        <FilePathCondition Path="%SYSTEM32%\net.exe" />
+        <FilePathCondition Path="%SYSTEM32%\netdom.exe" />
+        <FilePathCondition Path="%SYSTEM32%\netsh.exe" />
+        <FilePathCondition Path="%SYSTEM32%\netstat.exe" />
+        <FilePathCondition Path="%SYSTEM32%\nltest.exe" />
+        <FilePathCondition Path="%SYSTEM32%\odbcconf.exe" />
+        <FilePathCondition Path="%SYSTEM32%\pcalua.exe" />
+        <FilePathCondition Path="%SYSTEM32%\PresentationHost.exe" />
+        <FilePathCondition Path="%SYSTEM32%\query.exe" />
+        <FilePathCondition Path="%SYSTEM32%\quser.exe" />
+        <FilePathCondition Path="%SYSTEM32%\regedit.exe" />
+        <FilePathCondition Path="%SYSTEM32%\regedt32.exe" />
+        <FilePathCondition Path="%SYSTEM32%\regini.exe" />
+        <FilePathCondition Path="%SYSTEM32%\rekeywiz.exe" />
+        <FilePathCondition Path="%SYSTEM32%\rekeywizard.exe" />
+        <FilePathCondition Path="%SYSTEM32%\sc.exe" />
+        <FilePathCondition Path="%SYSTEM32%\schtasks.exe" />
+        <FilePathCondition Path="%SYSTEM32%\script.exe" />
+        <FilePathCondition Path="%SYSTEM32%\sigverif.exe" />
+        <FilePathCondition Path="%SYSTEM32%\Spool\PRINTERS\*" />
+        <FilePathCondition Path="%SYSTEM32%\spool\SERVERS\*" />
+        <FilePathCondition Path="%SYSTEM32%\subst.exe" />
+        <FilePathCondition Path="%SYSTEM32%\telnet.exe" />
+        <FilePathCondition Path="%SYSTEM32%\tracker.exe" />
+        <FilePathCondition Path="%SYSTEM32%\tree.com" />
+        <FilePathCondition Path="%SYSTEM32%\tskill.exe" />
+        <FilePathCondition Path="%SYSTEM32%\vssadmin.exe" />
+        <FilePathCondition Path="%SYSTEM32%\wbem\WMIC.exe" />
+        <FilePathCondition Path="%SYSTEM32%\wecutil.exe" />
+        <FilePathCondition Path="%SYSTEM32%\WindowsPowerShell\v1.0\powershell.exe" />
+        <FilePathCondition Path="%SYSTEM32%\winrm.exe" />
+        <FilePathCondition Path="%SYSTEM32%\winrs.exe" />
+        <FilePathCondition Path="%SYSTEM32%\winver.exe" />
+	<FilePathCondition Path="%SYSTEM32%\Applocker\*" />
+	<FilePathCondition Path="%SYSTEM32%\Applocker:*" />
+        <FilePathCondition Path="%SYSTEM32%\wscript.exe" />
+        <FilePathCondition Path="%SYSTEM32%\xwizard.exe" />
+        <FilePathCondition Path="%SYSTEM32%esentutl.exe" />
+        <FilePathCondition Path="%system32\eventvwr.exe" />
+        <FilePathCondition Path="%WINDIR%\com\dmp\*" />
+        <FilePathCondition Path="%WINDIR%\debug:*" />
+        <FilePathCondition Path="%WINDIR%\Debug\*" />
+        <FilePathCondition Path="%WINDIR%\debug\WIA" />
+        <FilePathCondition Path="%WINDIR%\debug\wia:*" />
+        <FilePathCondition Path="%WINDIR%\microsoft.net\framework:*" />
+        <FilePathCondition Path="%WINDIR%\microsoft.net\framework\*" />
+        <FilePathCondition Path="%WINDIR%\Microsoft.NET\Framework64" />
+        <FilePathCondition Path="%WINDIR%\Microsoft.NET\Framework64\*" />
+        <FilePathCondition Path="%WINDIR%\Microsoft.NET\Framework64\*\*" />
+        <FilePathCondition Path="%WINDIR%\Microsoft.NET\Framework64\v3.5\MSBuild.exe" />
+        <FilePathCondition Path="%WINDIR%\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe" />
+        <FilePathCondition Path="%WINDIR%\msxsl.exe" />
+        <FilePathCondition Path="%WINDIR%\PCHEALTH\ERRORREP\QHEADLES\*" />
+        <FilePathCondition Path="%WINDIR%\PCHEALTH\ERRORREP\QSIGNOFF\*" />
+        <FilePathCondition Path="%WINDIR%\PLA\Reports\*" />
+        <FilePathCondition Path="%WINDIR%\PLA\Rules\*" />
+        <FilePathCondition Path="%WINDIR%\PLA\Templates\*" />
+        <FilePathCondition Path="%WINDIR%\Registration\CRMLog\*" />
+        <FilePathCondition Path="%WINDIR%\servicing\sessions\*" />
+        <FilePathCondition Path="%WINDIR%\spool\servers:*" />
+        <FilePathCondition Path="%WINDIR%\System32\catroot2\{F750E6C3-38EE-11D1-85E5-00C04FC295EE}\*" />
+        <FilePathCondition Path="%WINDIR%\System32\com\dmp\*" />
+        <FilePathCondition Path="%WINDIR%\System32\LogFiles\WMI\*" />
+        <FilePathCondition Path="%WINDIR%\System32\spool\drivers\color\*" />
+        <FilePathCondition Path="%WINDIR%\System32\spool\PRINTERS\*" />
+        <FilePathCondition Path="%WINDIR%\system32\tasks:*" />
+        <FilePathCondition Path="%WINDIR%\System32\Tasks\" />
+        <FilePathCondition Path="%WINDIR%\System32\Tasks\*" />
+        <FilePathCondition Path="%WINDIR%\System32\Tasks\Microsoft\Windows\CertificateServicesClient\UserTask-Roam\*" />
+        <FilePathCondition Path="%WINDIR%\System32\Tasks\Microsoft\Windows\PLA\System\" />
+        <FilePathCondition Path="%WINDIR%\System32\Tasks\User_Feed_Synchronization-{F3998D1D-6B67-45B6-BE78-9A1176A90B" />
+        <FilePathCondition Path="%WINDIR%\SysWOW64\com\dmp\*" />
+        <FilePathCondition Path="%WINDIR%\SysWOW64\FxsTmp\*" />
+        <FilePathCondition Path="%WINDIR%\SysWOW64\Tasks\*" />
+        <FilePathCondition Path="%WINDIR%\tasks:*" />
+        <FilePathCondition Path="%WINDIR%\Tasks\*" />
+        <FilePathCondition Path="%WINDIR%\tasks\*\:*" />
+        <FilePathCondition Path="%WINDIR%\temp:*" />
+        <FilePathCondition Path="%WINDIR%\Temp\*" />
+        <FilePathCondition Path="%WINDIR%\temp\cookies:*" />
+        <FilePathCondition Path="%WINDIR%\Temp\Cookies\*" />
+        <FilePathCondition Path="%WINDIR%\Temp\History\*" />
+        <FilePathCondition Path="%WINDIR%\Temp\Temporary Internet Files\*" />
+        <FilePathCondition Path="%WINDIR%\tracing:*" />
+        <FilePathCondition Path="%WINDIR%\tracing\*" />
+        <FilePathCondition Path="%WINDIR%\winevt\logs\*" />
+        <FilePathCondition Path="C:\Windows\Microsoft.NET\assembly\GAC_32\MSBuild\v4.0_4.0.0.0__b03f5f7f11d50a3a\*" />
+        <FilePathCondition Path="C:\Windows\Microsoft.NET\assembly\GAC_64\MSBuild\v4.0_4.0.0.0__b03f5f7f11d50a3a\*" />
+        <FilePathCondition Path="C:\Windows\Microsoft.NET\Framework\v4.0.30319\*" />
+        <FilePathCondition Path="c:\windows\regedit.exe" />
+        <FilePathCondition Path="C:\Windows\ServiceProfiles\LocalService\*" />
+        <FilePathCondition Path="C:\Windows\Servicing\packages\*" />
+        <FilePathCondition Path="C:\Windows\System32\catroot2\{F750E6C3-38EE-11D1-85E5-00C04FC295EE}\*" />
+        <FilePathCondition Path="c:\windows\system32\certutil.exe" />
+        <FilePathCondition Path="C:\Windows\System32\Dnscmd.exe" />
+        <FilePathCondition Path="C:\Windows\System32\Expand.exe" />
+        <FilePathCondition Path="C:\Windows\System32\findstr.exe" />
+        <FilePathCondition Path="c:\windows\system32\forfiles.exe" />
+        <FilePathCondition Path="C:\Windows\System32\gpscript.exe" />
+        <FilePathCondition Path="c:\windows\system32\ie4unit.exe" />
+        <FilePathCondition Path="C:\Windows\System32\Infdefaultinstall.exe" />
+        <FilePathCondition Path="C:\Windows\System32\makecab.exe" />
+        <FilePathCondition Path="C:\Windows\System32\mavinject.exe" />
+        <FilePathCondition Path="C:\windows\System32\Microsoft\Crypto\RSA\MachineKeys\*" />
+        <FilePathCondition Path="C:\Windows\System32\msinfo32.exe" />
+        <FilePathCondition Path="C:\Windows\System32\pcwrun.exe" />
+        <FilePathCondition Path="c:\windows\system32\rasdial.exe" />
+        <FilePathCondition Path="C:\Windows\System32\rpcping.exe" />
+        <FilePathCondition Path="c:\windows\system32\secedit.exe" />
+        <FilePathCondition Path="C:\Windows\System32\SyncAppvPublishingServer.exe" />
+        <FilePathCondition Path="C:\Windows\System32\wbem\scrcons.exe" />
+        <FilePathCondition Path="C:\Windows\System32\wbem\wbemtest.exe" />
+        <FilePathCondition Path="C:\Windows\System32\wbem\winmgmt.exe" />
+        <FilePathCondition Path="C:\Windows\System32\wecutil.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\at.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\bcdedit.exe" />
+        <FilePathCondition Path="C:\Windows\SysWOW64\bitsadmin.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\certutil.exe" />
+        <FilePathCondition Path="C:\Windows\SysWOW64\cmstp.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\cscript.exe" />
+        <FilePathCondition Path="C:\Windows\SysWOW64\diskshadow.exe" />
+        <FilePathCondition Path="C:\Windows\SysWOW64\Dnscmd.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\expand.exe" />
+        <FilePathCondition Path="C:\Windows\SysWOW64\findstr.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\forfiles.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\gpresult.exe" />
+        <FilePathCondition Path="C:\Windows\SysWOW64\gpscript.exe" />
+        <FilePathCondition Path="c:\windows\sysWOW64\ie4unit.exe" />
+        <FilePathCondition Path="C:\Windows\SysWOW64\Infdefaultinstall.exe" />
+        <FilePathCondition Path="C:\Windows\SysWOW64\makecab.exe" />
+        <FilePathCondition Path="C:\Windows\SysWOW64\mavinject.exe" />
+	<FilePathCondition Path="C:\Windows\SysWOW64\windowspowershell\v1.0\powershell_ise.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\msinfo32.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\mstha.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\net.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\netdom.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\presentationhost.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\query.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\regedit.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\regedt32.exe" />
+        <FilePathCondition Path="C:\Windows\SysWOW64\rpcping.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\runas.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\sc.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\schtasks.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\subst.exe" />
+        <FilePathCondition Path="C:\Windows\SysWOW64\SyncAppvPublishingServer.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\syswow64.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\vssadmin.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\wbem\wbemtest.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\wbem\winmgmt.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\wbem\wmic.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\wecutil.exe" />
+        <FilePathCondition Path="C:\Windows\Syswow64\wscript.exe" />
+        <FileHashCondition>
+          <FileHash Type="SHA256" Data="0x68705285F7914823244E19E4F6DBC4A75C4DE807EA1CF128AEC2CCAFCE5FE109" SourceFileName="powershell.exe" SourceFileLength="448000" />
+        </FileHashCondition>
+        <FileHashCondition>
+          <FileHash Type="SHA256" Data="0x154911087A936359BA936871A2999C56641693630CD64FC6D30E53974A88D790" SourceFileName="WMIC.exe" SourceFileLength="497664" />
+        </FileHashCondition>
+      </Exceptions>
+    </FilePathRule>
+    <FilePathRule Id="6d4bc6b3-18f2-4048-ac94-8312bb522f39" Name="All files in the Program Files folder" Description="Allows members of the Everyone group to run applications in the Program Files folder." UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePathCondition Path="%PROGRAMFILES%\*" />
+      </Conditions>
+      <Exceptions>
+        <FilePathCondition Path="%PROGRAMFILES%\WinRAR\*" />
+        <FilePathCondition Path="C:\Program Files (x86)\Common Files\Java\Java Update" />
+        <FilePathCondition Path="C:\Program Files (x86)\MSBuild\14.0\Bin\csi.exe" />
+        <FilePathCondition Path="C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe" />
+        <FilePathCondition Path="C:\Program Files (x86)\Windows Mail\wab.exe" />
+        <FilePathCondition Path="C:\Program Files\Common Files\microsoft shared\MSInfo\*" />
+        <FilePathCondition Path="C:\Program Files\Internet Explorer(x86)\Extexport.exe" />
+        <FilePathCondition Path="C:\Program Files\Internet Explorer\Extexport.exe" />
+        <FilePathCondition Path="C:\Program Files\Windows Firewall Control\*" />
+        <FilePathCondition Path="C:\Program Files\Windows Mail\wab.exe" />
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="MICROSOFT? WINDOWS? OPERATING SYSTEM" BinaryName="POWERSHELL.EXE">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+      </Exceptions>
+    </FilePathRule>
+<FilePathRule Id="fd686d83-a829-4351-8ff4-27c7de5755d2" Name="(Default) All Files" Description="Allows members of the local Administrators group to run all applications." UserOrGroupSid="S-1-5-32-544" Action="Allow">
+      <Conditions>
+        <FilePathCondition Path="*" />
+      </Conditions>
+    </FilePathRule>
+ <FilePublisherRule Id="d98e826d-c310-42a3-a900-879f7eaaf8ad" Name="MICROSOFT TEAMS, van O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" Description="" UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="MICROSOFT TEAMS" BinaryName="*">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+      </Conditions>
+    </FilePublisherRule>
+ <FilePublisherRule Id="d98e826d-c319-42a3-a904-879f6eaaf8ad" Name="MICROSOFT TEAMS UPDATE, van O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" Description="" UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePublisherCondition PublisherName="O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON, C=US" ProductName="MICROSOFT TEAMS UPDATE" BinaryName="*">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+      </Conditions>
+    </FilePublisherRule>
+  <FilePublisherRule Id="722a27fc-2c03-4eb8-ad1e-9cdbdcf74df0" Name="Ondertekend door O=TEAMVIEWER GERMANY GMBH, L=Gï¿½PPINGEN, S=BADEN-Wï¿½RTTEMBERG, C=DE" Description="" UserOrGroupSid="S-1-1-0" Action="Allow">
+      <Conditions>
+        <FilePublisherCondition PublisherName="O=TEAMVIEWER GERMANY GMBH, L=Gï¿½PPINGEN, S=BADEN-Wï¿½RTTEMBERG, C=DE" ProductName="*" BinaryName="*">
+          <BinaryVersionRange LowSection="*" HighSection="*" />
+        </FilePublisherCondition>
+      </Conditions>
+    </FilePublisherRule>
+</RuleCollection>
