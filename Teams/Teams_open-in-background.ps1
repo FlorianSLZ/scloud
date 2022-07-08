@@ -20,7 +20,7 @@ try{
             if(Get-Process Teams -ErrorAction SilentlyContinue){Get-Process Teams | Stop-Process -Force}
             # Replace/Set "openAsHidden" option to true
             (Get-Content $ENV:APPDATA\Microsoft\Teams\desktop-config.json -ErrorAction Stop).replace('"openAsHidden":false', '"openAsHidden":true') | Set-Content $ENV:APPDATA\Microsoft\Teams\desktop-config.json
-            # STart Teams in background
+            # Start Teams in background
             Start-Process -File $env:LOCALAPPDATA\Microsoft\Teams\Update.exe -ArgumentList '--processStart "Teams.exe" --process-start-args "--system-initiated"'
 
             #   END CODE TO RUN ONCE
