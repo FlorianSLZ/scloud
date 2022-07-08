@@ -15,7 +15,7 @@ try{
     # Hintergründe kopieren
     Copy-Item -path '.\bg\*' -Destination $TeamsBG_Folder -Recurse -Force
 
-    # Validierungs File
+    # Validation File
     New-Item -Path "$env:localAPPDATA\4net\EndpointManager\Validation\$PackageName" -ItemType "file" -Value $Version -Force
 }catch{
     Write-Host "_____________________________________________________________________"

@@ -1,9 +1,6 @@
 ﻿$PackageName = "PR4Business"
 $Version = 1
 
-$Path_4Log = "$Env:Programfiles\4net\EndpointManager"
-Start-Transcript -Path "$Path_4Log\Log\$PackageName-install.log" -Force
-
 ##########################################################################
 #   Recurence Data
 ##########################################################################
@@ -15,12 +12,53 @@ $Schedule_StartTime = "8am"         # ex 8am or 5pm     (for Once, Hourly, Daily
 
 ##########################################################################
 
+
+# check if running as system
+function Test-RunningAsSystem {
+	[CmdletBinding()]
+	param()
+	process {
+		return [bool]($(whoami -user) -match "S-1-5-18")
+	}
+}
+
+function Create-VBShiddenPS {
+    # Dummy vbscript to hide PowerShell Window popping up at task execution
+	$Content_VBShiddenPS = "
+	Dim shell,fso,file
+
+	Set shell=CreateObject(`"WScript.Shell`")
+	Set fso=CreateObject(`"Scripting.FileSystemObject`")
+
+	strPath=WScript.Arguments.Item(0)
+
+	If fso.FileExists(strPath) Then
+		set file=fso.GetFile(strPath)
+		strCMD=`"powershell -nologo -executionpolicy ByPass -command `" & Chr(34) & `"&{`" &_
+		file.ShortPath & `"}`" & Chr(34)
+		shell.Run strCMD,0
+	End If
+	"
+	$Path_VBShiddenPS = $(Join-Path -Path "C:\Program Files\4net\EndpointManager\Data" -ChildPath "run-ps-hidden.vbs")
+	$Content_VBShiddenPS | Out-File -FilePath (New-Item -Path $Path_VBShiddenPS -Force) -Force
+    return $Path_VBShiddenPS
+}
+
+if(Test-RunningAsSystem){$Path_4Log = "$ENV:Programfiles\4net\EndpointManager"}
+else{$Path_4Log = "$ENV:LOCALAPPDATA\4net\EndpointManager"}
+
+Start-Transcript -Path "$Path_4Log\Log\$PackageName-install.log" -Force
+
 try{
     # local Path
     $Path_PR = "$Path_4Log\Data\PR_$PackageName"
 
+    # Task Name & Description
+    $schtaskName = "$PackageName - $env:username"
+    $schtaskDescription = "Version $Version"
+
     # Check if Task exist with correct version
-    $task_existing = Get-ScheduledTask -TaskName $PackageName -ErrorAction SilentlyContinue
+    $task_existing = Get-ScheduledTask -TaskName $schtaskName -ErrorAction SilentlyContinue
     if($task_existing.Description -like "Version $Version*"){
         cd $Path_PR
         .\detection.ps1
@@ -33,16 +71,17 @@ try{
     }else{
         # path declaration / creation
         New-Item -path $Path_PR -ItemType Directory -Force
-        $Path_script = "$Path_PR\$PackageName.ps1"
+        $Path_PSscript = "$Path_PR\$PackageName.ps1"
         # get and save file content
-        Get-Content -Path $($PSCommandPath) | Out-File -FilePath $Path_script -Force
+        Get-Content -Path $($PSCommandPath) | Out-File -FilePath $Path_PSscript -Force
+        # create vbs to run PS hidden
+        $Path_vbs = Create-VBShiddenPS
 
         # copy/safe detection- and remediation script
         Copy-Item detection.ps1 -Destination $Path_PR -Force
         Copy-Item remediation.ps1 -Destination $Path_PR -Force
 
         # Register scheduled task to run at startup
-        $schtaskDescription = "Version $Version"
         switch ($Schedule_Frequency)                         
         {                        
             "Once"      {$trigger = New-ScheduledTaskTrigger -Once -At $(Get-Date "$Schedule_StartDate $Schedule_StartTime")}                        
@@ -52,13 +91,14 @@ try{
             Default     {Write-Error "Wrong frequency declaration."}                        
         }  
         
-        $principal= New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType "ServiceAccount" -RunLevel "Highest"
-        $action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ExecutionPolicy Bypass -File `"$Path_script`""
+        if(Test-RunningAsSystem){$principal= New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType "ServiceAccount" -RunLevel "Highest"}
+        else{$principal= New-ScheduledTaskPrincipal -UserId ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name)}
+       	$action = New-ScheduledTaskAction -Execute $(Join-Path $env:SystemRoot -ChildPath "System32\wscript.exe") -Argument "`"$Path_vbs`" `"$Path_PSscript`""
         $settings= New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
-        Register-ScheduledTask -TaskName $PackageName -Trigger $trigger -Action $action -Principal $principal -Settings $settings -Description $schtaskDescription -Force
+        Register-ScheduledTask -TaskName $schtaskName -Trigger $trigger -Action $action -Principal $principal -Settings $settings -Description $schtaskDescription -Force
 
         # Start Task if Frequency is Hourly
-        if($Schedule_Frequency -eq "Hourly"){Start-ScheduledTask $PackageName}
+        if($Schedule_Frequency -eq "Hourly"){Start-ScheduledTask $schtaskName}
     
     }
 
@@ -69,6 +109,3 @@ try{
 
 Stop-Transcript
 
-
-# Validation
-#Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Tree\
