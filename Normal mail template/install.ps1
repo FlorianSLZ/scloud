@@ -1,7 +1,7 @@
 ﻿$PackageName = "NormalEmail-template"
 $Version = "1"
 
-# Font Settings Outlook
+# Font Settings/Values Outlook
 $ComposeFontComplex = ""
 $ComposeFontSimple = ""
 $MarkCommentsWith = ""
@@ -9,6 +9,19 @@ $ReplyFontComplex = ""
 $ReplyFontSimple = ""
 $TextFontComplex = ""
 $TextFontSimple = ""
+#######################################################################################################################################
+#   Get the RegValues
+#######################################################################################################################################
+<# 
+$($(Get-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Common\MailSettings").ComposeFontComplex -join ",")
+$($(Get-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Common\MailSettings").ComposeFontSimple -join ",")
+$($(Get-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Common\MailSettings").MarkCommentsWith -join ",")
+$($(Get-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Common\MailSettings").ReplyFontComplex -join ",").
+$($(Get-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Common\MailSettings").ReplyFontSimple -join ",")
+$($(Get-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Common\MailSettings").TextFontComplex -join ",")
+$($(Get-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Common\MailSettings").TextFontSimple -join ",")
+#>
+
 
 # Transcript for local log
 $Path_4netIntune = "$Env:Programfiles\4net\EndpointManager"
@@ -21,13 +34,13 @@ $ErrorActionPreference = "Stop"
 $Path = "HKCU:\Software\Policies\Microsoft\Office\16.0\Common\MailSettings" 
 if(!(Test-Path $Path)){New-Item -Path $Path -Force}
 
-if($ComposeFontComplex){Set-ItemProperty -Path $Path -Name "ComposeFontComplex" -Value $ComposeFontComplex -Type "Binary"}
-if($ComposeFontSimple){Set-ItemProperty -Path $Path -Name "ComposeFontSimple" -Value $ComposeFontSimple -Type "Binary"}
-if($MarkCommentsWith){Set-ItemProperty -Path $Path -Name "MarkCommentsWith" -Value $MarkCommentsWith -Type "Binary"}
-if($ReplyFontComplex){Set-ItemProperty -Path $Path -Name "ReplyFontComplex" -Value $ReplyFontComplex -Type "Binary"}
-if($ReplyFontSimple){Set-ItemProperty -Path $Path -Name "ReplyFontSimple" -Value $ReplyFontSimple -Type "Binary"}
-if($TextFontComplex){Set-ItemProperty -Path $Path -Name "TextFontComplex" -Value $TextFontComplex -Type "Binary"}
-if($TextFontSimple){Set-ItemProperty -Path $Path -Name "TextFontSimple" -Value $TextFontSimple -Type "Binary"}
+if($ComposeFontComplex){Set-ItemProperty -Path $Path -Name "ComposeFontComplex" -Value ([byte[]]$($ComposeFontComplex.Split(',') | % { "$_"})) -Type "Binary"}
+if($ComposeFontSimple){Set-ItemProperty -Path $Path -Name "ComposeFontSimple" -Value ([byte[]]$($ComposeFontSimple.Split(',') | % { "$_"})) -Type "Binary"}
+if($MarkCommentsWith){Set-ItemProperty -Path $Path -Name "MarkCommentsWith" -Value ([byte[]]$($MarkCommentsWith.Split(',') | % { "$_"})) -Type "Binary"}
+if($ReplyFontComplex){Set-ItemProperty -Path $Path -Name "ReplyFontComplex" -Value ([byte[]]$($ReplyFontComplex.Split(',') | % { "$_"})) -Type "Binary"}
+if($ReplyFontSimple){Set-ItemProperty -Path $Path -Name "ReplyFontSimple" -Value ([byte[]]$($ReplyFontSimple.Split(',') | % { "$_"})) -Type "Binary"}
+if($TextFontComplex){Set-ItemProperty -Path $Path -Name "TextFontComplex" -Value ([byte[]]$($TextFontComplex.Split(',') | % { "$_"})) -Type "Binary"}
+if($TextFontSimple){Set-ItemProperty -Path $Path -Name "TextFontSimple" -Value ([byte[]]$($TextFontSimple.Split(',') | % { "$_"})) -Type "Binary"}
 
 
 #######################################################################################################################################
