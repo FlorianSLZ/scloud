@@ -18,7 +18,7 @@ try{
             Copy-Item -Path "$WorkingPath\$($FontFile.Name)" -Destination "$env:windir\Fonts" -Force -PassThru -ErrorAction Stop
             New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts" -Name $FontFile.Name -PropertyType String -Value $FontFile.Name -Force
         }catch{
-            Write-Host $_
+            Write-Error $_
         }
     }
 
@@ -30,5 +30,6 @@ try{
     Write-Host "ERROR"
     Write-Host "$_"
     Write-Host "_____________________________________________________________________"
+    exit 1618
 }
 Stop-Transcript
