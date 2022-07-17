@@ -1,7 +1,7 @@
 ﻿$PackageName = "NormalEmail-template"
 
-$Path_4netIntune = "$Env:Programfiles\4net\EndpointManager"
-Start-Transcript -Path "$Path_4netIntune\Log\uninstall\$PackageName-$env:USERNAME-uninstall.log" -Force
+$Path_4Log = "$ENV:LOCALAPPDATA\_MEM"
+Start-Transcript -Path "$Path_4Log\Log\$PackageName-uninstall.log" -Force
 
 $NormalEmail_File = "$env:APPDATA\Microsoft\Templates\NormalEmail.dotm"
 
@@ -18,6 +18,6 @@ try{
 
 Remove-Item -Path "HKCU:\Software\Policies\Microsoft\Office\16.0\Common\MailSettings" -Force -Verbose
 
-Remove-Item -Path "$env:localAPPDATA\4net\EndpointManager\Validation\$PackageName" -Force
+Remove-Item -Path "$Path_4Log\Validation\$PackageName" -Force
 
 Stop-Transcript
