@@ -31,7 +31,7 @@ $ErrorActionPreference = "Stop"
 #######################################################################################################################################
 #   Font Settings
 #######################################################################################################################################
-$Path = "HKCU:\Software\Policies\Microsoft\Office\16.0\Common\MailSettings" 
+$Path = "HKCU:\Software\Microsoft\Office\16.0\Common\MailSettings" 
 if(!(Test-Path $Path)){New-Item -Path $Path -Force}
 
 if($ComposeFontComplex){Set-ItemProperty -Path $Path -Name "ComposeFontComplex" -Value ([byte[]]$($ComposeFontComplex.Split(',') | % { "$_"})) -Type "Binary"}
