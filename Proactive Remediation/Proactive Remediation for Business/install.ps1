@@ -39,19 +39,19 @@ function Create-VBShiddenPS {
 		shell.Run strCMD,0
 	End If
 	"
-	$Path_VBShiddenPS = $(Join-Path -Path "C:\Program Files\4net\EndpointManager\Data" -ChildPath "run-ps-hidden.vbs")
+	$Path_VBShiddenPS = $(Join-Path -Path "$global:Path_4Log\Data" -ChildPath "run-ps-hidden.vbs")
 	$Content_VBShiddenPS | Out-File -FilePath (New-Item -Path $Path_VBShiddenPS -Force) -Force
     return $Path_VBShiddenPS
 }
 
-if(Test-RunningAsSystem){$Path_4Log = "$ENV:Programfiles\4net\EndpointManager"}
-else{$Path_4Log = "$ENV:LOCALAPPDATA\4net\EndpointManager"}
+if(Test-RunningAsSystem){$global:Path_4Log = "$ENV:Programfiles\4net\EndpointManager"}
+else{$global:Path_4Log = "$ENV:LOCALAPPDATA\4net\EndpointManager"}
 
-Start-Transcript -Path "$Path_4Log\Log\$PackageName-install.log" -Force
+Start-Transcript -Path "$global:Path_4Log\Log\$PackageName-install.log" -Force
 
 try{
     # local Path
-    $Path_PR = "$Path_4Log\Data\PR_$PackageName"
+    $Path_PR = "$global:Path_4Log\Data\PR_$PackageName"
 
     # Task Name & Description
     $schtaskName = "$PackageName - $env:username"
