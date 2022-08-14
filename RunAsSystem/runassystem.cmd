@@ -1,1 +1,1 @@
-psexec.exe -i -s powershell.exe
+.\psexec.exe -i -s powershell.exe
