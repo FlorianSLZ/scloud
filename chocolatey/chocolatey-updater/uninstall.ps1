@@ -1,6 +1,8 @@
-﻿$PackageName = "choco-upgrade-all-at-startup"
+﻿$Path_local = "$Env:Programfiles\_MEM"
+Start-Transcript -Path "$Path_local\Log\uninstall\$ProgramName-uninstall.log" -Force
 
-C:\ProgramData\chocolatey\choco.exe uninstall $PackageName -y
+# Remove Task
+$schtaskName = "Chocolatey Upgrade All"
+Unregister-ScheduledTask -TaskName $schtaskName
 
-$PackageName = "choco-upgrade-all-at"
-C:\ProgramData\chocolatey\choco.exe uninstall $PackageName -y
+Stop-Transcript

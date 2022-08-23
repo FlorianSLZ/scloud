@@ -1,1 +1,0 @@
--params='"/licensekey:ABCD-EFGH-IJKL /licensename:""scloud"" /nodesktopshortcut"'

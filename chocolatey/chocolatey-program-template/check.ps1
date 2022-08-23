@@ -1,4 +1,4 @@
-$ProgramName = "snagit"
+$ProgramName = "ChocoProgramID"
 
 
 $ChocoPrg_Existing = C:\ProgramData\chocolatey\choco.exe list --localonly
