@@ -5,13 +5,11 @@ $URL_msixbundle = "https://aka.ms/getwinget"
 $Path_local = "$Env:Programfiles\_MEM"
 Start-Transcript -Path "$Path_local\Log\$ProgramName-install.log" -Force
 
-# Program/Installation Folder
+# Program/Installation folder
 $Folder_install = "$Path_local\Data\$PackageName"
 New-Item -Path $Folder_install -ItemType Directory -Force -Confirm:$false
 
-
-# Download current WinGet MSIXBundle
-Write-Host "Not installed. Downloading WinGet..." 
+# Download current winget MSIXBundle
 $wc = New-Object net.webclient
 $wc.Downloadfile($URL_msixbundle, "$Folder_install\$MSIXBundle")
 
