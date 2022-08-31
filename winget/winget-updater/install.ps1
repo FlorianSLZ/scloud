@@ -1,19 +1,5 @@
-﻿Param
-  (
-    [parameter(Mandatory=$false)]
-    [String[]]
-    $included
-
-    $excluded
-
-    $undifined
-
-    $AtStartup
-
-    $onTime
-  )
-  
-$PackageName = "winget-updater"
+﻿$PackageName = "winget-updater"
+$Version = 1
 
 $Path_local = "$Env:Programfiles\_MEM"
 Start-Transcript -Path "$Path_local\Log\$ProgramName-install.log" -Force
@@ -29,7 +15,7 @@ cd `$Path_Winget
 .\winget.exe upgrade --query --silent --force --accept-package-agreements --accept-source-agreements --all
 
 ")
-$upgrade_script | Out-File $upgrade_script_path
+$upgrade_script | Out-File $(New-Item $upgrade_script_path -Type File -Force)
 
 # Scheduled Task for "winget upgrades"
 $schtaskName = "Windows Package Manager - UPDATER"

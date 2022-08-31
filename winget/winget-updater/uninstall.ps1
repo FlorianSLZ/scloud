@@ -5,7 +5,7 @@ Start-Transcript -Path "$Path_local\Log\uninstall\$ProgramName-uninstall.log" -F
 
 # Remove Task
 $schtaskName = "Windows Package Manager - UPDATER"
-Unregister-ScheduledTask -TaskName $schtaskName
+Unregister-ScheduledTask -TaskName $schtaskName -Confirm:$false
 
 # Remove local directory
 Remove-Item "$Path_local\Data\$PackageName" -Force -Recurse
