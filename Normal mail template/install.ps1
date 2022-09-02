@@ -22,8 +22,8 @@ $($(Get-ItemProperty -Path "HKCU:\Software\Microsoft\Office\16.0\Common\MailSett
 
 
 # Transcript for local log
-$Path_4Log = "$ENV:LOCALAPPDATA\_MEM"
-Start-Transcript -Path "$Path_4Log\Log\$PackageName-install.log" -Force
+$Path_local = "$ENV:LOCALAPPDATA\_MEM"
+Start-Transcript -Path "$Path_local\Log\$PackageName-install.log" -Force
 $ErrorActionPreference = "Stop"
 
 #######################################################################################################################################
@@ -61,7 +61,7 @@ try{
         Start-Process Outlook
     }
     # Validation file
-    New-Item -Path "$Path_4Log\Validation\$PackageName" -ItemType "file" -Force -Value $Version
+    New-Item -Path "$Path_local\Validation\$PackageName" -ItemType "file" -Force -Value $Version
 }catch{
     Write-Host "_____________________________________________________________________"
     Write-Host "ERROR"
