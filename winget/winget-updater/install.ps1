@@ -23,7 +23,7 @@ $schtaskDescription = "Manages the Updates of the Windows Package Manager. V$($V
 $trigger1 = New-ScheduledTaskTrigger -AtStartup
 $trigger2 = New-ScheduledTaskTrigger -Weekly -WeeksInterval 1 -DaysOfWeek Wednesday -At 8pm
 $principal= New-ScheduledTaskPrincipal -UserId 'SYSTEM'
-$action = New-ScheduledTaskAction –Execute "PowerShell.exe" -Argument 'upgrade all -y'
+$action = New-ScheduledTaskAction –Execute "PowerShell.exe" -Argument "-ExecutionPolicy Bypass -File $upgrade_script_path"
 $settings= New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
 
 Register-ScheduledTask -TaskName $schtaskName -Trigger $trigger1,$trigger2 -Action $action -Principal $principal -Settings $settings -Description $schtaskDescription -Force
