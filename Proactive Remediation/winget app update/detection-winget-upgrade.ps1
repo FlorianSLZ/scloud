@@ -5,7 +5,7 @@ Param(
 
 	[parameter(Mandatory=$false)]
     [String[]]
-	$version
+	$version = "auto"
 )
 
 # resolve and navigate to winget
