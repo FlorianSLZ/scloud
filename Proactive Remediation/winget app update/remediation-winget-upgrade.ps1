@@ -1,5 +1,4 @@
 $app_2upgrade = "WINGETPROGRAMID"
-$version = "auto"
 
 try{
     # resolve and navigate to winget.exe
