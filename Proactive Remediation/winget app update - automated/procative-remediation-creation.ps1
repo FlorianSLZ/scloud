@@ -1,6 +1,6 @@
 #############################################################################################################
 #
-#   Tool:       Intune Win32 Deployer - Module/Function
+#   Tool:       PAR winget app upgrade automated
 #   Author:     Florian Salzmann
 #   Website:    http://www.scloud.work
 #   Twitter:    https://twitter.com/FlorianSLZ
@@ -18,48 +18,104 @@
 [CmdletBinding()]
 Param (
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $false)]
     [String] $Publisher = "scloud",
 
     [Parameter(Mandatory = $true)]
-    [String] $PAR_name = "scloud",
+    [String] $PAR_name,
 
     [Parameter(Mandatory = $true)]
+    [String] $winget_id,
+
+    [Parameter(Mandatory = $false)]
     [String] $PAR_description = "Automatically createt via PowerShell",
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $false)]
     [String] $PAR_RunAs = "system",
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $false)]
     [String] $PAR_Scheduler = "Daily",
 
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $false)]
     [Int] $PAR_Frequency = "1",
 
-    [Parameter(Mandatory = $true)]
-    [String] $PAR_StartTime = "10:00",
+    [Parameter(Mandatory = $false)]
+    [String] $PAR_StartTime = "01:00",
 
-    [Parameter(Mandatory = $true)]
-    [Bool] $PAR_RunAs32 = $true,
+    [Parameter(Mandatory = $false)]
+    [Bool] $PAR_RunAs32 = $false,
 
     [Parameter(Mandatory = $true)]
     [String] $PAR_AADGroup,
 
-    [Parameter(Mandatory = $true)]
-    [String] $PAR_script_detection,
+    [Parameter(Mandatory = $false)]
+    [String] $PAR_script_detection = "$PSScriptRoot\$PAR_name\detection-winget-upgrade.ps1",
 
-    [Parameter(Mandatory = $true)]
-    [String] $PAR_script_remediation
+    [Parameter(Mandatory = $false)]
+    [String] $PAR_script_remediation = "$PSScriptRoot\$PAR_name\remediation-winget-upgrade.ps1"
 
     
 )
 
+##############################################################################################################
+#   Check / Install required Modules
+##############################################################################################################
+
+$Modules_needed = "Microsoft.Graph", "AzureAD"
+try{  
+    foreach($Module in $Modules_needed){
+        if (!$(Get-Module -ListAvailable -Name $Module -ErrorAction SilentlyContinue)){
+        Write-Host "Installing Module: $Module"
+        Install-Module $Module -Scope CurrentUser -Force
+        }
+    }
+}catch{$_}
+
+##############################################################################################################
+#   Create Detection and Remediation Script
+##############################################################################################################
+$script_detection = = @'
+$app_2upgrade = "WINGETPROGRAMID"
+
+# resolve and navigate to winget.exe
+$Winget = Get-ChildItem -Path (Join-Path -Path (Join-Path -Path $env:ProgramFiles -ChildPath "WindowsApps") -ChildPath "Microsoft.DesktopAppInstaller*_x64*\winget.exe")
+
+if ($(&$winget upgrade) -like "* $app_2upgrade *") {
+	Write-Host "Upgrade aviable for: $app_2upgrade"
+	exit 1 # upgrade aviable, remediation needed
+}
+else {
+		Write-Host "No Upgrade aviable"
+		exit 0 # no upgared, no action needed
+}
+'@
+
+$script_remediation = = @'
+$app_2upgrade = "WINGETPROGRAMID"
+
+try{
+    $Winget = Get-ChildItem -Path (Join-Path -Path (Join-Path -Path $env:ProgramFiles -ChildPath "WindowsApps") -ChildPath "Microsoft.DesktopAppInstaller*_x64*\winget.exe")
+
+    # upgrade command
+    &$winget upgrade --exact $app_2upgrade --silent --force --accept-package-agreements --accept-source-agreements
+    exit 0
+
+}catch{
+    Write-Error "Error while installing upgarde for: $app_2upgrade"
+    exit 1
+}
+
+'@
+
+# Create and save
+$script_detection.replace("WINGETPROGRAMID","$winget_id") | Out-File (New-Item "$PSScriptRoot\$PAR_name\detection-winget-upgrade.ps1" -Type File -Force) -Encoding utf8
+$script_remediation.replace("WINGETPROGRAMID","$winget_id") | Out-File (New-Item "$PSScriptRoot\$PAR_name\remediation-winget-upgrade.ps1" -Type File -Force) -Encoding utf8
 
 
-###############################################################################################################
-#                                              CREATE IT                                                      #
-###############################################################################################################
 
+##############################################################################################################
+#   Create the Proactive remediation script package
+##############################################################################################################
 $params = @{
          DisplayName = $PAR_name
          Description = $PAR_description
@@ -74,60 +130,32 @@ $params = @{
          )
 }
 
-
-
-
-Write-Host "Connecting to Graph"
+Write-Host "Connecting to Graph" -ForegroundColor Cyan
 Connect-MSGraph
 
-
-
-#   Create It
-Write-Host "Creating Proactive Remediation: $PAR_name"
+Write-Host "Creating Proactive Remediation: $PAR_name" -ForegroundColor Cyan
 $graphApiVersion = "beta"
 $Resource = "deviceManagement/deviceHealthScripts"
 $uri = "https://graph.microsoft.com/$graphApiVersion/$Resource"
 
 try {
     $proactive = Invoke-MSGraphRequest -Url $uri -HttpMethod Post -Content $params
+    Write-Host "Proactive Remediation Created" -ForegroundColor Green
 }
 catch {
-    Write-Error $_.Exception 
-    
+    Write-Error $_.Exception
 }
 
-Write-Host "Proactive Remediation Created"
-
-##Assign It
-Write-Host "Assigning Proactive Remediation"
-##Connect to Azure AD to find Group ID
-Write-Host "Connecting to AzureAD to Query Group"
+Write-Host "Connecting to AzureAD to query Group to assign" -ForegroundColor Cyan
 Connect-AzureAD
 
-##Get Group ID
-$AADGroupID = (get-azureadgroup | where-object DisplayName -eq $PAR_AADGroup).ObjectID
-Write-Host "Group ID discovered: $AADGroupID"
-##Set the JSON
-if ($PAR_Scheduler -eq "Hourly") {
-    Write-Host "Assigning Hourly Schedule running every $PAR_Frequency hours"
-$params = @{
-	DeviceHealthScriptAssignments = @(
-		@{
-			Target = @{
-				"@odata.type" = "#microsoft.graph.groupAssignmentTarget"
-				GroupId = $AADGroupID
-			}
-			RunRemediationScript = $true
-			RunSchedule = @{
-				"@odata.type" = "#microsoft.graph.deviceHealthScriptHourlySchedule"
-				Interval = $PAR_Frequency
-			}
-		}
-	)
-}
-}
-else {
-    Write-Host "Assigning Daily Schedule running at $PAR_StartTime each $PAR_Frequency days"
+#   Get Group ID
+$AADGroupID = (Get-AzureADGroup -All $true | where-object DisplayName -eq $PAR_AADGroup).ObjectID
+    if($AADGroupID){
+    Write-Host "Group ID discovered: $AADGroupID" -ForegroundColor Green
+    ##Set the JSON
+    if ($PAR_Scheduler -eq "Hourly") {
+        Write-Host "Assigning Hourly Schedule running every $PAR_Frequency hours"
     $params = @{
         DeviceHealthScriptAssignments = @(
             @{
@@ -137,30 +165,66 @@ else {
                 }
                 RunRemediationScript = $true
                 RunSchedule = @{
-                    "@odata.type" = "#microsoft.graph.deviceHealthScriptDailySchedule"
+                    "@odata.type" = "#microsoft.graph.deviceHealthScriptHourlySchedule"
                     Interval = $PAR_Frequency
-                    Time = $PAR_StartTime
-                    UseUtc = $false
                 }
             }
         )
     }
     }
+    else {
+        Write-Host "Assigning Daily Schedule running at $PAR_StartTime each $PAR_Frequency days"
+        $params = @{
+            DeviceHealthScriptAssignments = @(
+                @{
+                    Target = @{
+                        "@odata.type" = "#microsoft.graph.groupAssignmentTarget"
+                        GroupId = $AADGroupID
+                    }
+                    RunRemediationScript = $true
+                    RunSchedule = @{
+                        "@odata.type" = "#microsoft.graph.deviceHealthScriptDailySchedule"
+                        Interval = $PAR_Frequency
+                        Time = $PAR_StartTime
+                        UseUtc = $false
+                    }
+                }
+            )
+        }
+        }
 
-$remediationID = $proactive.ID
+    $remediationID = $proactive.ID
 
 
-$graphApiVersion = "beta"
-$Resource = "deviceManagement/deviceHealthScripts"
-$uri = "https://graph.microsoft.com/$graphApiVersion/$Resource/$remediationID/assign"
+    $graphApiVersion = "beta"
+    $Resource = "deviceManagement/deviceHealthScripts"
+    $uri = "https://graph.microsoft.com/$graphApiVersion/$Resource/$remediationID/assign"
 
-try {
-    $proactive = Invoke-MSGraphRequest -Url $uri -HttpMethod Post -Content $params
+    try {
+        $proactive = Invoke-MSGraphRequest -Url $uri -HttpMethod Post -Content $params
+    }
+    catch {
+        Write-Error $_.Exception 
+        
+    }
+    Write-Host "Remediation Assigned"
+
+    Write-Host "Complete"
+}else{
+    Write-Host "Group $PAR_AADGroup not found, PAR createt but not assigned" -ForegroundColor Yellow
 }
-catch {
-    Write-Error $_.Exception 
-    
-}
-Write-Host "Remediation Assigned"
 
-Write-Host "Complete"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
