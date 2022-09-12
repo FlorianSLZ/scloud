@@ -49,10 +49,10 @@ Param (
     [String] $PAR_AADGroup,
 
     [Parameter(Mandatory = $false)]
-    [String] $PAR_script_detection = "$PSScriptRoot\$PAR_name\detection-winget-upgrade.ps1",
+    [String] $PAR_detection_path = "$PSScriptRoot\$PAR_name\detection-winget-upgrade.ps1",
 
     [Parameter(Mandatory = $false)]
-    [String] $PAR_script_remediation = "$PSScriptRoot\$PAR_name\remediation-winget-upgrade.ps1"
+    [String] $PAR_remediation_path = "$PSScriptRoot\$PAR_name\remediation-winget-upgrade.ps1"
 
     
 )
@@ -77,7 +77,6 @@ try{
 $script_detection = @'
 $app_2upgrade = "WINGETPROGRAMID"
 
-# resolve and navigate to winget.exe
 $Winget = Get-ChildItem -Path (Join-Path -Path (Join-Path -Path $env:ProgramFiles -ChildPath "WindowsApps") -ChildPath "Microsoft.DesktopAppInstaller*_x64*\winget.exe")
 
 if ($(&$winget upgrade) -like "* $app_2upgrade *") {
@@ -108,8 +107,10 @@ try{
 '@
 
 # Create and save
-$script_detection.replace("WINGETPROGRAMID","$winget_id") | Out-File (New-Item "$PSScriptRoot\$PAR_name\detection-winget-upgrade.ps1" -Type File -Force) -Encoding utf8
-$script_remediation.replace("WINGETPROGRAMID","$winget_id") | Out-File (New-Item "$PSScriptRoot\$PAR_name\remediation-winget-upgrade.ps1" -Type File -Force) -Encoding utf8
+$PAR_detection = $script_detection.replace("WINGETPROGRAMID","$winget_id") 
+$PAR_detection | Out-File (New-Item $PAR_detection_path -Type File -Force) -Encoding utf8
+$PAR_remediation = $script_remediation.replace("WINGETPROGRAMID","$winget_id") 
+$PAR_remediation | Out-File (New-Item $PAR_remediation_path -Type File -Force) -Encoding utf8
 
 
 
@@ -123,8 +124,8 @@ $params = @{
          PAR_RunAs32Bit = $PAR_RunAs32
          RunAsAccount = $PAR_RunAs
          EnforceSignatureCheck = $false
-         DetectionScriptContent = [System.Text.Encoding]::ASCII.GetBytes($PAR_script_detection)
-         RemediationScriptContent = [System.Text.Encoding]::ASCII.GetBytes($PAR_script_remediation)
+         DetectionScriptContent = [System.Text.Encoding]::ASCII.GetBytes($PAR_detection)
+         RemediationScriptContent = [System.Text.Encoding]::ASCII.GetBytes($PAR_remediation)
          RoleScopeTagIds = @(
                  "0"
          )
