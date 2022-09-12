@@ -74,7 +74,7 @@ try{
 ##############################################################################################################
 #   Create Detection and Remediation Script
 ##############################################################################################################
-$script_detection = = @'
+$script_detection = @'
 $app_2upgrade = "WINGETPROGRAMID"
 
 # resolve and navigate to winget.exe
@@ -90,7 +90,7 @@ else {
 }
 '@
 
-$script_remediation = = @'
+$script_remediation = @'
 $app_2upgrade = "WINGETPROGRAMID"
 
 try{
@@ -209,22 +209,7 @@ $AADGroupID = (Get-AzureADGroup -All $true | where-object DisplayName -eq $PAR_A
     }
     Write-Host "Remediation Assigned"
 
-    Write-Host "Complete"
+    Write-Host "Complete" -ForegroundColor Green
 }else{
     Write-Host "Group $PAR_AADGroup not found, PAR createt but not assigned" -ForegroundColor Yellow
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
