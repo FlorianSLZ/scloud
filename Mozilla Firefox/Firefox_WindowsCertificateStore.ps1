@@ -1,6 +1,7 @@
 $PackageName = "Firefox_WindowsCertificateStore"
-$Path_Intune = "$Env:Programfiles\scloud\EndpointManager"
-Start-Transcript -Path "$Path_Intune\Log\$PackageName-install.log" -Force
+
+$Path_local = "$Env:Programfiles\_MEM"
+Start-Transcript -Path "$Path_local\Log\$PackageName-install.log" -Force
 
 $localSettings_file = "C:\Program Files\Mozilla Firefox\defaults\pref\local-settings.js"
 $profileCFG_file = "C:\Program Files\Mozilla Firefox\scloud.cfg"
