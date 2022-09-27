@@ -1,0 +1,4 @@
+File exists:
+
+C:\Program Files\HPImageAssistant\
+HPImageAssistant.exe
