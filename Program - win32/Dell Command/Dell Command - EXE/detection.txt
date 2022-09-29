@@ -1,0 +1,4 @@
+File Version: 4.6.0.3
+
+C:\Program Files (x86)\Dell\CommandUpdate\
+dcu-cli.exe
