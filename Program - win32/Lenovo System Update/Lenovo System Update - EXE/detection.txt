@@ -1,0 +1,4 @@
+File Version: 5.7.0.139
+
+C:\Program Files (x86)\Lenovo\System Update\
+tvsu.exe
