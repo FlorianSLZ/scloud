@@ -2,6 +2,7 @@
 
 $Path_local = "$Env:Programfiles\_MEM"
 Start-Transcript -Path "$Path_local\Log\$PackageName-install.log" -Force
+$ErrorActionPreference = 'Stop'
 
 try{
     Start-Process "hpia.exe" -ArgumentList "/s /e /f ""$Env:Programfiles\HPImageAssistant""" -Wait
