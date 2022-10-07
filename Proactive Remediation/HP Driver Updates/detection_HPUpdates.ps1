@@ -13,7 +13,7 @@ Try {
             Write-Output "Compliant, no drivers needed"
             Exit 0
         }else{
-            Write-Warning "Found drivers to download/install"
+            Write-Warning "Found drivers to download/install: $($HPIA_analyze.HPIA.Recommendations)"
             Exit 1
         }
         
