@@ -1,7 +1,7 @@
 $global:PackageName = "SharedPrinters"
 
-$Path_4netIntune = "$Env:Programfiles\4net\EndpointManager"
-Start-Transcript -Path "$Path_4netIntune\Log\$global:PackageName-$env:UserName.log" -Force
+$Path_local_system = "$Env:Programfiles\_MEM"
+$Path_local_user = "$Env:LOCALAPPDATA\_MEM"
 
 ###########################################################################################
 # Input values 
@@ -9,8 +9,8 @@ $Prt_Server = "S-SLZ-APP08.scloud.work"
 $Prt_Shares = "PRT Home EG",
 "PRT Home OG"
 
-$REMOVE_fromServer = $true #	$true: removes only printers from targeted Server, $false: remove all printer declared string in name
 #$Prt_REMOVEs = ""
+$REMOVE_fromServer = $false #	$true: removes only printers from targeted Server, $false: remove all printer declared string in name
 
 ###########################################################################################
 
@@ -76,27 +76,38 @@ Write-Output "Running as SYSTEM: $(Test-RunningAsSystem)"
 
 # Processing Printers in user context
 if (-not (Test-RunningAsSystem)) {
+	Start-Transcript -Path "$Path_local_user\Log\$global:PackageName-$env:UserName.log" -Force
+
+
 	$testConnection = Test-Connection $Prt_Server -Count 1 -Quiet
 	if($testConnection -eq $true){
 		Remove-Printer $Prt_Server $Prt_REMOVEs
 		Mapping-Printer $Prt_Server $Prt_Shares
 	}
+
+	Stop-Transcript
 }
+
+
+
+#!ENDUSERCONTEXT!#
 
 # Create Sceduled Task as System
 if (Test-RunningAsSystem) {
 
-	Write-Output "Creating scheduled task which will run on user logon and network changes"
+	Start-Transcript -Path "$Path_local_system\Log\$global:PackageName-$env:UserName.log" -Force
+	Write-Output "Running as System --> creating scheduled task which will run on user logon and network changes"
 
 	# get this script content
 	$currentScript = Get-Content -Path $($PSCommandPath)
-	$scriptSavePath = $(Join-Path -Path "$Path_4netIntune\Data" -ChildPath "printer-mapping")
+	$schtaskScript = $currentScript[(0) .. ($currentScript.IndexOf("#!ENDUSERCONTEXT!#") - 1)]
+	$scriptSavePath = $(Join-Path -Path "$Path_local\Data" -ChildPath "printer-mapping")
 	# Create Path if not exists
 	if (-not (Test-Path $scriptSavePath)) {New-Item -ItemType Directory -Path $scriptSavePath -Force}
 	# Save this file on local computer
 	$PS_PathName = "$global:PackageName.ps1"
 	$PS_ScriptPath = $(Join-Path -Path $scriptSavePath -ChildPath $PS_PathName)
-	$currentScript | Out-File -FilePath $PS_ScriptPath -Force
+	$schtaskScript | Out-File -FilePath $PS_ScriptPath -Force
 
 	# Dummy vbscript to hide PowerShell Window popping up at task execution
 	$vbsHiddenPS = "
@@ -143,7 +154,6 @@ if (Test-RunningAsSystem) {
 	
 	Start-ScheduledTask -TaskName $schtaskName
 	
+	Stop-Transcript
 
 }
-
-Stop-transcript
