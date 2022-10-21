@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<policyDefinitions xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.microsoft.com/GroupPolicy/PolicyDefinitions"
+                   revision="1.0"
+                   schemaVersion="1.0">
+
+  <policyNamespaces>
+    <target prefix="makemeadmin" namespace="SinclairCC.Policies.MakeMeAdmin" />
+    <using prefix="scc" namespace="SinclairCC.Policies.SCC" />
+    <using prefix="windows" namespace="Microsoft.Policies.Windows" />
+  </policyNamespaces>
+
+  <resources minRequiredRevision="1.0" fallbackCulture="en-us" />
+
+  <categories>
+    <category name="MakeMeAdmin" displayName="$(string.MakeMeAdminDisplayName)" explainText="$(string.MakeMeAdminExplainText)">
+      <parentCategory ref="scc:SinclairRoot" />
+    </category>
+  </categories>
+
+  <policies>
+
+    <policy name="AllowedEntities"
+             class="Machine"
+             displayName="$(string.AllowedEntitiesDisplayName)"
+             explainText="$(string.AllowedEntitiesExplainText)"
+             key="SOFTWARE\Policies\Sinclair Community College\Make Me Admin"
+             presentation="$(presentation.AllowedEntitiesMultiText_Presentation)" >
+      <parentCategory ref="makemeadmin:MakeMeAdmin" />
+      <supportedOn ref="windows:SUPPORTED_Windows7" />
+      <elements>
+        <multiText id="AllowedEntitiesMultiText" valueName="Allowed Entities" required="false" maxLength="100" maxStrings="0" />
+      </elements>
+    </policy>
+
+    <policy name="RemoteAllowedEntities"
+             class="Machine"
+             displayName="$(string.RemoteAllowedEntitiesDisplayName)"
+             explainText="$(string.RemoteAllowedEntitiesExplainText)"
+             key="SOFTWARE\Policies\Sinclair Community College\Make Me Admin"
+             presentation="$(presentation.RemoteAllowedEntitiesMultiText_Presentation)" >
+      <parentCategory ref="makemeadmin:MakeMeAdmin" />
+      <supportedOn ref="windows:SUPPORTED_Windows7" />
+      <elements>
+        <multiText id="RemoteAllowedEntitiesMultiText" valueName="Remote Allowed Entities" required="false" maxLength="100" maxStrings="0" />
+      </elements>
+    </policy>
+
+    <policy name="AutomaticallyAddAllowedEntities"
+             class="Machine"
+             displayName="$(string.AutomaticallyAddAllowedEntitiesDisplayName)"
+             explainText="$(string.AutomaticallyAddAllowedEntitiesExplainText)"
+             key="SOFTWARE\Policies\Sinclair Community College\Make Me Admin"
+             presentation="$(presentation.AllowedAutomaticallyAddMultiText_Presentation)" >
+      <parentCategory ref="makemeadmin:MakeMeAdmin" />
+      <supportedOn ref="windows:SUPPORTED_Windows7" />
+      <elements>
+        <multiText id="AllowedAutomaticallyAddEntitiesMultiText" valueName="Automatic Add Allowed" required="false" maxLength="100" maxStrings="0" />
+      </elements>
+    </policy>
+	
+    <policy name="DeniedEntities"
+             class="Machine"
+             displayName="$(string.DeniedEntitiesDisplayName)"
+             explainText="$(string.DeniedEntitiesExplainText)"
+             key="SOFTWARE\Policies\Sinclair Community College\Make Me Admin"
+             presentation="$(presentation.DeniedEntitiesMultiText_Presentation)" >
+      <parentCategory ref="makemeadmin:MakeMeAdmin" />
+      <supportedOn ref="windows:SUPPORTED_Windows7" />
+      <elements>
+        <multiText id="DeniedEntitiesMultiText" valueName="Denied Entities" required="false" maxLength="100" maxStrings="0" />
+      </elements>
+    </policy>
+
+    <policy name="RemoteDeniedEntities"
+             class="Machine"
+             displayName="$(string.RemoteDeniedEntitiesDisplayName)"
+             explainText="$(string.RemoteDeniedEntitiesExplainText)"
+             key="SOFTWARE\Policies\Sinclair Community College\Make Me Admin"
+             presentation="$(presentation.RemoteDeniedEntitiesMultiText_Presentation)" >
+      <parentCategory ref="makemeadmin:MakeMeAdmin" />
+      <supportedOn ref="windows:SUPPORTED_Windows7" />
+      <elements>
+        <multiText id="RemoteDeniedEntitiesMultiText" valueName="Remote Denied Entities" required="false" maxLength="100" maxStrings="0" />
+      </elements>
+    </policy>
+
+    <policy name="AutomaticallyAddDeniedEntities"
+             class="Machine"
+             displayName="$(string.AutomaticallyAddDeniedEntitiesDisplayName)"
+             explainText="$(string.AutomaticallyAddDeniedEntitiesExplainText)"
+             key="SOFTWARE\Policies\Sinclair Community College\Make Me Admin"
+             presentation="$(presentation.DeniedAutomaticallyAddMultiText_Presentation)" >
+      <parentCategory ref="makemeadmin:MakeMeAdmin" />
+      <supportedOn ref="windows:SUPPORTED_Windows7" />
+      <elements>
+        <multiText id="DeniedAutomaticallyAddEntitiesMultiText" valueName="Automatic Add Denied" required="false" maxLength="100" maxStrings="0" />
+      </elements>
+    </policy>
+	
+    <policy name="AdminRightsTimeout"
+             class="Machine"
+             displayName="$(string.AdminRightsTimeoutDisplayName)"
+             explainText="$(string.AdminRightsTimeoutExplainText)"
+             key="SOFTWARE\Policies\Sinclair Community College\Make Me Admin"
+             valueName="Admin Rights Timeout"
+             presentation="$(presentation.Admin_Rights_Timeout_Spin)" >
+      <parentCategory ref="makemeadmin:MakeMeAdmin"></parentCategory>
+      <supportedOn ref="windows:SUPPORTED_Windows7" />
+      <elements>
+        <decimal id="AdminRightsTimeoutValue" required="true" valueName="Admin Rights Timeout" minValue="1" maxValue="1440" storeAsText="false" />
+      </elements>
+    </policy>
+
+    <policy name="TimeoutOverrideList"
+            class="Machine"
+            displayName="$(string.TimeoutOverrideDisplayName)"
+            explainText="$(string.TimeoutOverrideExplainText)"
+            key="SOFTWARE\Policies\Sinclair Community College\Make Me Admin\Timeout Overrides"
+            presentation="$(presentation.TimeoutOverrideList_Presentation)" >
+      <parentCategory ref="makemeadmin:MakeMeAdmin" />
+      <supportedOn ref="windows:SUPPORTED_Windows7" />
+      <elements>
+        <list id="TimeoutOverrideListBox" explicitValue="true" />
+      </elements>
+    </policy>
+
+    <policy name="RemoveOnLogout"
+             class="Machine"
+             displayName="$(string.RemoveOnLogoutDisplayName)"
+             explainText="$(string.RemoveOnLogoutExplainText)"
+             key="SOFTWARE\Policies\Sinclair Community College\Make Me Admin"
+             valueName="Remove Admin Rights On Logout">
+      <parentCategory ref="makemeadmin:MakeMeAdmin"></parentCategory>
+      <supportedOn ref="windows:SUPPORTED_Windows7" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><delete /></disabledValue>
+    </policy>
+
+    <policy name="OverrideOutsideProcess"
+             class="Machine"
+             displayName="$(string.OverrideOutsideProcessDisplayName)"
+             explainText="$(string.OverrideOutsideProcessExplainText)"
+             key="SOFTWARE\Policies\Sinclair Community College\Make Me Admin"
+             valueName="Override Removal By Outside Process">
+      <parentCategory ref="makemeadmin:MakeMeAdmin"></parentCategory>
+      <supportedOn ref="windows:SUPPORTED_Windows7" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><delete /></disabledValue>
+    </policy>
+
+    <policy name="AllowRemoteRequests"
+             class="Machine"
+             displayName="$(string.AllowRemoteRequestsDisplayName)"
+             explainText="$(string.AllowRemoteRequestsExplainText)"
+             key="SOFTWARE\Policies\Sinclair Community College\Make Me Admin"
+             valueName="Allow Remote Requests">
+      <parentCategory ref="makemeadmin:MakeMeAdmin"></parentCategory>
+      <supportedOn ref="windows:SUPPORTED_Windows7" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><delete /></disabledValue>
+    </policy>
+
+    <policy name="EndRemoteSessionsOnExpiration"
+             class="Machine"
+             displayName="$(string.EndRemoteSessionsDisplayName)"
+             explainText="$(string.EndRemoteSessionsExplainText)"
+             key="SOFTWARE\Policies\Sinclair Community College\Make Me Admin"
+             valueName="End Remote Sessions Upon Expiration">
+      <parentCategory ref="makemeadmin:MakeMeAdmin"></parentCategory>
+      <supportedOn ref="windows:SUPPORTED_Windows7" />
+      <enabledValue><delete /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+
+    <policy name="SyslogServers"
+             class="Machine"
+             displayName="$(string.SyslogServersDisplayName)"
+             explainText="$(string.SyslogServersExplainText)"
+             key="SOFTWARE\Policies\Sinclair Community College\Make Me Admin"
+             presentation="$(presentation.SyslogMultiText_Presentation)" >
+      <parentCategory ref="makemeadmin:MakeMeAdmin" />
+      <supportedOn ref="windows:SUPPORTED_Windows7" />
+      <elements>
+        <multiText id="SyslogMultiText" valueName="Syslog Servers" required="false" maxLength="200" maxStrings="0" />
+      </elements>
+    </policy>
+
+  </policies>
+
+</policyDefinitions>
