@@ -1,0 +1,4 @@
+Type:		File
+Path:		C:\ProgramData\chocolatey\lib
+File: 	makemeadmin
+Detection:	File or folder exists
