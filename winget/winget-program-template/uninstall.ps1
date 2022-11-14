@@ -1,6 +1,6 @@
-$ProgramName = "WINGETPROGRAMID"
+﻿$ProgramName = "WINGETPROGRAMID"
 $Path_local = "$Env:Programfiles\_MEM"
-Start-Transcript -Path "$Path_local\Log\uninstall\$ProgramName-uninstall.log" -Force
+Start-Transcript -Path "$Path_local\Log\uninstall\$ProgramName-uninstall.log" -Force -Append
 
 # resolve winget
 $ResolveWingetPath = Resolve-Path "C:\Program Files\WindowsApps\Microsoft.DesktopAppInstaller_*_x64__8wekyb3d8bbwe\winget.exe"
