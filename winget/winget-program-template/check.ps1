@@ -7,7 +7,7 @@ $ResolveWingetPath = Resolve-Path "C:\Program Files\WindowsApps\Microsoft.Deskto
     }
 $wingetexe = $ResolveWingetPath 
 
-$wingetPrg_Existing = & $wingetexe list --id $ProgramName --exact
+$wingetPrg_Existing = & $wingetexe list --id $ProgramName --exact --accept-source-agreements
     if ($wingetPrg_Existing -like "*$ProgramName*"){
     Write-Host "Found it!"
 }
