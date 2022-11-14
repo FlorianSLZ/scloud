@@ -16,6 +16,6 @@ $ResolveWingetPath = Resolve-Path "C:\Program Files\WindowsApps\Microsoft.Deskto
     }
 $wingetexe = $ResolveWingetPath
 
-& $wingetexe install --exact --id $ProgramName --silent --accept-package-agreements --accept-source-agreements $param
+& $wingetexe install --exact --id $ProgramName --silent --accept-package-agreements --accept-source-agreements --scope=machine $param
 
 Stop-Transcript
