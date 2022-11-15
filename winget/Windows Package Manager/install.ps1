@@ -3,7 +3,7 @@ $MSIXBundle = "Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
 $URL_msixbundle = "https://aka.ms/getwinget"
 
 $Path_local = "$Env:Programfiles\_MEM"
-Start-Transcript -Path "$Path_local\Log\$ProgramName-install.log" -Force
+Start-Transcript -Path "$Path_local\Log\$PackageName-install.log" -Force
 
 # Program/Installation folder
 $Folder_install = "$Path_local\Data\$PackageName"
