@@ -1,11 +1,13 @@
 $ProgramName = "WINGETPROGRAMID"
 
-# resolve and nacigate to winget
-$Path_WingetAll = Resolve-Path "C:\Program Files\WindowsApps\Microsoft.DesktopAppInstaller_*_x64__8wekyb3d8bbwe"
-if($Path_WingetAll){$Path_Winget = $Path_WingetAll[-1].Path}
-cd $Path_Winget
+# resolve winget
+$ResolveWingetPath = Resolve-Path "C:\Program Files\WindowsApps\Microsoft.DesktopAppInstaller_*_x64__8wekyb3d8bbwe\winget.exe"
+    if ($ResolveWingetPath){
+           $WingetPath = $ResolveWingetPath[-1].Path
+    }
+$wingetexe = $ResolveWingetPath 
 
-$wingetPrg_Existing = .\winget list --id $ProgramName --exact
+$wingetPrg_Existing = & $wingetexe list --id $ProgramName --exact --accept-source-agreements
     if ($wingetPrg_Existing -like "*$ProgramName*"){
     Write-Host "Found it!"
 }

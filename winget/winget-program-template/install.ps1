@@ -7,13 +7,15 @@
   
 $ProgramName = "WINGETPROGRAMID"
 $Path_local = "$Env:Programfiles\_MEM"
-Start-Transcript -Path "$Path_local\Log\$ProgramName-install.log" -Force
+Start-Transcript -Path "$Path_local\Log\$ProgramName-install.log" -Force -Append
 
-# navigate to winget.exe
-$Path_WingetAll = Resolve-Path "C:\Program Files\WindowsApps\Microsoft.DesktopAppInstaller_*_x64__8wekyb3d8bbwe"
-if($Path_WingetAll){$Path_Winget = $Path_WingetAll[-1].Path}
-cd $Path_Winget
+# resolve and navigate to winget
+$ResolveWingetPath = Resolve-Path "C:\Program Files\WindowsApps\Microsoft.DesktopAppInstaller_*_x64__8wekyb3d8bbwe\winget.exe"
+    if ($ResolveWingetPath){
+           $WingetPath = $ResolveWingetPath[-1].Path
+    }
+$wingetexe = $ResolveWingetPath
 
-.\winget.exe install --exact --id $ProgramName --silent --accept-package-agreements --accept-source-agreements $param
+& $wingetexe install --exact --id $ProgramName --silent --accept-package-agreements --accept-source-agreements --scope=machine $param
 
 Stop-Transcript
