@@ -1,7 +1,8 @@
-$ProgramName = "Microsoft.DesktopAppInstaller"
-$ProgramVersion_minimum = '2022.506.16.0'
-$ProgramVersion_current = (Get-AppPackage -Name $ProgramName).Version
+$wingetexe = Resolve-Path "C:\Program Files\WindowsApps\Microsoft.DesktopAppInstaller_*_x64__8wekyb3d8bbwe\winget.exe"
+    if ($wingetexe.count -gt 1){
+           $wingetexe = $wingetexe[-1].Path
+    }
 
-if($ProgramVersion_current -ge [System.Version]$ProgramVersion_minimum){
+if ($wingetexe){
     Write-Host "Found it!"
 }
