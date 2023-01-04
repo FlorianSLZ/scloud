@@ -47,14 +47,11 @@ $MenuObj_Action = $Menu_Main.Items.Add("Send Support info");
 $MenuObj_Action_Picture =[System.Drawing.Bitmap]::FromFile("$SysT_Folder\icons\send.ico")
 $MenuObj_Action.Image = $MenuObj_Action_Picture
 $MenuObj_Action.add_Click({ 
-	$answer = $wshell.Popup("Would you like to send infos about your PC to the helpdek?",0,"Alert",64+4)
 	$wshell = new-object -comobject wscript.shell
 	$intAnswer = $wshell.popup("Would you like to send infos about your PC to the helpdek?", 0,"Send Helpdesk Infos",4)
 	if($intAnswer -eq 6) {
 	  &"$SysT_Folder\Actions\SendToHelpdesk_Teams.ps1"
 	}
-	
-    [System.Windows.Forms.MessageBox]::Show("")
 })
 
 # Exit
