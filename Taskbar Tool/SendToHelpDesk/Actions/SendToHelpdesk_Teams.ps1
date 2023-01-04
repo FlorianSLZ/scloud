@@ -3,6 +3,7 @@ $WebHookURL = "https://xxxxx.webhook.office.com/webhookb2/someid..."
 
 Function Get_DeviceUpTime
 	{
+    # https://www.systanddeploy.com/2022/06/using-powershell-to-get-real-device.html
 		param(
 		[Switch]$Show_Days,
 		[Switch]$Show_Uptime			
