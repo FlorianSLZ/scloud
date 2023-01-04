@@ -10,7 +10,7 @@ Try {
         
 	$DCU_analyze = if(Test-Path "$DCU_report\DCUApplicableUpdates.xml"){[xml](get-content "$DCU_report\DCUApplicableUpdates.xml")}
         
-        if($DCU_analyze.updates.update.Count -lt 1){
+        if($DCU_analyze.updates.update.SelectNodes.Count -lt 1){
             Write-Output "Compliant, no drivers needed"
             Exit 0
         }else{

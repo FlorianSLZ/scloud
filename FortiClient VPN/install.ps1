@@ -1,8 +1,8 @@
 ﻿$PackageName = "FortiClientVPN"
 $ConfigPW = "Kateoih785" # insert your password here!
 
-$Path_4netIntune = "$Env:Programfiles\4net\EndpointManager"
-Start-Transcript -Path "$Path_4netIntune\Log\$PackageName-install.log" -Force
+$Path_local = "$Env:Programfiles\_MEM"
+Start-Transcript -Path "$Path_local\Log\$PackageName-install.log" -Force
 
 (Start-Process "msiexec.exe" -ArgumentList "/i FortiClientVPN.msi /passive /quiet INSTALLLEVEL=3 DESKTOPSHORTCUT=0 /NORESTART" -NoNewWindow -Wait -PassThru).ExitCode
 Start-Sleep 5

@@ -114,7 +114,8 @@ if (-not (Test-RunningAsSystem)) {
 	Start-Transcript -Path "$Path_local_user\Log\$global:PackageName-$env:UserName.log" -Force
 
 	Write-Host "Testing Server connection..."
-	$testConnection = Test-Connection $Prt_Server -Count 1 -Quiet
+	$testConnection = $(Test-netConnection $Prt_Server -port 445).TcpTestSucceeded 
+	$testConnection
 	if($testConnection -eq $true){
 		if($Prt_REMOVEs){Remove-Prt_REMOVEs $Prt_Server $Prt_REMOVEs}
 		if($Prt_Shares){Invoke-PrinterMapping $Prt_Server $Prt_Shares}
