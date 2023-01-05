@@ -16,7 +16,6 @@ try{
     $task_existing = Get-ScheduledTask -TaskName $schtaskName -ErrorAction SilentlyContinue
     if($task_existing.Description -like "Version $Version*"){
         Write-Warning "$PackageName already installed with target version: $Version"
-        break
     }else{
        if(!$(Test-Path $SysT_Folder)){
             New-Item -Type directory -Path $SysT_Folder -Force
@@ -27,7 +26,7 @@ try{
         # Register scheduled task to run at startup
         $trigger = New-ScheduledTaskTrigger -AtLogon 
         $principal= New-ScheduledTaskPrincipal -GroupId S-1-5-32-545
-       	$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-WindowStyle hidden -ExecutionPolicy Bypass -Command ""$SysT_Folder\HelpdeskInfo.ps1"""
+       	$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-WindowStyle hidden -ExecutionPolicy Bypass -File ""$SysT_Folder\HelpdeskInfo.ps1"""
         $settings= New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
         Register-ScheduledTask -TaskName $schtaskName -Trigger $trigger -Action $action -Principal $principal -Settings $settings -Description $schtaskDescription -Force
 

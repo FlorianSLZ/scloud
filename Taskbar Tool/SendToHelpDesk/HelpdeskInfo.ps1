@@ -6,6 +6,12 @@ $SysT_Folder = "$env:Programdata\$SysT_Name"
 
 
 #############################
+#	Log
+#############################
+Start-Transcript -Path "$SysT_Folder\$SysT_Name-$env:USERNAME.log" -Force
+
+
+#############################
 #	Systray icon
 #############################
 # Load Assemblies
@@ -37,7 +43,7 @@ $Menu_Main.Items.Add($MenuObj_InfoHostname)
 
 # IP address
 $MenuObj_InfoIP = New-Object System.Windows.Forms.ToolStripMenuItem
-$IP = $((Get-NetIPAddress | ?{ $_.AddressFamily -eq "IPv4"  -and !($_.IPAddress -match "169") -and !($_.IPaddress -match "127") }).IPAddress)[0]
+$IP = $((Get-NetIPAddress | Where-Object{ $_.AddressFamily -eq "IPv4"  -and !($_.IPAddress -match "169") -and !($_.IPaddress -match "127") }).IPAddress) | Select-Object -first 1
 $MenuObj_InfoIP.Text = ("$IP")
 $MenuObj_InfoIP.Image = [System.Drawing.Bitmap]::FromFile("$SysT_Folder\icons\internet.ico")
 $Menu_Main.Items.Add($MenuObj_InfoIP)
@@ -78,3 +84,4 @@ $null = $asyncwindow::ShowWindowAsync((Get-Process -PID $pid).MainWindowHandle, 
 $appContext = New-Object System.Windows.Forms.ApplicationContext
 [void][System.Windows.Forms.Application]::Run($appContext)
 
+Stop-Transcript
