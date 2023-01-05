@@ -90,10 +90,7 @@ $GroupMemberships = $UserObj.Groups | foreach-object {
  $_.Translate([Security.Principal.NTAccount])
 } 
 
-
-
-
-
+# Message JSON 
 $Message_Json = [PSCustomObject][Ordered]@{
     "@type" = "MessageCard"
     "@context" = "<http://schema.org/extensions>"
