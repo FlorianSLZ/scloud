@@ -27,7 +27,7 @@ try{
         # Register scheduled task to run at startup
         $trigger = New-ScheduledTaskTrigger -AtLogon 
         $principal= New-ScheduledTaskPrincipal -GroupId S-1-5-32-545
-       	$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-WindowStyle hidden $SysT_Folder/HelpdeskInfo.ps1"
+       	$action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-WindowStyle hidden -ExecutionPolicy Bypass -Command ""$SysT_Folder\HelpdeskInfo.ps1"""
         $settings= New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
         Register-ScheduledTask -TaskName $schtaskName -Trigger $trigger -Action $action -Principal $principal -Settings $settings -Description $schtaskDescription -Force
 
