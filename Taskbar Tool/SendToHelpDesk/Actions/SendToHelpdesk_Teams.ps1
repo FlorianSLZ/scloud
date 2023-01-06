@@ -66,6 +66,7 @@ Function Get_DeviceUpTime
 # Routine to gather device Informations
 $UserObj = [Security.Principal.WindowsIdentity]::GetCurrent()
 $Hostname = $env:COMPUTERNAME
+$SerialNumber = $(Get-WmiObject win32_bios).Serialnumber
 $OSVersion = $((([Environment]::OSVersion).Version).ToString())
 $Winver =  (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name DisplayVersion).DisplayVersion
 $UPTime = Get_DeviceUpTime
@@ -77,6 +78,7 @@ $imeStatus = If(Get-Service -Name "Microsoft Intune Management Extension" -Error
 $GeneralInfo = @{
     "User" = "$($UserObj.Name)"
     "Hostname" = "$Hostname"
+	"Serial number" = "$SerialNumber"
     "Uptime" = "$UPTime"
     "OS" = "$OSVersion / $Winver"
     "enrollment" = "$enrollment"

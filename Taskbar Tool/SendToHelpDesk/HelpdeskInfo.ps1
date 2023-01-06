@@ -43,7 +43,7 @@ $Menu_Main.Items.Add($MenuObj_InfoHostname)
 
 # IP address
 $MenuObj_InfoIP = New-Object System.Windows.Forms.ToolStripMenuItem
-$IP = $((Get-NetIPAddress | Where-Object{ $_.AddressFamily -eq "IPv4"  -and !($_.IPAddress -match "169") -and !($_.IPaddress -match "127") }).IPAddress) | Select-Object -first 1
+$IP = $((Get-NetIPAddress | Where-Object{ $_.AddressFamily -eq "IPv4"  -and !($_.IPAddress -match "169") -and !($_.IPaddress -match "127") }).IPAddress) | Select-Object -First 1
 $MenuObj_InfoIP.Text = ("$IP")
 $MenuObj_InfoIP.Image = [System.Drawing.Bitmap]::FromFile("$SysT_Folder\icons\internet.ico")
 $Menu_Main.Items.Add($MenuObj_InfoIP)
