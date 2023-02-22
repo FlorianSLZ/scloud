@@ -1,8 +1,8 @@
 ﻿$PackageName = "Excel-template"
 $Version = "1"
 
-$Path_4Log = "$ENV:LOCALAPPDATA\_MEM"
-Start-Transcript -Path "$Path_4Log\Log\$PackageName-install.log" -Force
+$Path_local = "$ENV:LOCALAPPDATA\_MEM"
+Start-Transcript -Path "$Path_local\Log\$PackageName-install.log" -Force
 
 try{
     # Create Excel\XLSTART folder
@@ -12,7 +12,7 @@ try{
     Copy-Item -Path "Sheet.xltx" -Destination "$env:APPDATA\Microsoft\Excel\XLSTART\Sheet.xltx" -Recurse -Force
 
     # Validation File
-    New-Item -Path "$Path_4Log\Validation\$PackageName" -ItemType "file" -Force -Value $Version
+    New-Item -Path "$Path_local\Validation\$PackageName" -ItemType "file" -Force -Value $Version
 
 }catch{$_}
 
