@@ -1,11 +1,11 @@
 ﻿$PackageName = "Company-Fonts"
 $Version = "1"
 
-$Path_4netIntune = "$Env:Programfiles\4net\EndpointManager"
-Start-Transcript -Path "$Path_4netIntune\Log\$PackageName-install.log" -Force
+$Path_local = "$Env:Programfiles\_MEM"
+Start-Transcript -Path "$Path_local\Log\$PackageName-install.log" -Force
 try{
 
-    $WorkingPath = "$Path_4netIntune\Data\Fonts"
+    $WorkingPath = "$Path_local\Data\Fonts"
     New-Item -ItemType "directory" -Path $WorkingPath -Force
     Copy-Item -Path ".\Fonts\*" -Destination $WorkingPath -Recurse
 
@@ -24,7 +24,7 @@ try{
 
     Remove-Item $WorkingPath -Force -Recurse
 
-    New-Item -Path "$Path_4netIntune\Validation\$PackageName" -ItemType "file" -Force -Value $Version
+    New-Item -Path "$Path_local\Validation\$PackageName" -ItemType "file" -Force -Value $Version
 }catch{
     Write-Host "_____________________________________________________________________"
     Write-Host "ERROR"

@@ -1,9 +1,9 @@
 ﻿$PackageName = "Company-Fonts"
 
-$Path_4netIntune = "$Env:Programfiles\4net\EndpointManager"
-Start-Transcript -Path "$Path_4netIntune\Log\uninstall\$PackageName-install.log" -Force
+$Path_local = "$Env:Programfiles\_MEM"
+Start-Transcript -Path "$Path_local\Log\uninstall\$PackageName-uninstall.log" -Force
 
-$WorkingPath = "$Path_4netIntune\Data\Fonts"
+$WorkingPath = "$Path_local\Data\Fonts"
 New-Item -ItemType "directory" -Path $WorkingPath -Force
 Copy-Item -Path ".\Fonts\*" -Destination $WorkingPath -Recurse
 
@@ -21,6 +21,6 @@ foreach($FontFile in $AllFonts){
 
 Remove-Item $WorkingPath -Force -Recurse
 
-Remove-Item -Path "$Path_4netIntune\Validation\$PackageName" -ItemType "file" -Force -Value $Version
+Remove-Item -Path "$Path_local\Validation\$PackageName" -ItemType "file" -Force -Value $Version
 
 Stop-Transcript

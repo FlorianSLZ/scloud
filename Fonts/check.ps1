@@ -1,6 +1,7 @@
 $PackageName = "Company-Fonts"
 $Version = "1"
-$ProgramVersion_current = Get-Content -Path "$Env:Programfiles\4net\EndpointManager\Validation\$PackageName"
+$Path_local = "$Env:Programfiles\_MEM"
+$ProgramVersion_current = Get-Content -Path "$Path_local\Validation\$PackageName"
 
 if($ProgramVersion_current -eq $Version){
     Write-Host "Found it!"
