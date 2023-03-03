@@ -11,6 +11,15 @@ try{
     Copy-Item -Path "Book.xltx" -Destination "$env:APPDATA\Microsoft\Excel\XLSTART\Book.xltx" -Recurse -Force
     Copy-Item -Path "Sheet.xltx" -Destination "$env:APPDATA\Microsoft\Excel\XLSTART\Sheet.xltx" -Recurse -Force
 
+    # Default Font
+    $Path = "HKCU:\Software\Microsoft\Office\16.0\Excel\Options" 
+    $Key = "Font" 
+    $KeyFormat = "String"
+    $Value = "Arial,10"
+    if(!(Test-Path $Path)){New-Item -Path $Path -Force}
+    if(!$Key){Set-Item -Path $Path -Value $Value
+    }else{Set-ItemProperty -Path $Path -Name $Key -Value $Value -Type $KeyFormat}
+
     # Validation File
     New-Item -Path "$Path_local\Validation\$PackageName" -ItemType "file" -Force -Value $Version
 
