@@ -5,7 +5,7 @@ $Version = 1
 #   Recurence Data
 ##########################################################################
 
-$Schedule_Frequency = "Hourly"       # Once, Hourly, Daily, AtLogon
+$Schedule_Frequency = "Hourly"      # Once, Hourly, Daily, AtLogon
 $Schedule_RepeatInterval = "1"      # Number            (for Daily and Hourly)
 $Schedule_StartDate = "2023-01-30"  # YYYY.MM.DD        (for Once)
 $Schedule_StartTime = "8am"         # ex 8am or 5pm     (for Once, Hourly, Daily)
@@ -87,11 +87,14 @@ try{
             "Once"      {$trigger = New-ScheduledTaskTrigger -Once -At $(Get-Date "$Schedule_StartDate $Schedule_StartTime")}                        
             "Hourly"    {$trigger = New-ScheduledTaskTrigger -Once -At $Schedule_StartTime -RepetitionDuration  (New-TimeSpan -Days 1)  -RepetitionInterval  (New-TimeSpan -Hours $Schedule_RepeatInterval)}                     
             "Daily"     {$trigger = New-ScheduledTaskTrigger -Daily -DaysInterval $Schedule_RepeatInterval -At $Schedule_StartTime}
-            "AtLogon"   {$trigger = New-ScheduledTaskTrigger -AtLogon}   
+            "AtLogon"   {
+                if($(Test-RunningAsSystem) -eq "True"){$trigger = New-ScheduledTaskTrigger -AtLogon}
+                else{$trigger = New-ScheduledTaskTrigger -AtLogon -User $env:USERNAME}
+                }   
             Default     {Write-Error "Wrong frequency declaration."}                        
         }  
         
-        if(Test-RunningAsSystem){$principal= New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType "ServiceAccount" -RunLevel "Highest"}
+        if($(Test-RunningAsSystem) -eq "True"){$principal= New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType "ServiceAccount" -RunLevel "Highest"}
         else{$principal= New-ScheduledTaskPrincipal -UserId ([System.Security.Principal.WindowsIdentity]::GetCurrent().Name)}
        	$action = New-ScheduledTaskAction -Execute $(Join-Path $env:SystemRoot -ChildPath "System32\wscript.exe") -Argument "`"$Path_vbs`" `"$Path_PSscript`""
         $settings= New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
