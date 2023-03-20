@@ -10,6 +10,6 @@ if ($winget_exe.count -gt 1){
 
 if (!$winget_exe){Write-Error "Winget not installed"}
 
-& $winget_exe uninstall --exact --id $ProgramName --silent --accept-package-agreements --accept-source-agreements
+& $winget_exe uninstall --exact --id $ProgramName --silent --accept-source-agreements
 
 Stop-Transcript
