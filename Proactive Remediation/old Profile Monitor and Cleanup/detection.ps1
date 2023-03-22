@@ -15,7 +15,7 @@ Try {
         Write-Warning "Old profiles ($Profile_age days+): $($Profiles_2remove.LocalPath)"
         Exit 1
     }else{
-        Write-Output -NoEnumerate $(Get-CimInstance -Class Win32_UserProfile | Select-Object LocalPath, LastUseTime)
+        Write-Output "No profiles oldter than $Profile_age days found. "
         Exit 0
     }
 

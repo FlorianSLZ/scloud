@@ -15,7 +15,7 @@ Try {
         # Removing all old profiles
         $Profiles_2remove | Remove-CimInstance
     }else{
-        Write-Output "No old profiles found."
+        Write-Output "No profiles oldter than $Profile_age days found. "
     }
 
 } 
