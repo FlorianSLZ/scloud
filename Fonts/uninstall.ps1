@@ -1,7 +1,7 @@
 ﻿$PackageName = "Company-Fonts"
 
 $Path_local = "$Env:Programfiles\_MEM"
-Start-Transcript -Path "$Path_local\Log\uninstall\$PackageName-uninstall.log" -Force
+Start-Transcript -Path "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$PackageName-uninstall.log" -Force
 
 $WorkingPath = "$Path_local\Data\Fonts"
 New-Item -ItemType "directory" -Path $WorkingPath -Force

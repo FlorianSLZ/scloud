@@ -2,7 +2,8 @@
 $Version = "1"
 
 $Path_local = "$Env:Programfiles\_MEM"
-Start-Transcript -Path "$Path_local\Log\$PackageName-install.log" -Force
+Start-Transcript -Path "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$PackageName-install.log" -Force
+
 try{
 
     $WorkingPath = "$Path_local\Data\Fonts"
