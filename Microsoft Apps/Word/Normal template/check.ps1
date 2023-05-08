@@ -1,8 +1,7 @@
 $PackageName = "Normal-template"
 $Version = '1'
 
-$Path_4Log = "$ENV:LOCALAPPDATA\_MEM"
-$ProgramVersion_current = Get-Content -Path "$Path_4Log\Validation\$PackageName"
+$ProgramVersion_current = Get-Content -Path "$ENV:LOCALAPPDATA\_MEM\$PackageName"
 
 if($ProgramVersion_current -eq $Version){
     Write-Host "Found it!"
