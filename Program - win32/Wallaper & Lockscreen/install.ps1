@@ -2,7 +2,7 @@ $PackageName = "Wallpaper"
 $Version = 1
 
 # Set image file names for desktop background and lock screen
-# leave blank if you with not to set either of one
+# leave blank if you wish not to set either of one
 $WallpaperIMG = "wallpaper-scloud.jpg"
 $LockscreenIMG = "scloud-banner.jpg"
 
