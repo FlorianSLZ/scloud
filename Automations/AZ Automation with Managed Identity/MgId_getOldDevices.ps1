@@ -1,0 +1,61 @@
+# Conenction with Managed Identity
+Connect-MgGraph -Identity
+
+Connect-MgGraph -Scopes "DeviceManagementManagedDevices.Read.All"
+
+# Define device age to include
+$inactiveDays = "180"
+
+# Construct the Graph API request URI
+$graphUri = "https://graph.microsoft.com/beta/deviceManagement/managedDevices"
+$filter = "lastSyncDateTime le $((Get-Date).AddDays(-$inactiveDays).ToString('yyyy-MM-ddTHH:mm:ssZ'))"
+$uri = "$($graphUri)?`$filter=$filter"
+$Method = "GET"
+
+# Send the request and retrieve the devices
+$response = Invoke-MgGraphRequest -Method $Method -uri $uri
+
+# Create a report variable
+$report = @()
+
+# Build the report
+foreach ($device in $response.value) {
+    $deviceName = $device.deviceName
+    $lastSyncDateTime = $device.lastSyncDateTime
+    $deviceInfo = [PSCustomObject]@{
+        DeviceName = $deviceName
+        LastSyncDateTime = $lastSyncDateTime
+    }
+    $report += $deviceInfo
+}
+
+# Output the report
+$report
+
+
+###############################################################################
+
+# YOUR Webhook URL
+$WebHookURL = "https://xxxx.webhook.office.com/someID..."
+
+
+# Message JSON 
+$Message_Json = [PSCustomObject][Ordered]@{
+    "@type" = "MessageCard"
+    "@context" = "<http://schema.org/extensions>"
+    "summary" = "You have $($report.count) Inactive Devices which haven't have contatc in the last $inactiveDays"
+    "themeColor" = '0078D7'
+	"title" = "Inactive Devices ($($report.count))"
+    "text" = "<h1>Inactive Devices for $inactiveDays+ days</h1>
+    <pre>$($report | Format-Table DeviceName, LastSyncDateTime | Out-String)</pre>"
+} | ConvertTo-Json
+
+
+$parameters = @{
+	"URI" = $WebHookURL
+	"Method" = 'POST'
+	"Body" = $Message_Json
+	"ContentType" = 'application/json'
+}
+
+Invoke-RestMethod @parameters
