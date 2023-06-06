@@ -42,7 +42,7 @@ if($report){
     $Message_Json = [PSCustomObject][Ordered]@{
         "@type" = "MessageCard"
         "@context" = "<http://schema.org/extensions>"
-        "summary" = "You have $($report.count) Inactive Devices which haven't have contatc in the last $inactiveDays"
+        "summary" = "You have $($report.count) Inactive Devices which haven't had contatc in the last $inactiveDays"
         "themeColor" = '0078D7'
         "title" = "Inactive Devices ($($report.count))"
         "text" = "<h1>Inactive Devices for $inactiveDays+ days</h1>
