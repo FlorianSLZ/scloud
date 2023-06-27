@@ -1,8 +1,7 @@
-﻿$ProgramName = "makemeadmin"
+﻿$PackageName = "makemeadmin"
 
-$Path_4Log = "$Env:Programfiles\_MEM"
-Start-Transcript -Path "$Path_4Log\Log\uninstall\$ProgramName-uninstall.log" -Force
+Start-Transcript -Path "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$PackageName-uninstall.log" -Force
 
-C:\ProgramData\chocolatey\choco.exe uninstall $ProgramName -y
+C:\ProgramData\chocolatey\choco.exe uninstall $PackageName -y
 
 Stop-Transcript
