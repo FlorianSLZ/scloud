@@ -1,13 +1,13 @@
-﻿$ProgramName = Get-Content choco.txt
-$InstallParameter = Get-Content parameter.txt
-$Path_local = "$Env:Programfiles\_MEM"
-Start-Transcript -Path "$Path_local\Log\$ProgramName-install.log" -Force
+﻿$PackageName = Get-Content choco.txt
+$InstallParameter = Get-Content parameter.txt -ErrorAction SilentlyContinue
 
-$localprograms = C:\ProgramData\chocolatey\choco.exe list --localonly
-if ($localprograms -like "*$ProgramName*"){
-    C:\ProgramData\chocolatey\choco.exe upgrade $ProgramName -y $InstallParameter
+Start-Transcript -Path "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$PackageName-install.log" -Force
+
+$localprograms = C:\ProgramData\chocolatey\choco.exe list
+if ($localprograms -like "*$PackageName*"){
+    C:\ProgramData\chocolatey\choco.exe upgrade $PackageName -y $InstallParameter
 }else{
-    C:\ProgramData\chocolatey\choco.exe install $ProgramName -y $InstallParameter
+    C:\ProgramData\chocolatey\choco.exe install $PackageName -y $InstallParameter
 }
 
 Stop-Transcript

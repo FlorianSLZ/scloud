@@ -1,7 +1,6 @@
-$ProgramName = "ChocoProgramID"
+$choco_id= "chocoID"
 
-
-$ChocoPrg_Existing = C:\ProgramData\chocolatey\choco.exe list --localonly
-    if ($ChocoPrg_Existing -like "*$ProgramName*"){
+$choco_path = "C:\ProgramData\chocolatey\lib\$choco_id"
+if (Test-Path -Path $choco_path -PathType Container){
     Write-Host "Found it!"
 }
