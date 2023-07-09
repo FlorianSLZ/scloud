@@ -1,12 +1,12 @@
 ﻿$PackageName = "DesktopIcon_SLZ"
 $Version = "1"
 
-$Path_4netIntune = "$Env:Programfiles\4net\EndpointManager"
-Start-Transcript -Path "$Path_4netIntune\Log\$PackageName-install.log" -Force
+$Path_local = "$Env:Programfiles\MEM"
+Start-Transcript -Path "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$PackageName-install.log" -Force
 
 # Paths
-$DesktopTMP = "$Path_4netIntune\Data\Desktop\$PackageName"
-$DesktopIcons = "$Path_4netIntune\Data\icons\$PackageName"
+$DesktopTMP = "$Path_local\Data\Desktop\$PackageName"
+$DesktopIcons = "$Path_local\Data\icons\$PackageName"
 
 # Create Folders
 New-Item -Path $DesktopTMP -ItemType directory -force
@@ -39,7 +39,7 @@ foreach($shortcut in $shortcuts){
 Copy-Item -Path "$DesktopTMP\*" -Destination "C:\Users\Public\Desktop" -Recurse
 
 # Validation
-New-Item -Path "$Path_4netIntune\Validation\$PackageName" -ItemType "file" -Force -Value $Version
+New-Item -Path "$Path_local\Validation\$PackageName" -ItemType "file" -Force -Value $Version
 
 Stop-Transcript
 

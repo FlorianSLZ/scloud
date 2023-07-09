@@ -1,8 +1,9 @@
 $PackageName = "run-once"
 $Version = "1"
 
-$Path_4netIntune = "$Env:Programfiles\4net\EndpointManager"
-Start-Transcript -Path "$Path_4netIntune\Log\$PackageName.log" -Force
+$Path_local = "$Env:Programfiles\MEM"
+Start-Transcript -Path "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$PackageName-script.log" -Force
+
 try{
     # if running as system, local machine Key, else current user
     if($(whoami -user) -match "S-1-5-18"){$KeyPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\RunOnce"}
@@ -28,7 +29,7 @@ try{
 
     }else{
         # script path
-        $script_path = "$Path_4netIntune\Data\$PackageName.ps1"
+        $script_path = "$Path_local\Data\$PackageName.ps1"
         # get and save file content
         Get-Content -Path $($PSCommandPath) | Out-File -FilePath $script_path -Force
 
