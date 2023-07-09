@@ -1,20 +1,19 @@
 $PackageName = "DesktopInfo"
 $Description = "Zeigt den Hostname auf dem Desktop, unabhängig vom Hintergrund."
+$Prg_path = "$Env:Programfiles\DesktopInfo"
 
-$Path_4netIntune = "$Env:Programfiles\4net\EndpointManager"
-Start-Transcript -Path "$Path_4netIntune\Log\$PackageName-install.log" -Force
+Start-Transcript -Path "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$PackageName-install.log" -Force
 
 #Bestehenden Task beenden
 taskkill /IM DesktopInfo64.exe /F
 ###########################################################################################
 # Initial Setup und Variabeln
 ###########################################################################################
-$scriptSavePath = "C:\Program Files\4net\EndpointManager\Program\DesktopInfo"
-$scriptSavePathName = "DesktopInfo.ps1"
-$scriptPath = "$scriptSavePath\$scriptSavePathName"
-New-item -itemtype directory -force -path "$Path_4netIntune\Program\DesktopInfo"
-Copy-item -path ".\DesktopInfo64.exe" -destination "$Path_4netIntune\Program\DesktopInfo\DesktopInfo64.exe"
-Copy-item -path ".\hostname.ini" -destination "$Path_4netIntune\Program\DesktopInfo\hostname.ini"
+$scriptSaveName = "DesktopInfo.ps1"
+$scriptPath = "$Prg_path\$scriptSaveName"
+New-item -itemtype directory -force -path "$Prg_path\Program\DesktopInfo"
+Copy-item -path ".\DesktopInfo64.exe" -destination "$Prg_path\Program\DesktopInfo\DesktopInfo64.exe"
+Copy-item -path ".\hostname.ini" -destination "$Prg_path\Program\DesktopInfo\hostname.ini"
 Copy-item -path ".\DesktopInfo.ps1" -destination $scriptPath
 
 ###########################################################################################
@@ -37,9 +36,9 @@ If fso.FileExists(strPath) Then
 End If
 "
 
-$scriptSavePathName = "$PackageName-VBSHelper.vbs"
+$scriptSaveName = "$PackageName-VBSHelper.vbs"
 
-$dummyScriptPath = $(Join-Path -Path $scriptSavePath -ChildPath $scriptSavePathName)
+$dummyScriptPath = $(Join-Path -Path $Prg_path -ChildPath $scriptSaveName)
 
 $vbsDummyScript | Out-File -FilePath $dummyScriptPath -Force
 
