@@ -4,7 +4,7 @@ $bgInfoFolder = "$env:programfiles\BgInfo"
 $bgInfoFolderContent = $bgInfoFolder + "\*"
 $itemType = "Directory"
 $bgInfoUrl = "https://download.sysinternals.com/files/BGInfo.zip"
-$logonBgiUrl = "https://salzmann.pro/share/BGInfo/logon.bgi"
+$logonBgiUrl = "https://github.com/FlorianSLZ/scloud/raw/main/BGInfo/scloud.bgi"
 $bgInfoZip = "$bgInfoFolder\BgInfo.zip"
 $bgInfoEula = "$bgInfoFolder\Eula.txt"
 $logonBgiZip = "$bgInfoFolder\logon.bgi"
@@ -47,16 +47,14 @@ Start-BitsTransfer -Source $bgInfoUrl -Destination $bgInfoZip
 [System.IO.Compression.ZipFile]::ExtractToDirectory($bgInfoZip, $bgInfoFolder)
 Remove-Item $bgInfoZip
 Remove-Item $bgInfoEula
-Write-Host ($writeEmptyLine + "# bginfo.exe available")`
--foregroundcolor $foregroundColor2 $writeEmptyLine
+Write-Host ($writeEmptyLine + "# bginfo.exe available") -foregroundcolor $foregroundColor2 $writeEmptyLine
  
 ## ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  
 ## Download, save and extract logon.bgi file to $bgInfoFolder
  
 Invoke-WebRequest -Uri $logonBgiUrl -OutFile $logonBgiZip
-Write-Host ($writeEmptyLine + "# logon.bgi available")`
--foregroundcolor $foregroundColor2 $writeEmptyLine
+Write-Host ($writeEmptyLine + "# logon.bgi available") -foregroundcolor $foregroundColor2 $writeEmptyLine
  
 ## ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  
@@ -72,17 +70,14 @@ Write-Host ($writeEmptyLine + "# BgInfo regkey added")`
 ## ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  
 ## Run BgInfo
- 
-$bgInfoFolder\Bginfo.exe $bgInfoFolder\logon.bgi /timer:0 /nolicprompt
-Write-Host ($writeEmptyLine + "# BgInfo has run")`
--foregroundcolor $foregroundColor2 $writeEmptyLine
+Start-Process "$bgInfoFolder\Bginfo.exe" -ArgumentList """$bgInfoFolder\logon.bgi"" /timer:0 /nolicprompt"
+Write-Host ($writeEmptyLine + "# BgInfo has run") -foregroundcolor $foregroundColor2 $writeEmptyLine
  
 ## ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  
 ## Exit PowerShell window 3 seconds after completion
  
-Write-Host ($writeEmptyLine + "# Script completed, the PowerShell window will close in 3 seconds")`
--foregroundcolor $foregroundColor1 $writeEmptyLine
+Write-Host ($writeEmptyLine + "# Script completed, the PowerShell window will close in 3 seconds") -foregroundcolor $foregroundColor1 $writeEmptyLine
 
  
 ## ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
