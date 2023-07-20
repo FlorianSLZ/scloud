@@ -1,7 +1,7 @@
 $PackageName = "run-once"
 $Version = "1"
 
-$Path_local = "$Env:Programfiles\MEM"
+$Path_local = "$env:localappdata\MEM"
 Start-Transcript -Path "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$PackageName-script.log" -Force
 
 try{
@@ -29,7 +29,11 @@ try{
 
     }else{
         # script path
-        $script_path = "$Path_local\Data\$PackageName.ps1"
+        # If the folder doesn't exist, create it
+        if (-not (Test-Path -Path $Path_local)) {
+            New-Item -ItemType Directory -Path $folderPath | Out-Null
+        }
+        $script_path = "$Path_local\$PackageName.ps1"
         # get and save file content
         Get-Content -Path $($PSCommandPath) | Out-File -FilePath $script_path -Force
 
