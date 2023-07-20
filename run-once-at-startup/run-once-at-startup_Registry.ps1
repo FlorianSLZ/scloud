@@ -31,7 +31,7 @@ try{
         # script path
         # If the folder doesn't exist, create it
         if (-not (Test-Path -Path $Path_local)) {
-            New-Item -ItemType Directory -Path $folderPath | Out-Null
+            New-Item -ItemType Directory -Path $Path_local
         }
         $script_path = "$Path_local\$PackageName.ps1"
         # get and save file content
