@@ -34,6 +34,7 @@ try{
     }else{
         # script path
         $script_path = "$Path_local\Data\$PackageName.ps1"
+        New-Item -ItemType Directory -Force -Path "$Path_local\Data" | Out-Null
         # get and save file content
         Get-Content -Path $($PSCommandPath) | Out-File -FilePath $script_path -Force
 
