@@ -21,6 +21,6 @@ foreach($FontFile in $AllFonts){
 
 Remove-Item $WorkingPath -Force -Recurse
 
-Remove-Item -Path "$Path_local\Validation\$PackageName" -ItemType "file" -Force -Value $Version
+Remove-Item -Path "$Path_local\Validation\$PackageName" -Force
 
 Stop-Transcript
