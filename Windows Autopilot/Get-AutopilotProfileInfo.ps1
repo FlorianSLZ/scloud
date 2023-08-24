@@ -1,11 +1,11 @@
 <#PSScriptInfo
   
-.VERSION 1.0
+.VERSION 1.1
 .GUID b72d1888-1997-4812-b53c-be274a6b80cc
 .AUTHOR Florian Salzmann
 .COMPANYNAME scloud.work
 .COPYRIGHT
-.TAGS Windows Autopilot
+.TAGS Windows Autopilot Intune
 .LICENSEURI https://github.com/FlorianSLZ/scloud/blob/main/LICENSE.md
 .PROJECTURI https://scloud.work/Get-AutopilotProfileInfo
 .ICONURI
@@ -13,6 +13,7 @@
 .REQUIREDSCRIPTS
 .EXTERNALSCRIPTDEPENDENCIES
 .RELEASENOTES
+    Version 1.1: typos ;)
     Version 1.0: Original published version.
  
 #>
@@ -26,7 +27,7 @@ Find out in which tenant a device is registered with Windows Autopilot.
 The details are stored in the device's registry (if the Autopilot profile has been downloaded). 
 
 .PARAMETER All
-Switch to get extended infos from the Profile
+Switch to get extended information from the profile
 
 .EXAMPLE
 .\Get-AutopilotProfileInfo.ps1
@@ -37,7 +38,7 @@ Switch to get extended infos from the Profile
 #>
 
 param(
-    [parameter(Mandatory = $false, HelpMessage = "Switch to get extended infos from the Profile")]
+    [parameter(Mandatory = $false, HelpMessage = "Switch to get extended information from the profile")]
     [ValidateNotNullOrEmpty()]
     [switch]$All
 )
@@ -53,7 +54,7 @@ $Policy_Key = "PolicyJsonCache"
 Try {
     if (Test-Path $onMS_Path) {
         $RegResult = Get-ItemProperty $onMS_Path -Name $onMS_Key -ErrorAction Stop | Select-Object -ExpandProperty $onMS_Key
-        Write-Host "This Devices is registerd with the onMicorsft Domain: "
+        Write-Host "This device is registered with the domain:"
 		Write-Host "$($RegResult)`n" -ForegroundColor Green
 
     }
@@ -64,7 +65,7 @@ Try {
 	if($All){
 		if (Test-Path $Policy_Path) {
 			$Policy_RegResult = Get-ItemProperty $Policy_Path -Name $Policy_Key -ErrorAction Stop | Select-Object -ExpandProperty $Policy_Key | ConvertFrom-Json
-			Write-Host "`nMore Infos about this devices Atopilot profile:"
+			Write-Host "`nMore Infos about this devices Autopilot profile:"
 			$Policy_RegResult | fl
 
 		}
