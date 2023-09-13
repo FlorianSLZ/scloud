@@ -3,7 +3,7 @@ $Version = 1
 
 # Set image file names for desktop background and lock screen
 # leave blank if you wish not to set either of one
-$WallpaperIMG = "wallpaper-scloud.jpg"
+$WallpaperIMG = "wallpaper-scloud-rocket.jpg"
 $LockscreenIMG = "scloud-banner.jpg"
 
 Start-Transcript -Path "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$PackageName-install.log" -Force

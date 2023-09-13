@@ -1,3 +1,16 @@
+<#
+.DESCRIPTION
+    Reads and upload the Autopilot information from a device to Intune. 
+.NOTES
+    Version:        1
+    Information:    https://scloud.work/autopilot-registration-app/
+    Author:         Florian Salzmann
+
+    Changes: 
+        1.0 initial version
+  
+#>
+
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Unrestricted -Force
 Write-Host "(i) We will now install the some required components`n" -ForegroundColor Cyan
 Install-PackageProvider -Name NuGet -Force | Out-Null
