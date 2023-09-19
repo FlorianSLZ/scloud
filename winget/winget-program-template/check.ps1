@@ -1,7 +1,7 @@
 $ProgramName = "WINGETPROGRAMID"
 
 # resolve winget_exe
-$winget_exe = Resolve-Path "C:\Program Files\WindowsApps\Microsoft.DesktopAppInstaller_*_x64__8wekyb3d8bbwe\winget.exe"
+$winget_exe = Resolve-Path "C:\Program Files\WindowsApps\Microsoft.DesktopAppInstaller_*_*__8wekyb3d8bbwe\winget.exe"
 if ($winget_exe.count -gt 1){
         $winget_exe = $winget_exe[-1].Path
 }
