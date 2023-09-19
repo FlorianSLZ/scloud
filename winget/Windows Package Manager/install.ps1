@@ -1,28 +1,28 @@
-﻿$PackageName = "WindowsPackageManager"
-$MSIXBundle = "Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
-$URL_msixbundle = "https://aka.ms/getwinget"
+﻿$PackageName = "winget"
 
-$Path_local = "$Env:Programfiles\_MEM"
-Start-Transcript -Path "$Path_local\Log\$PackageName-install.log" -Force
+Start-Transcript -Path "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$PackageName-install.log" -Force
 
 # Program/Installation folder
-$Folder_install = "$Path_local\Data\$PackageName"
+$Folder_install = "$env:temp\winget-installation"
 New-Item -Path $Folder_install -ItemType Directory -Force -Confirm:$false
+Set-Location $Folder_install
 
-# Download current winget MSIXBundle
-$wc = New-Object net.webclient
-$wc.Downloadfile($URL_msixbundle, "$Folder_install\$MSIXBundle")
+$progressPreference = 'silentlyContinue'
 
-# Install WinGet MSIXBundle 
-try{
-    Add-AppxProvisionedPackage -Online -PackagePath "$Folder_install\$MSIXBundle" -SkipLicense 
-    Write-Host "Installation of $PackageName finished"
-}catch{
-    Write-Error "Failed to install $PackageName!"
-} 
+# Download
+Write-Host "Downloading WinGet..."
+Invoke-WebRequest -Uri https://aka.ms/getwinget -OutFile Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
+Write-Host "Downloading VCLibs..."
+Invoke-WebRequest -Uri https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx -OutFile Microsoft.VCLibs.x64.14.00.Desktop.appx
+Write-Host "Downloading UI.Xaml..."
+Invoke-WebRequest -Uri https://github.com/microsoft/microsoft-ui-xaml/releases/download/v2.7.3/Microsoft.UI.Xaml.2.7.x64.appx -OutFile Microsoft.UI.Xaml.2.7.x64.appx
 
-# Install file cleanup
-Start-Sleep 3 # to unblock installation file
-Remove-Item -Path "$Folder_install" -Force -Recurse
+# Installation
+Write-Host "Installing VCLibs..."
+Add-AppxPackage Microsoft.VCLibs.x64.14.00.Desktop.appx
+Write-Host "Installing UI.Xaml..."
+Add-AppxPackage Microsoft.UI.Xaml.2.7.x64.appx
+Write-Host "Installing WinGet..."
+Add-AppxPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
 
 Stop-Transcript
