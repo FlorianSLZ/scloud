@@ -11,7 +11,7 @@ $logonBgiZip = "$bgInfoFolder\logon.bgi"
 $bgInfoRegPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
 $bgInfoRegkey = "BgInfo"
 $bgInfoRegType = "String"
-$bgInfoRegkeyValue = "$bgInfoFolder\Bginfo.exe $bgInfoFolder\logon.bgi /timer:0 /nolicprompt"
+$bgInfoRegkeyValue = """$bgInfoFolder\Bginfo.exe"" ""$bgInfoFolder\logon.bgi"" /timer:0 /nolicprompt"
 $regKeyExists = (Get-Item $bgInfoRegPath -EA Ignore).Property -contains $bgInfoRegkey
  
 $foregroundColor1 = "Cyan"
@@ -60,12 +60,8 @@ Write-Host ($writeEmptyLine + "# logon.bgi available") -foregroundcolor $foregro
  
 ## Create BgInfo Registry Key to AutoStart
  
-If ($regKeyExists -eq $True){Write-Host ($writeEmptyLine + "# BgInfo regkey exists, script wil go on")`
--foregroundcolor $foregroundColor1 $writeEmptyLine
-}Else{
-New-ItemProperty -Path $bgInfoRegPath -Name $bgInfoRegkey -PropertyType $bgInfoRegType -Value $bgInfoRegkeyValue
-Write-Host ($writeEmptyLine + "# BgInfo regkey added")`
--foregroundcolor $foregroundColor2 $writeEmptyLine}
+New-ItemProperty -Path $bgInfoRegPath -Name $bgInfoRegkey -Value $bgInfoRegkeyValue -PropertyType $bgInfoRegType -Force
+Write-Host ($writeEmptyLine + "# BgInfo regkey added") -foregroundcolor $foregroundColor2 $writeEmptyLine
  
 ## ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  
@@ -81,3 +77,5 @@ Write-Host ($writeEmptyLine + "# Script completed, the PowerShell window will cl
 
  
 ## ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
