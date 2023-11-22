@@ -212,5 +212,5 @@ $AADGroupID = (Get-AzureADGroup -All $true | where-object DisplayName -eq $PAR_A
 
     Write-Host "Complete" -ForegroundColor Green
 }else{
-    Write-Host "Group $PAR_AADGroup not found, PAR create but not assigned" -ForegroundColor Yellow
+    Write-Host "Group $PAR_AADGroup not found, PAR created but not assigned" -ForegroundColor Yellow
 }
