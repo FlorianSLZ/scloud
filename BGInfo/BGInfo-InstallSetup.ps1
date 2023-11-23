@@ -12,7 +12,6 @@ $bgInfoRegPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
 $bgInfoRegkey = "BgInfo"
 $bgInfoRegType = "String"
 $bgInfoRegkeyValue = """$bgInfoFolder\Bginfo.exe"" ""$bgInfoFolder\logon.bgi"" /timer:0 /nolicprompt"
-$regKeyExists = (Get-Item $bgInfoRegPath -EA Ignore).Property -contains $bgInfoRegkey
  
 $foregroundColor1 = "Cyan"
 $foregroundColor2 = "Yellow"
