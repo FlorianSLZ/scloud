@@ -11,9 +11,9 @@ taskkill /IM DesktopInfo64.exe /F
 ###########################################################################################
 $scriptSaveName = "DesktopInfo.ps1"
 $scriptPath = "$Prg_path\$scriptSaveName"
-New-item -itemtype directory -force -path "$Prg_path\Program\DesktopInfo"
-Copy-item -path ".\DesktopInfo64.exe" -destination "$Prg_path\Program\DesktopInfo\DesktopInfo64.exe"
-Copy-item -path ".\hostname.ini" -destination "$Prg_path\Program\DesktopInfo\hostname.ini"
+New-item -itemtype directory -force -path "$Prg_path"
+Copy-item -path ".\DesktopInfo64.exe" -destination "$Prg_path\DesktopInfo64.exe"
+Copy-item -path ".\hostname.ini" -destination "$Prg_path\hostname.ini"
 Copy-item -path ".\DesktopInfo.ps1" -destination $scriptPath
 
 ###########################################################################################
