@@ -2,27 +2,48 @@
 
 Start-Transcript -Path "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$PackageName-install.log" -Force
 
-# Program/Installation folder
-$Folder_install = "$env:temp\winget-installation"
-New-Item -Path $Folder_install -ItemType Directory -Force -Confirm:$false
-Set-Location $Folder_install
+# GitHub API endpoint for PowerShell (7) releases
+$githubApiUrl = 'https://api.github.com/repos/PowerShell/PowerShell/releases/latest'
 
-$progressPreference = 'silentlyContinue'
+# Fetch the latest release details
+$release = Invoke-RestMethod -Uri $githubApiUrl
 
-# Download
-Write-Host "Downloading WinGet..."
-Invoke-WebRequest -Uri https://aka.ms/getwinget -OutFile Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
-Write-Host "Downloading VCLibs..."
-Invoke-WebRequest -Uri https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx -OutFile Microsoft.VCLibs.x64.14.00.Desktop.appx
-Write-Host "Downloading UI.Xaml..."
-Invoke-WebRequest -Uri https://github.com/microsoft/microsoft-ui-xaml/releases/download/v2.7.3/Microsoft.UI.Xaml.2.7.x64.appx -OutFile Microsoft.UI.Xaml.2.7.x64.appx
+# Find asset with .msi in the name and x64 in the name
+$asset = $release.assets | Where-Object { $_.name -like "*msi*" -and $_.name -like "*x64*" }
 
-# Installation
-Write-Host "Installing VCLibs..."
-Add-AppxPackage Microsoft.VCLibs.x64.14.00.Desktop.appx
-Write-Host "Installing UI.Xaml..."
-Add-AppxPackage Microsoft.UI.Xaml.2.7.x64.appx
-Write-Host "Installing WinGet..."
-Add-AppxPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
+# Get the download URL and filename of the asset (assuming it's a MSI file)
+$downloadUrl = $asset.browser_download_url
+$filename = $asset.name
+
+# Download the latest release using .NET's System.Net.WebClient for faster download
+$webClient = New-Object System.Net.WebClient
+$webClient.DownloadFile($downloadUrl, $filename)
+
+# Install PowerShell 7
+Start-Process msiexec.exe -Wait -ArgumentList "/I $filename /qn"
+
+# Start a new PowerShell 7 session
+$pwshExecutable = "C:\Program Files\PowerShell\7\pwsh.exe"
+
+# Run a script block in PowerShell 7
+& $pwshExecutable -Command {
+    # Check if NuGet provider is installed
+    $provider = Get-PackageProvider NuGet -ErrorAction Ignore
+    if (-not $provider) {
+        Write-Host "Installing provider NuGet"
+        Find-PackageProvider -Name NuGet -ForceBootstrap -IncludeDependencies
+    }
+
+    # Install or update the Microsoft WinGet client module
+    Install-Module microsoft.winget.client -Force -AllowClobber
+
+    # Import the Microsoft WinGet client module
+    Import-Module microsoft.winget.client
+
+    # Repair the WinGet package manager
+    Repair-WinGetPackageManager
+
+}
+
 
 Stop-Transcript
