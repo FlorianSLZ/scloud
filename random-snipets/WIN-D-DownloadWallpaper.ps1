@@ -5,6 +5,6 @@ $Wallpaper_online = "https://github.com/FlorianSLZ/scloud/blob/main/img/scloud-w
 $Wallpaper_local = "C:\Windows\Wallpaper.jpg"
 
 $wc = New-Object System.Net.WebClient
-$wc.DownloadFile($url, "C:\temp\test.jpg")
+$wc.DownloadFile($Wallpaper_online, "$Wallpaper_local")
 
 Stop-Transcript
