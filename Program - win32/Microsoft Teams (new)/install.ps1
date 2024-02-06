@@ -24,10 +24,15 @@ function Uninstall-TeamsClassic($TeamsPath) {
 
 # Remove Teams Machine-Wide Installer
 Write-Host "Removing Teams Machine-wide Installer"
-$MachineWide = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -eq "Teams Machine-Wide Installer" }
+
+#Windows Uninstaller Registry Path
+$registryPath = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
+
+# Get all subkeys and match the subkey that contains "Teams Machine-Wide Installer" DisplayName.
+$MachineWide = Get-ItemProperty -Path $registryPath | Where-Object -Property DisplayName -eq "Teams Machine-Wide Installer"
 
 if ($MachineWide) {
-    $MachineWide.Uninstall()
+    Start-Process -FilePath "msiexec.exe" -ArgumentList "/x ""$($MachineWide.PSChildName)"" /qn" -NoNewWindow -Wait
 }
 else {
     Write-Host "Teams Machine-Wide Installer not found"
