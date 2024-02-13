@@ -1,0 +1,25 @@
+{
+    "description":  "Adds the companies virtual bakgrouonds to each users profile.",
+    "installCommandLine":  "%SystemRoot%\\sysnative\\WindowsPowerShell\\v1.0\\powershell.exe -windowstyle hidden -executionpolicy bypass -command .\\install.ps1",
+    "InstallFile":  "Deploy-Application.exe",
+    "Version":  "latest",
+    "Type": "custom",
+    "minimumSupportedWindowsRelease":  "W10_21H2",
+    "rules":  {
+        "ruleType": "detection",
+        "check32BitOn64System": false,
+        "keyPath": "HKEY_LOCAL_MACHINE\\SOFTWARE\\scloud\\Teams-new-Backgrounds",
+        "valueName": "Version",
+        "operationType": "string",
+        "operator": "equal",
+        "comparisonValue": "1"
+    },
+    "uninstallCommandLine":  "%SystemRoot%\\sysnative\\WindowsPowerShell\\v1.0\\powershell.exe -windowstyle hidden -executionpolicy bypass -command .\\uninstall.ps1",
+    "publisher":  "Microsoft",
+    "installExperience":  {
+                              "deviceRestartBehavior":  "suppress",
+                              "runAsAccount":  "user"
+                          },
+    "applicableArchitectures":  "x64",
+    "displayName":  "Teams virtual Backgrounds"
+}
