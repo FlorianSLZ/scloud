@@ -1,6 +1,6 @@
 ﻿$PackageName = "Teams-new-Backgrounds"
 
-Start-Transcript -Path "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$PackageName-$env:USERNAME-install.log" -Force
+Start-Transcript -Path "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$PackageName-$env:USERNAME-uninstall.log" -Force
 
 try{
     # Local Folder 
@@ -21,9 +21,8 @@ try{
     }
     
 
-    # Validation Key
-    Remove-Item -Path "$TeamsBG_Folder\$PackageName" -Force
-
+    # Remove Detection Key
+    Remove-Item -Path "HKLM:\SOFTWARE\scloud\$PackageName" -Force
 
     
 }catch{

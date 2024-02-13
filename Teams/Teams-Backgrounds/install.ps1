@@ -41,8 +41,15 @@ try{
     $obj_list = $vBackgrounds_GUID | Select-Object @{Name='Name';Expression={$_}}
     $obj_list | Export-Csv $TeamsBG_ref -NoTypeInformation 
 
-    # Validation Key
-    New-Item -Path "$TeamsBG_Folder\$PackageName" -ItemType File -Value $Version -Force
+    # Detection Key
+    $Path = "HKLM:\SOFTWARE\scloud\$PackageName" 
+    $Key = "Version" 
+    $KeyFormat = "string"
+    $Value = $Version
+
+    if(!(Test-Path $Path)){New-Item -Path $Path -Force}
+    if(!$Key){Set-Item -Path $Path -Value $Value
+    }else{Set-ItemProperty -Path $Path -Name $Key -Value $Value -Type $KeyFormat}
 
 
     
