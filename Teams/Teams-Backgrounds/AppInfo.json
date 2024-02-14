@@ -8,7 +8,7 @@
     "rules":  {
         "ruleType": "detection",
         "check32BitOn64System": false,
-        "keyPath": "HKEY_LOCAL_MACHINE\\SOFTWARE\\scloud\\Teams-new-Backgrounds",
+        "keyPath": "HKEY_CURRENT_USER\\Software\\scloud\\Teams-new-Backgrounds",
         "valueName": "Version",
         "operationType": "string",
         "operator": "equal",

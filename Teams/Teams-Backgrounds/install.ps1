@@ -42,7 +42,7 @@ try{
     $obj_list | Export-Csv $TeamsBG_ref -NoTypeInformation 
 
     # Detection Key
-    $Path = "HKLM:\SOFTWARE\scloud\$PackageName" 
+    $Path = "HKCU:\SOFTWARE\scloud\$PackageName" 
     $Key = "Version" 
     $KeyFormat = "string"
     $Value = $Version

@@ -22,7 +22,7 @@ try{
     
 
     # Remove Detection Key
-    Remove-Item -Path "HKLM:\SOFTWARE\scloud\$PackageName" -Force
+    Remove-Item -Path "HKCU:\SOFTWARE\scloud\$PackageName" -Force
 
     
 }catch{
