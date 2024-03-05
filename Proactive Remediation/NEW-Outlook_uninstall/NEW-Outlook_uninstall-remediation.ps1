@@ -4,5 +4,5 @@ try{
 
 }
 catch{
-    Write-Error "Error removing the New Microsoft Outlook."
+    Write-Error "Error removing the New Microsoft Outlook: " + $_.Exception.Message
 }
