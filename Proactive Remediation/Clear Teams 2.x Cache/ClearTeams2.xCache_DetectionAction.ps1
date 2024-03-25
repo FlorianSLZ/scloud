@@ -1,3 +1,5 @@
+Start-Transcript "C:\ProgramData\Microsoft\IntuneManagementExtension\Logs\ClearTeams2.xCache_DetectionAction.log"
+
 $TeamsCache = "C:\Users\$env:UserName\AppData\Local\Packages\MSTeams_8wekyb3d8bbwe"
 $ProcessName = "ms-teams" 
 
@@ -90,3 +92,6 @@ else{
     Write-Host "Cache cleared for $env:username"
     exit 0
 }
+
+
+Stop-Transcript
