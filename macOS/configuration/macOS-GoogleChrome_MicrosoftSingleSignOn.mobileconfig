@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>PayloadContent</key>
+    <array>
+      <dict>
+        <key>PayloadContent</key>
+          <dict>
+            <key>com.google.Chrome</key>
+              <dict>
+                <key>Forced</key>
+                <array>
+                  <dict>
+                    <key>mcx_preference_settings</key>
+                    <dict>
+
+
+<key>ExtensionSettings</key>
+<dict>
+  <key>ppnbnpeolgkicgegkbkbjmhlideopiji</key>
+  <dict>
+    <key>installation_mode</key>
+    <string>force_installed</string>
+    <key>update_url</key>
+    <string>https://clients2.google.com/service/update2/crx</string>
+  </dict>
+</dict>
+
+
+              </dict>
+            </dict>
+          </array>
+        </dict>
+      </dict>
+      <key>PayloadDisplayName</key>
+      <string>Chrome Extension Microsoft Single Sign On</string>
+      <key>PayloadEnabled</key>
+      <true/>
+      <key>PayloadIdentifier</key>
+      <string>com.Google.Chrome.Extension.MicrosoftSingleSignOn</string>
+      <key>PayloadType</key>
+      <string>com.apple.ManagedClient.preferences</string>
+      <key>PayloadUUID</key>
+      <string>a5c53548-65aa-11e7-907b-a6006ad3dba0</string>
+      <key>PayloadVersion</key>
+      <integer>1</integer>
+    </dict>
+  </array>
+  <key>PayloadDescription</key>
+  <string>Chrome Extension Microsoft Single Sign On</string>
+  <key>PayloadDisplayName</key>
+  <string>Chrome Extension Microsoft Single Sign On</string>
+  <key>PayloadIdentifier</key>
+  <string>com.Google.Chrome.Extension.MicrosoftSingleSignOn</string>
+  <key>PayloadOrganization</key>
+  <string>scloud</string>
+  <key>PayloadRemovalDisallowed</key>
+  <true/>
+  <key>PayloadScope</key>
+  <string>System</string>
+  <key>PayloadType</key>
+  <string>Configuration</string>
+  <key>PayloadUUID</key>
+  <string>97f83546978746574b5f4882e1d3985764907861895746574f95fa247c847523dd</string>
+  <key>PayloadVersion</key>
+  <integer>1</integer>
+</dict>
+</plist>
