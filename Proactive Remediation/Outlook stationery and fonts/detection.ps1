@@ -9,6 +9,10 @@ try{
     $TextFontSimple     = ""
 
     $Path = "HKCU:\Software\Microsoft\Office\16.0\Common\MailSettings" 
+    if(!(Test-Path $Path)){
+        Write-Output "Font Settings Outlook are NOT set correctly"
+        exit 1
+    }
 
     if(($(Get-ItemPropertyValue -Path $Path -Name ComposeFontComplex) -eq ([byte[]]$($ComposeFontComplex.Split(',') | % { "$_"}))) `
     -and ($(Get-ItemPropertyValue -Path $Path -Name ComposeFontSimple) -eq ([byte[]]$($ComposeFontSimple.Split(',') | % { "$_"}))) `
