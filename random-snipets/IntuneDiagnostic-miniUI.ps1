@@ -61,6 +61,13 @@ $textBox_DragDrop = {
     $droppedItems = $e.Data.GetData([Windows.Forms.DataFormats]::FileDrop)
     if ($droppedItems.Count -eq 1 -and (Test-Path $droppedItems[0] -PathType Container)) {
         $textBox.Text = $droppedItems[0]
+        $LogFiles = $droppedItems[0]
+
+        if($LogFiles -like "*.zip"){
+            # Unzip
+            Expand-Archive -Path $LogFiles -DestinationPath "$env:temp\$(Get-ChildItem -Path $LogFiles -Name)" -Force
+            $LogFiles = "$env:temp\$(Get-ChildItem -Path $LogFiles -Name)"
+        }
         # Call your script with the selected folder parameter
         if (Test-Path $scriptPath) {
             & $scriptPath -LogFilesFolder $droppedItems[0]

@@ -12,25 +12,30 @@
     1.0.0 - (2024-05-21) Script created
 #>
 
-Start-Transcript "C:\ProgramData\Microsoft\IntuneManagementExtension\Logs\Autopilot-WelcomeMessage-Task.log"
+Start-Transcript "C:\ProgramData\Microsoft\IntuneManagementExtension\Logs\WIN-S-U-Autopilot-WelcomeMessage-Task.log"
 
 # Check Date/Time of device enrollment
 $DeviceEnrollmentTime = [datetime]$(Get-Item -Path ('{0}\Microsoft Intune Management Extension' -f (${env:ProgramFiles(x86)})) | Select-Object -ExpandProperty 'CreationTimeUtc')
-$hours = 48
+$hours = 24
+
+
+# ESP Status: HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Provisioning\AutopilotSettings
+# Entrollment Status: $EnrollmentKey = Get-Item -Path HKLM:\SOFTWARE\Microsoft\Enrollments\* | Get-ItemProperty | Where-Object -FilterScript {$null -ne $_.UPN} # 6
+
 
 
 if ($(($(Get-Date) - $DeviceEnrollmentTime).TotalHours) -gt $hours) {
     Write-Host "Enroll date [$DeviceEnrollmentTime] was to long ago, will skip this script..."
-    $EnrollmentDateOK = $False
 } else {
 
-    if ($EnrollmentDateOK -eq $True) {
-        Write-Host "Adding scheduled task"
+    Write-Host "Adding scheduled task"
 
+    $PackagePath = "$env:localappdata\Autopilot-WelcomeMessage"
+    New-Item $PackagePath -ItemType Directory -Force
 
-        # Create the PowerShell script that will display the popup
-        $psScriptPath = "$env:localappdata\Autopilot-WelcomeMessage.ps1"
-        $psScriptContent = @'
+    # Create the PowerShell script that will display the popup
+    $psScriptPath = "$PackagePath\Autopilot-WelcomeMessage.ps1"
+    $psScriptContent = @'
 
 Start-Transcript "C:\ProgramData\Microsoft\IntuneManagementExtension\Logs\Autopilot-WelcomeMessage-$env:username.log"
 
@@ -150,33 +155,33 @@ Stop-Transcript
 
 
 '@
-        $psScriptContent | Out-File -FilePath $psScriptPath -Encoding UTF8
+    $psScriptContent | Out-File -FilePath $psScriptPath -Encoding UTF8
 
-        # Create the VBScript that will run the PowerShell script silently
-        $vbsScriptPath = "$env:localappdata\Autopilot-WelcomeMessage.vbs"
-        $vbsScriptContent = @'
-Set objShell = CreateObject("WScript.Shell")
-objShell.Run "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ""' + $psScriptPath + '""", 0, False
-'@
-        $vbsScriptContent | Out-File -FilePath $vbsScriptPath -Encoding UTF8
+    # Create the VBScript that will run the PowerShell script silently
+    $vbsScriptPath = "$PackagePath\Autopilot-WelcomeMessage.vbs"
+    $vbsScriptContent = $vbsScriptContent = @"
+Set WshShell = CreateObject("WScript.Shell")
+WshShell.Run "powershell -ExecutionPolicy Bypass -NoProfile -File ""$psScriptPath""", 0  ' 0 = Hidden window
+
+"@
+
+    $vbsScriptContent | Out-File -FilePath $vbsScriptPath -Encoding Ascii
 
 
-        # Create the scheduled task
-        $taskName = "Autopilot Welcome Message"
+    # Create the scheduled task
+    $taskName = "Autopilot Welcome Message"
 
-        if (Get-ScheduledTask | Where-Object { $_.TaskName -like $taskName }) {
-            Write-Host "The scheduled task already exists, will not recreate it."
-        } else {
-            # Create the scheduled task
-            $time = (Get-Date).AddMinutes(1)
-            $action = New-ScheduledTaskAction -Execute 'wscript.exe' -Argument "`"$vbsScriptPath`""
-            $trigger = New-ScheduledTaskTrigger -At $time -Once
-            $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit '00:00:00' -MultipleInstances IgnoreNew
-            Register-ScheduledTask -Action $action -Trigger $trigger -TaskName $taskName -Settings $settings 
-        }
+    if (Get-ScheduledTask | Where-Object { $_.TaskName -like $taskName }) {
+        Write-Host "The scheduled task already exists, will not recreate it."
     } else {
-        Write-Host "The enrollment date was outside of the allowed timeframe, will NOT launch Welcome prompt..."
+        # Create the scheduled task
+        $time = (Get-Date).AddMinutes(3)
+        $action = New-ScheduledTaskAction -Execute 'wscript.exe' -Argument "`"$vbsScriptPath`""
+        $trigger = New-ScheduledTaskTrigger -At $time -Once
+        $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit '00:00:00' -MultipleInstances IgnoreNew
+        Register-ScheduledTask -Action $action -Trigger $trigger -TaskName $taskName -Settings $settings 
     }
+
 }
 
 Stop-Transcript
