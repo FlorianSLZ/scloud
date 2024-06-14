@@ -1,11 +1,12 @@
 try{
     # Font Settings Outlook
     $ComposeFontComplex = ""
-    $ComposeFontSimple = ""
-    $ReplyFontComplex = ""
-    $ReplyFontSimple = ""
-    $TextFontComplex = ""
-    $TextFontSimple = ""
+    $ComposeFontSimple  = ""
+    $MarkCommentsWith	= ""
+    $ReplyFontComplex   = ""
+    $ReplyFontSimple    = ""
+    $TextFontComplex    = ""
+    $TextFontSimple     = ""
 
     $Path = "HKCU:\Software\Microsoft\Office\16.0\Common\MailSettings" 
 
