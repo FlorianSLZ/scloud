@@ -9,11 +9,11 @@ $TextFontSimple		=	$($(Get-ItemProperty -Path "HKCU:\Software\Microsoft\Office\1
 
 @"
 # Font Settings Outlook
-`$ComposeFontComplex = "$ComposeFontComplex"
-`$ComposeFontSimple = "$ComposeFontSimple"
-`$MarkCommentsWith = "$MarkCommentsWith"
-`$ReplyFontComplex = "$ReplyFontComplex"
-`$ReplyFontSimple = "$ReplyFontSimple"
-`$TextFontComplex = "$TextFontComplex"
-`$TextFontSimple = "$TextFontSimple"
+`$ComposeFontComplex    = "$ComposeFontComplex"
+`$ComposeFontSimple     = "$ComposeFontSimple"
+`$MarkCommentsWith      = "$MarkCommentsWith"
+`$ReplyFontComplex      = "$ReplyFontComplex"
+`$ReplyFontSimple       = "$ReplyFontSimple"
+`$TextFontComplex       = "$TextFontComplex"
+`$TextFontSimple        = "$TextFontSimple"
 "@ | Out-File -FilePath "$([Environment]::GetFolderPath("Desktop"))\FontSettingsOutlook.txt" -Encoding utf8
