@@ -16,7 +16,13 @@ try{
     -and ($(Get-ItemPropertyValue -Path $Path -Name ReplyFontSimple) -eq ([byte[]]$($ReplyFontSimple.Split(',') | % { "$_"}))) `
     -and ($(Get-ItemPropertyValue -Path $Path -Name TextFontComplex) -eq ([byte[]]$($TextFontComplex.Split(',') | % { "$_"}))) `
     -and ($(Get-ItemPropertyValue -Path $Path -Name TextFontSimple) -eq ([byte[]]$($TextFontSimple.Split(',') | % { "$_"})))
-    ){exit 1}else{exit 0} # exit 0 = detectet, 1 = remediation needed
+    ){
+        Write-Output "Font Settings Outlook are NOT set correctly"
+        exit 1
+    }else{
+        Write-Output "Font Settings Outlook are set correctly"
+        exit 0
+    } # exit 0 = detectet, 1 = remediation needed
 
 }catch{
     Write-Output $_
