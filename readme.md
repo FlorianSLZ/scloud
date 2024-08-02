@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://scloud.work" alt="Florian Salzmann | scloud"></a>
-            <img src="https://scloud.work/wp-content/uploads/2023/08/terminal-logo-scloud.webp" width="75" height="75" /></a>
+            <img src="https://scloud.work/wp-content/uploads/2023/08/terminal-logo-scloud.webp" height="75" /></a>
 </p>
 <p align="center">
     <a href="https://www.linkedin.com/in/fsalzmann/">
