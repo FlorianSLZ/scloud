@@ -15,9 +15,9 @@
 
 .LICENSEURI https://github.com/FlorianSLZ/scloud/blob/main/LICENSE
 
-.PROJECTURI https://contoso.com/
+.PROJECTURI https://github.com/FlorianSLZ/scloud/tree/main/scripts/Start-SplashScreen
 
-.ICONURI https://contoso.com/Icon
+.ICONURI https://scloud.work/wp-content/uploads/2023/08/terminal-logo-scloud.webp
 
 .EXTERNALMODULEDEPENDENCIES 
 
@@ -28,12 +28,14 @@
 .RELEASENOTES
 
 
-#>
+#> 
+
+
 
 <# 
 
 .DESCRIPTION 
- Start-SplashScreen is a PowerShell script designed to execute a series of scripts with a user-friendly graphical interface. It provides a visual representation of the script execution process, including progress updates and a status indicator. The script also offers the ability to open the running PowerShell terminal window for troubleshooting or additional actions. 
+Start-SplashScreen is a PowerShell script designed to execute a series of scripts with a user-friendly graphical interface. It provides a visual representation of the script execution process, including progress updates and a status indicator. The script also offers the ability to open the running PowerShell terminal window for troubleshooting or additional actions.
 
 #> 
 Param()
