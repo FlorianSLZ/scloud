@@ -22,9 +22,6 @@
     <a href="https://raw.githubusercontent.com/FlorianSLZ/Start-SplashScreen/master/LICENSE" alt="GitHub License">
         <img src="https://img.shields.io/github/license/FlorianSLZ/Start-SplashScreen.svg" />
     </a>
-    <a href="https://github.com/FlorianSLZ/Start-SplashScreen/graphs/contributors" alt="GitHub Contributors">
-        <img src="https://img.shields.io/github/contributors/FlorianSLZ/Start-SplashScreen.svg"/>
-    </a>
 </p>
 
 <p align="center">
