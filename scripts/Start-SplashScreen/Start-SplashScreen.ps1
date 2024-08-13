@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.0
+.VERSION 1.1
 .GUID b00d1997-e5da-4af1-86f0-92120cfab2f3
 .AUTHOR Florian Salzmann
 .COMPANYNAME scloud.work
@@ -8,12 +8,13 @@
 .TAGS Windows SplashScreen PowerShell
 .LICENSEURI https://github.com/FlorianSLZ/scloud/blob/main/LICENSE
 .PROJECTURI https://github.com/FlorianSLZ/scloud/tree/main/scripts/Start-SplashScreen
-.ICONURI https://scloud.work/wp-content/uploads/2023/08/terminal-logo-scloud.webp
+.ICONURI https://scloud.work/wp-content/uploads/Start-SplashScreen.webp
 .EXTERNALMODULEDEPENDENCIES 
 .REQUIREDSCRIPTS 
 .EXTERNALSCRIPTDEPENDENCIES 
 .RELEASENOTES
-    Version 1.0:    Original published version.
+    2024-08-09, 1.0:    Original published version.
+    2024-08-13, 1.1:    New icon, always in front. 
 
 #> 
 
@@ -63,6 +64,7 @@ Add-Type -AssemblyName PresentationFramework
   WindowStyle="None" 
   ShowInTaskbar="False" 
   AllowsTransparency="True"
+  Topmost="True"
   Background="$ColorBackground"
   Foreground="$ColorText"
   WindowState="Maximized">
