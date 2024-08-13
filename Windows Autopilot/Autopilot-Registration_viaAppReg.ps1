@@ -4,7 +4,7 @@
 .NOTES
     Version:        1
     Information:    https://scloud.work/autopilot-registration-app/
-    Author:         Florian Salzmann
+    Author:         Florian Salzmann | @FlorianSLZ | https://scloud.work
 
     Changes: 
         1.0 initial version
