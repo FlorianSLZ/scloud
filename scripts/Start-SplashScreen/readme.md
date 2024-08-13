@@ -33,8 +33,6 @@
 
 # Start-SplashScreen 
 
-## Overview
-
 The **Start-SplashScreen** script is a PowerShell tool designed to provide a user-friendly graphical interface for executing a series of scripts. The interface displays progress updates, status indicators, and an optional countdown timer before closing. It also offers the ability to toggle the visibility of the PowerShell console, allowing for troubleshooting or additional actions.
 
 ## Features 
@@ -66,14 +64,14 @@ Install-Module -Name IntuneBulkMaster
 ```
 
 ## Parameters
--Processes (Required): An array of processes to run, specified by name and command or URL.
--MessageHeader (Optional): Main message on the Splash Screen. Default: "Windows Preparation".
--MessageText (Optional): Initial message on the Splash Screen. Default: "Initiate Installation".
--MessageStatus (Optional): Initial status indicator on the Splash Screen. Default: "...".
--MessageFinished (Optional): Final message before the Splash Screen closes. Default: "All processes finished. This window will automatically close in".
--ClosingTimer (Optional): Time in seconds until the Splash Screen closes after finishing. Default: 5.
--ColorBackground (Optional): Background color of the Splash Screen. Default: "#CCf4f4f4".
--ColorText (Optional): Text color on the Splash Screen. Default: "#161616".
+- Processes (Required): An array of processes to run, specified by name and command or URL.
+- MessageHeader (Optional): Main message on the Splash Screen. Default: "Windows Preparation".
+- MessageText (Optional): Initial message on the Splash Screen. Default: "Initiate Installation".
+- MessageStatus (Optional): Initial status indicator on the Splash Screen. Default: "...".
+- MessageFinished (Optional): Final message before the Splash Screen closes. Default: "All processes finished. This window will automatically close in".
+- ClosingTimer (Optional): Time in seconds until the Splash Screen closes after finishing. Default: 5.
+- ColorBackground (Optional): Background color of the Splash Screen. Default: "#CCf4f4f4".
+- ColorText (Optional): Text color on the Splash Screen. Default: "#161616".
 
 ```powershell
 $ProcessesArray = @(
