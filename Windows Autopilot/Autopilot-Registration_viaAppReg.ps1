@@ -2,7 +2,7 @@
 .DESCRIPTION
     Reads and upload the Autopilot information from a device to Intune. 
 .NOTES
-    Version:        1
+    Version:        1.0
     Information:    https://scloud.work/autopilot-registration-app/
     Author:         Florian Salzmann | @FlorianSLZ | https://scloud.work
 
@@ -17,7 +17,7 @@ Install-PackageProvider -Name NuGet -Force | Out-Null
 Install-Script -Name Get-WindowsAutoPilotInfo -Force | Out-Null
 Install-Module -Name WindowsAutopilotIntune -Force | Out-Null
 
-$GroupTag = Read-Host "To upload with a Group Tag, enter the Group Tag now. Otherwise, press Enter to continue without a Group Tag."
+$GroupTag = "Office"
 
 $AutopilotParams = @{
     Online = $true
