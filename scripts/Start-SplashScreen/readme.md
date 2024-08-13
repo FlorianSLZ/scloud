@@ -19,7 +19,7 @@
     </a>
 </p>
 <p align="center">
-    <a href="https://github.com/FlorianSLZ/scloud/blob/main/scripts/Start-SplashScreen/LICENSE" alt="GitHub License">
+    <a href="https://raw.githubusercontent.com/FlorianSLZ/scloud/master/LICENSE" alt="GitHub License">
         <img src="https://img.shields.io/github/license/FlorianSLZ/Start-SplashScreen.svg" />
     </a>
 </p>
