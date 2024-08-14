@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.1
+.VERSION 1.2
 .GUID b00d1997-e5da-4af1-86f0-92120cfab2f3
 .AUTHOR Florian Salzmann
 .COMPANYNAME scloud.work
@@ -15,6 +15,7 @@
 .RELEASENOTES
     2024-08-09, 1.0:    Original published version.
     2024-08-13, 1.1:    New icon, always in front. 
+    2024-08-14, 1.2:    Removed OSDCloud dependency.
 
 #> 
 
@@ -142,10 +143,12 @@ foreach ($script in $Processes) {
     $Window.Dispatcher.Invoke([System.Windows.Threading.DispatcherPriority]::Background, [System.Action]{})
 
 
-    # Check if the value is a URL (starts with "http")
+    # Check if the value is a URL (starts with "http") 
     if ($script.Script -match "^https?://") {
         Write-Output "($counter/$total) - Running online script: $($script.Script)"
-        Invoke-WebPSScript $($script.Script)
+        $ScriptFile = Invoke-WebRequest $($script.Script)
+        $ScriptBlock = [Scriptblock]::Create($ScriptFile.Content) 
+        Invoke-Command -ScriptBlock $ScriptBlock -ArgumentList ($args + @('someargument'))
     } else {
       # Directly run the command (assuming it's a string)
       Write-Output "($counter/$total)- Running PowerShell command: $($script.Script)"
