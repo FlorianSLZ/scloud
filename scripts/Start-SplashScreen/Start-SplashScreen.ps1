@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.5
+.VERSION 1.6
 .GUID b00d1997-e5da-4af1-86f0-92120cfab2f3
 .AUTHOR Florian Salzmann
 .COMPANYNAME scloud.work
@@ -19,6 +19,7 @@
     2024-08-14, 1.3:    -UseBasicParsing added to Invoke-WebRequest.
     2024-08-14, 1.4:    Removed "Topmost" to allow better troubleshooting.
     2024-08-15, 1.5:    Optimized online script handling.
+    2024-08-15, 1.6:    Added support for http and ftp.
 
 #> 
 
@@ -154,11 +155,16 @@ foreach ($script in $Processes) {
 
 
     # Check if the value is a URL (starts with "http") 
-    if ($script.Script -match "^https?://") {
+    if ($script.Script -match "^https?://" -or $script.Script -match "^http://" -or $script.Script -match "^ftp://") {
         Write-Output "($counter/$total) - Running online script: $($script.Script)"
-        $ScriptFile = Invoke-WebRequest $($script.Script) -UseBasicParsing
-        $ScriptBlock = [Scriptblock]::Create($ScriptFile.Content) 
-        Invoke-Command -ScriptBlock $ScriptBlock
+
+        # Download the script and run it
+        if (-NOT (Test-WebConnection "$($script.Script)")) {Write-Warning "Script not available: $($script.Script)"; continue}
+        $WebClient = New-Object System.Net.WebClient
+        $WebPSCommand = $WebClient.DownloadString("$($script.Script)")
+        Invoke-Expression -Command $WebPSCommand
+        $WebClient.Dispose()
+
     } else {
       # Directly run the command (assuming it's a string)
       Write-Output "($counter/$total)- Running PowerShell command: $($script.Script)"
