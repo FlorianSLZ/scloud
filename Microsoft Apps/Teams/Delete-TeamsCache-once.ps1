@@ -1,8 +1,8 @@
 $PackageName = "clear-TeamsCache_run-once"
 $Version = "1"
 
-$Path_4netIntune = "$Env:Programfiles\4net\EndpointManager"
-Start-Transcript -Path "$Path_4netIntune\Log\$PackageName.log" -Force
+$PackagePath = "$Env:ProgramData\Intune-Helper-Data\$PackageName"
+Start-Transcript -Path "$Env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$PackageName.log" -Force
 try{
     # Check if Task exist with correct version
     $task_existing = Get-ScheduledTask -TaskName $PackageName -ErrorAction SilentlyContinue
@@ -22,13 +22,15 @@ try{
         # Delete ScheduledTask
         Unregister-ScheduledTask -TaskName $PackageName -Confirm:$false
 
-        # Delete Script
+        # Delete Script & Package Folder
         Remove-Item -Path $MyInvocation.MyCommand.Source
+        Remove-Item -Path $PackagePath -Force -Recurse
 
     }else{
         # script path
-        $script_path = "$Path_4netIntune\Data\$PackageName.ps1"
+        $script_path = "$PackagePath\$PackageName.ps1"
         # get and save file content
+        if(!$(Test-Path $PackagePath)){ New-Item -Path $PackagePath -Force -ItemType Directory }
         Get-Content -Path $($PSCommandPath) | Out-File -FilePath $script_path -Force
         
         # Register scheduled task to run at startup
@@ -37,7 +39,7 @@ try{
         $principal= New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType "ServiceAccount" -RunLevel "Highest"
         $action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-ExecutionPolicy Bypass -File `"$script_path`""
         $settings= New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
-        Register-ScheduledTask -TaskName $PackageName -Trigger $trigger -Action $action -Principal $principal -Settings $settings -Description $schtaskDescription -Force
+        Register-ScheduledTask -TaskName $PackageName -TaskPath Intune-Helper-Data -Trigger $trigger -Action $action -Principal $principal -Settings $settings -Description $schtaskDescription -Force
     }
 }catch{
     Write-Error $_
