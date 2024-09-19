@@ -4,71 +4,91 @@
 
 .DESCRIPTION
     This script identifies failed Intune-managed Win32 application installations on a device 
-    and trigers the remediation with the exit code 1.
+    and triggers remediation with exit code 1.
 
 .NOTES
     Author: Florian Salzmann | @FlorianSLZ | https://scloud.work
-    Version: 1.0
+    Version: 1.1
 
     Changelog:
-    - 2024-08-15: 1.0 Initial version
-    
+    - 2022-07-25: 1.0 Initial version by Rudo Oms
+    - 2024-09-18: 1.1 Code cleanup and formatting improvement
+#>
+
+# Start Logging
+Start-Transcript 'C:\ProgramData\Microsoft\IntuneManagementExtension\Logs\WIN-PR-D-RetryFailedApps_detection.log'
+
+
+#### FUNCTIONS ####
+
+<#
+.SYNOPSIS
+    Retrieves the failed Win32 app states from the Intune registry.
+
+.DESCRIPTION
+    This function searches the Intune Win32 apps registry key for subkeys containing an EnforcementStateMessage property.
+    It extracts the error codes from these properties and identifies failed installations.
+
+.OUTPUTS
+    PSCustomObject representing the failed app states.
 #>
 
 
-# Function to search for registry entries related to failed Win32 apps
-function Search-FailedApps {
-    # Define the registry path where Intune tracks Win32 app enforcement states
-    $KeyPath = 'HKLM:\SOFTWARE\Microsoft\IntuneManagementExtension\Win32Apps'
 
-    # Check if the registry key exists
-    if (Test-Path -Path $KeyPath) {
-        # Get all subkeys under the Win32Apps path
-        $SubKeys = Get-ChildItem -Path $KeyPath
-        
-        # Array to store failed apps
-        $FailedApps = @()
+#### BEGIN FUNCTIONS ####
 
-        # Loop through each app's registry key
-        foreach ($SubKey in $SubKeys) {
-            # Get the value of the EnforcementStateMessage property
-            $EnforcementStateMessage = Get-ItemProperty -Path $SubKey.PSPath -Name "EnforcementStateMessage" -ErrorAction SilentlyContinue
-            
-            # Check if the EnforcementStateMessage contains an error code that indicates failure (not 0 or 3010)
-            if ($EnforcementStateMessage -and $EnforcementStateMessage -notmatch '"ErrorCode":0' -and $EnforcementStateMessage -notmatch '"ErrorCode":3010') {
-                # Collect information about the failed app
-                $FailedApp = @{
-                    "AppID" = $SubKey.Name
-                    "EnforcementStateMessage" = $EnforcementStateMessage
+<#
+    .SYNOPSIS
+    Retrieves the failed Win32 app states from the Intune registry.
+    
+    .DESCRIPTION
+    This function searches the Intune Win32 apps registry key for subkeys containing an EnforcementStateMessage property.
+    It extracts the error codes from these properties and identifies failed installations.
+
+    .OUTPUTS
+    PSCustomObject representing the failed app states.
+#>
+function Get-FailedWin32AppStates {
+    $win32AppsKeyPath = 'HKLM:\SOFTWARE\Microsoft\IntuneManagementExtension\Win32Apps'
+    $appSubKeys = Get-ChildItem -Path $win32AppsKeyPath -Recurse
+
+    $failedStates = @()
+    foreach ($subKey in $appSubKeys) {
+        $enforcementStateMessage = Get-ItemProperty -Path $subKey.PSPath -Name EnforcementStateMessage -ErrorAction SilentlyContinue
+        if ($enforcementStateMessage) {
+            if ($enforcementStateMessage.EnforcementStateMessage -match '"ErrorCode":(-?\d+|null)') {
+                $errorCode = $matches[1]
+                if ($errorCode -ne "null") {
+                    $errorCode = [int]$errorCode
+                    if (($errorCode -ne 0) -and ($errorCode -ne 3010) -and ($errorCode -ne $null)) {
+                        $failedStates += [PSCustomObject]@{
+                            SubKeyPath = $subKey.PSPath
+                            ErrorCode  = $errorCode
+                        }
+                    }
                 }
-                # Add the failed app to the list
-                $FailedApps += $FailedApp
             }
         }
+    }
 
-        # Output the results
-        if ($FailedApps.Count -gt 0) {
-            Write-Output "Failed applications detected:"
-            $FailedApps | ForEach-Object { Write-Output "AppID: $($_.AppID), Error: $($_.EnforcementStateMessage)" }
-            return $true
-        }
-        else {
-            Write-Output "No failed applications detected."
-            return $false
-        }
-    }
-    else {
-        Write-Output "The registry path for Intune Win32 apps does not exist. No apps detected."
-        return $false
-    }
+    return $failedStates
 }
 
-# Call the function to detect failed apps
-$Failed = Search-FailedApps
+#### SCRIPT ENTRY POINT ####
 
-# If failed apps are detected, exit with 1 to trigger remediation
-if ($Failed) {
+# Get the failed Win32 app states
+$failedStates = Get-FailedWin32AppStates
+
+# Output the result and exit accordingly
+if ($failedStates) {
+    Write-Host "Failed applications detected:"
+    foreach ($failedApp in $failedStates) {
+        Write-Host "App Registry Path: $($failedApp.SubKeyPath) `n Error Code: $($failedApp.ErrorCode)" -ForegroundColor Red
+    }
+    Stop-Transcript
     exit 1
 } else {
+    Write-Host "No failed applications detected." -ForegroundColor Green
+    Stop-Transcript
     exit 0
 }

@@ -11,294 +11,196 @@
     Version: 1.1
 
     Changelog:
-    - unknown date: 1.0 Initial version - Unknown source
-    - 2024-08-15: 1.1 Transcript and Error handling
+    - 2022-07-25: 1.0 Initial version by Rudo Oms
+    - 2024-08-15: 1.1 Simplification
     
 #>
 
-Start-Transcript 'C:\ProgramData\Microsoft\IntuneManagementExtension\Logs\WIN-PR-D-RetryFailedApps.log'
- 
- 
- 
-function Search-Registry {
-   
-    [CmdletBinding(DefaultParameterSetName = 'ByWildCard')]
-    Param(
-        [Parameter(ValueFromPipeline = $true, Mandatory = $false, Position = 0)]
-        [string[]]$ComputerName = $env:COMPUTERNAME,
- 
-        [Parameter(Mandatory = $false, ParameterSetName = 'ByRegex')]
-        [string]$RegexPattern,
- 
-        [Parameter(Mandatory = $false, ParameterSetName = 'ByWildCard')]
-        [string]$Pattern,
- 
-        [Parameter(Mandatory = $false)]
-        [ValidateSet('HKEY_CLASSES_ROOT', 'HKEY_CURRENT_CONFIG', 'HKEY_CURRENT_USER', 'HKEY_DYN_DATA', 'HKEY_LOCAL_MACHINE',
-            'HKEY_PERFORMANCE_DATA', 'HKEY_USERS', 'HKCR', 'HKCC', 'HKCU', 'HKDD', 'HKLM', 'HKPD', 'HKU')]
-        [string]$Hive,
- 
-        [string]$KeyPath,
-        [int32] $MaximumResults = [int32]::MaxValue,
-        [switch]$SearchKeyName,
-        [switch]$SearchPropertyName,
-        [switch]$SearchPropertyValue,
-        [switch]$Recurse
+Start-Transcript 'C:\ProgramData\Microsoft\IntuneManagementExtension\Logs\WIN-PR-D-RetryFailedApps_remediation.log'
+
+
+#### BEGIN FUNCTIONS ####
+
+<#
+    .SYNOPSIS
+    Retrieves the failed Win32 app states from the Intune registry.
+    
+    .DESCRIPTION
+    This function searches the Intune Win32 apps registry key for subkeys containing an EnforcementStateMessage property.
+    It extracts the error codes from these properties and identifies failed installations.
+
+    .OUTPUTS
+    PSCustomObject representing the failed app states.
+#>
+function Get-FailedWin32AppStates {
+    $win32AppsKeyPath = 'HKLM:\SOFTWARE\Microsoft\IntuneManagementExtension\Win32Apps'
+    $appSubKeys = Get-ChildItem -Path $win32AppsKeyPath -Recurse
+
+    $failedStates = @()
+    foreach ($subKey in $appSubKeys) {
+        $enforcementStateMessage = Get-ItemProperty -Path $subKey.PSPath -Name EnforcementStateMessage -ErrorAction SilentlyContinue
+        if ($enforcementStateMessage) {
+            if ($enforcementStateMessage.EnforcementStateMessage -match '"ErrorCode":(-?\d+|null)') {
+                $errorCode = $matches[1]
+                if ($errorCode -ne "null") {
+                    $errorCode = [int]$errorCode
+                    if (($errorCode -ne 0) -and ($errorCode -ne 3010) -and ($errorCode -ne $null)) {
+                        $failedStates += [PSCustomObject]@{
+                            SubKeyPath = $subKey.PSPath
+                            ErrorCode  = $errorCode
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return $failedStates
+}
+
+<#
+    .SYNOPSIS
+    Retrieves the last hash value for a specific user and app ID.
+    
+    .DESCRIPTION
+    This function gets the LastHashValue property from the registry for a given user and app ID.
+
+    .PARAMETER userObjectId
+    The object ID of the user.
+
+    .PARAMETER appId
+    The ID of the app.
+
+    .OUTPUTS
+    The last hash value as a string.
+#>
+function Get-LastHashValue {
+    param (
+        [string]$userObjectId,
+        [string]$appId
     )
-    Begin {
-        [bool]$isPipeLine = $MyInvocation.ExpectingInput
- 
-        # sanitize given parameters
-        if ([string]::IsNullOrWhiteSpace($ComputerName) -or $ComputerName -eq '.') { $ComputerName = $env:COMPUTERNAME }
- 
-        # parse the give KeyPath
-        if ($KeyPath -match '^(HK(?:CR|CU|LM|U|PD|CC|DD)|HKEY_[A-Z_]+)[:\\]?') {
-            $Hive = $matches[1]
-            # remove HKLM, HKEY_CURRENT_USER etc. from the path
-            $KeyPath = $KeyPath.Split("\", 2)[1]
-        }
-        switch ($Hive) {
-            { @('HKCC', 'HKEY_CURRENT_CONFIG') -contains $_ } { $objHive = [Microsoft.Win32.RegistryHive]::CurrentConfig; break }
-            { @('HKCR', 'HKEY_CLASSES_ROOT') -contains $_ } { $objHive = [Microsoft.Win32.RegistryHive]::ClassesRoot; break }
-            { @('HKCU', 'HKEY_CURRENT_USER') -contains $_ } { $objHive = [Microsoft.Win32.RegistryHive]::CurrentUser; break }
-            { @('HKDD', 'HKEY_DYN_DATA') -contains $_ } { $objHive = [Microsoft.Win32.RegistryHive]::DynData; break }
-            { @('HKLM', 'HKEY_LOCAL_MACHINE') -contains $_ } { $objHive = [Microsoft.Win32.RegistryHive]::LocalMachine; break }
-            { @('HKPD', 'HKEY_PERFORMANCE_DATA') -contains $_ } { $objHive = [Microsoft.Win32.RegistryHive]::PerformanceData; break }
-            { @('HKU', 'HKEY_USERS') -contains $_ } { $objHive = [Microsoft.Win32.RegistryHive]::Users; break }
-        }
- 
-        # critical: Hive could not be determined
-        if (!$objHive) {
-            Throw "Parameter 'Hive' not specified or could not be parsed from the 'KeyPath' parameter."
-        }
- 
-        # critical: no search criteria given
-        if (-not ($SearchKeyName -or $SearchPropertyName -or $SearchPropertyValue)) {
-            Throw "You must specify at least one of these parameters: 'SearchKeyName', 'SearchPropertyName' or 'SearchPropertyValue'"
-        }
- 
-        # no patterns given will only work for SearchPropertyName and SearchPropertyValue
-        if ([string]::IsNullOrEmpty($RegexPattern) -and [string]::IsNullOrEmpty($Pattern)) {
-            if ($SearchKeyName) {
-                Write-Warning "Both parameters 'RegexPattern' and 'Pattern' are emtpy strings. Searching for KeyNames will not yield results."
-            }
-        }
- 
-        # create two variables for output purposes
-        switch ($objHive.ToString()) {
-            'CurrentConfig' { $hiveShort = 'HKCC'; $hiveName = 'HKEY_CURRENT_CONFIG' }
-            'ClassesRoot' { $hiveShort = 'HKCR'; $hiveName = 'HKEY_CLASSES_ROOT' }
-            'CurrentUser' { $hiveShort = 'HKCU'; $hiveName = 'HKEY_CURRENT_USER' }
-            'DynData' { $hiveShort = 'HKDD'; $hiveName = 'HKEY_DYN_DATA' }
-            'LocalMachine' { $hiveShort = 'HKLM'; $hiveName = 'HKEY_LOCAL_MACHINE' }
-            'PerformanceData' { $hiveShort = 'HKPD'; $hiveName = 'HKEY_PERFORMANCE_DATA' }
-            'Users' { $hiveShort = 'HKU' ; $hiveName = 'HKEY_USERS' }
-        }
- 
-        if ($MaximumResults -le 0) { $MaximumResults = [int32]::MaxValue }
-        $script:resultCount = 0
-        [bool]$useRegEx = ($PSCmdlet.ParameterSetName -eq 'ByRegex')
- 
-        # -------------------------------------------------------------------------------------
-        # Nested helper function to (recursively) search the registry
-        # -------------------------------------------------------------------------------------
-        function _RegSearch([Microsoft.Win32.RegistryKey]$objRootKey, [string]$regPath, [string]$computer) {
-            try {
-                if ([string]::IsNullOrWhiteSpace($regPath)) {
-                    $objSubKey = $objRootKey
-                }
-                else {
-                    $regPath = $regPath.TrimStart("\")
-                    $objSubKey = $objRootKey.OpenSubKey($regPath, $false)    # $false --> ReadOnly
-                }
-            }
-            catch {
-                Write-Warning ("Error opening $($objRootKey.Name)\$regPath" + "`r`n         " + $_.Exception.Message)
-                return
-            }
-            $subKeys = $objSubKey.GetSubKeyNames()
- 
-            # Search for Keyname
-            if ($SearchKeyName) {
-                foreach ($keyName in $subKeys) {
-                    if ($script:resultCount -lt $MaximumResults) {
-                        if ($useRegEx) { $isMatch = ($keyName -match $RegexPattern) }
-                        else { $isMatch = ($keyName -like $Pattern) }
-                        if ($isMatch) {
-                            # for PowerShell < 3.0 use: New-Object -TypeName PSObject -Property @{ ... }
-                            [PSCustomObject]@{
-                                'ComputerName'     = $computer
-                                'Hive'             = $objHive.ToString()
-                                'HiveName'         = $hiveName
-                                'HiveShortName'    = $hiveShort
-                                'Path'             = $objSubKey.Name
-                                'SubKey'           = "$regPath\$keyName".TrimStart("\")
-                                'ItemType'         = 'RegistryKey'
-                                'DataType'         = $null
-                                'ValueKind'        = $null
-                                'PropertyName'     = $null
-                                'PropertyValue'    = $null
-                                'PropertyValueRaw' = $null
-                            }
-                            $script:resultCount++
-                        }
-                    }
-                }
-            }
- 
-            # search for PropertyName and/or PropertyValue
-            if ($SearchPropertyName -or $SearchPropertyValue) {
-                foreach ($name in $objSubKey.GetValueNames()) {
-                    if ($script:resultCount -lt $MaximumResults) {
-                        $data = $objSubKey.GetValue($name)
-                        $raw = $objSubKey.GetValue($name, '', [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
- 
-                        if ($SearchPropertyName) {
-                            if ($useRegEx) { $isMatch = ($name -match $RegexPattern) }
-                            else { $isMatch = ($name -like $Pattern) }
- 
-                        }
-                        else {
-                            if ($useRegEx) { $isMatch = ($data -match $RegexPattern -or $raw -match $RegexPattern) }
-                            else { $isMatch = ($data -like $Pattern -or $raw -like $Pattern) }
-                        }
- 
-                        if ($isMatch) {
-                            $kind = $objSubKey.GetValueKind($name).ToString()
-                            switch ($kind) {
-                                'Binary' { $dataType = 'REG_BINARY'; break }
-                                'DWord' { $dataType = 'REG_DWORD'; break }
-                                'ExpandString' { $dataType = 'REG_EXPAND_SZ'; break }
-                                'MultiString' { $dataType = 'REG_MULTI_SZ'; break }
-                                'QWord' { $dataType = 'REG_QWORD'; break }
-                                'String' { $dataType = 'REG_SZ'; break }
-                                default { $dataType = 'REG_NONE'; break }
-                            }
-                            # for PowerShell < 3.0 use: New-Object -TypeName PSObject -Property @{ ... }
-                            [PSCustomObject]@{
-                                'ComputerName'     = $computer
-                                'Hive'             = $objHive.ToString()
-                                'HiveName'         = $hiveName
-                                'HiveShortName'    = $hiveShort
-                                'Path'             = $objSubKey.Name
-                                'SubKey'           = $regPath.TrimStart("\")
-                                'ItemType'         = 'RegistryProperty'
-                                'DataType'         = $dataType
-                                'ValueKind'        = $kind
-                                'PropertyName'     = if ([string]::IsNullOrEmpty($name)) { '(Default)' } else { $name }
-                                'PropertyValue'    = $data
-                                'PropertyValueRaw' = $raw
-                            }
-                            $script:resultCount++
-                        }
-                    }
-                }
-            }
- 
-            # recurse through all subkeys
-            if ($Recurse) {
-                foreach ($keyName in $subKeys) {
-                    if ($script:resultCount -lt $MaximumResults) {
-                        $newPath = "$regPath\$keyName"
-                        _RegSearch $objRootKey $newPath $computer
-                    }
-                }
-            }
- 
-            # close opened subkey
-            if (($objSubKey) -and $objSubKey.Name -ne $objRootKey.Name) { $objSubKey.Close() }
-        }
+
+    $reportingKeyPath = "HKLM:\SOFTWARE\Microsoft\IntuneManagementExtension\Win32Apps\Reporting\$userObjectId\$appId\ReportCache\$userObjectId"
+    if (Test-Path -Path $reportingKeyPath) {
+        $reportingKey = Get-ItemProperty -Path $reportingKeyPath -Name LastHashValue -ErrorAction SilentlyContinue
+        return $reportingKey.LastHashValue
     }
-    Process {
-        if ($isPipeLine) { $ComputerName = @($_) }
-        $ComputerName | ForEach-Object {
-            Write-Verbose "Searching the registry on computer '$ComputerName'.."
-            try {
-                $rootKey = [Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey($objHive, $_)
-                _RegSearch $rootKey $KeyPath $_
-            }
-            catch {
-                Write-Error "$($_.Exception.Message)"
-            }
-            finally {
-                if ($rootKey) { $rootKey.Close() }
-            }
+
+    return $null
+}
+
+<#
+    .SYNOPSIS
+    Removes the registry keys for a failed app installation.
+    
+    .DESCRIPTION
+    This function removes the registry keys associated with a failed app installation to trigger a reinstallation attempt.
+
+    .PARAMETER userObjectId
+    The object ID of the user.
+
+    .PARAMETER appId
+    The ID of the app.
+
+    .PARAMETER lastHashValue
+    The last hash value for the app.
+#>
+function Remove-FailedAppRegistryKeys {
+    param (
+        [string]$userObjectId,
+        [string]$appId,
+        [string]$lastHashValue
+    )
+
+    $pathsToRemove = @(
+        "HKLM:\SOFTWARE\Microsoft\IntuneManagementExtension\Win32Apps\$userObjectId\$appId", # App status per user
+        "HKLM:\SOFTWARE\Microsoft\IntuneManagementExtension\Win32Apps\Reporting\$userObjectId\$appId", # Reporting key
+        "HKLM:\SOFTWARE\Microsoft\IntuneManagementExtension\Win32Apps\$userObjectId\GRS\$lastHashValue" # GRS using last hash value
+    )
+
+    foreach ($path in $pathsToRemove) {
+        if (Test-Path -Path $path) {
+            Remove-Item -Path $path -Recurse -Force
+            Write-Host "Removed registry key: $path"
         }
-        Write-Verbose "All Done searching the registry. Found $($script:resultCount) results."
+        else {
+            Write-Host "Registry key not found: $path"
+        }
     }
 }
-#### END FUNCTIONS ####
- 
+
+<#
+    .SYNOPSIS
+    Retrieves the username from an object ID.
+    
+    .DESCRIPTION
+    This function maps a user object ID to a username by searching the registry.
+
+    .PARAMETER ObjectID
+    The object ID of the user.
+
+    .OUTPUTS
+    The username as a string.
+#>
+function Get-UsernameFromObjectID {
+    param (
+        [string]$ObjectID
+    )
+
+    $userSIDs = Get-ChildItem -Path 'Registry::HKEY_USERS\'
+
+    foreach ($userSID in $userSIDs) {
+        $identityKeyPath = "Registry::HKEY_USERS\$($userSID.PSChildName)\Software\Microsoft\Office\16.0\Common\Identity"
+        if (Test-Path -Path $identityKeyPath) {
+            $identityKey = Get-ItemProperty -Path $identityKeyPath
+            if ($identityKey.ConnectedAccountWamAad -eq $ObjectID) {
+                return $identityKey.ADUserName
+            }
+        }
+    }
+
+    return $null
+}
+
 #### SCRIPT ENTRY POINT ####
- 
-# Grab the enforcement states for all apps
-$States = Search-Registry -Hive HKLM  -KeyPath 'SOFTWARE\Microsoft\IntuneManagementExtension\Win32Apps' -SearchPropertyName -Pattern EnforcementStateMessage -Recurse
- 
-# Determine if any are failures. If we find any, remove the reg key(s)
-Foreach ($State in $States) {
-    if (($State -notmatch '"ErrorCode":0') -and ($State -notmatch '"ErrorCode":3010')) {
-       
-        Write-Host "We found failure(s), let's fix!"
-        $State
- 
-        #Get the reg keys into formats we can use.
-        $ShortPath = Split-Path -path $State.Subkey -Parent
-        $NoVer = ("$ShortPath").Substring(0, "$ShortPath".IndexOf("_"))
-        $ID = Split-Path -path $NoVer -Leaf
-        $UserPath = Split-Path -path $NoVer -Parent
-        $User = Split-Path -path $UserPath -Leaf
-        $UserGRS = ($UserPath + "\GRS")
-        $Regpath = ("HKLM:\" + $ShortPath)
-       
-        # Remove the run history
-        Write-Host "$ID failed for $User"
-        if (Test-Path -Path $Regpath) {
-            Write-Host "Validated key path, deleting it"
-            try {
-                Write-Host "Removing $Regpath"
-                Remove-Item -Path $Regpath -Recurse -Force -ErrorAction SilentlyContinue
-            }
-            Catch {
-                Write-error $_
-            }
-        }else{
-            Write-Host "Registry key $regPath could not be validated. Something is wrong!"
-        }
-       
-        # Find and Remove the GRS entries
-        Write-Host "Looking for GRS entries for the failed app"
-        $GRSResult = Search-Registry -Hive HKLM  -KeyPath $UserGRS -SearchPropertyName -Pattern $ID -Recurse
-        If ($GRSResult) {
-            $GRSPath = ("HKLM:\" + $GRSResult.Subkey)
-            if (test-path -Path $GRSPath) {            
-                try {
-                    Write-Host "Removing $GRSPath"
-                    Remove-Item -Path $GRSPath -Recurse -Force -ErrorAction SilentlyContinue
-                }
-                Catch {
-                    Write-error $_
-                }else{
-                    Write-Host "Registry key $GRSPath could not be validated. Something is wrong!"
-                }
-            }
-        }
+
+# Get the failed Win32 app states
+$failedStates = Get-FailedWin32AppStates
+
+
+# Process each failed state
+foreach ($state in $failedStates) {
+    # Parse the subkey path to extract User and App ID
+    $subKeyPath = $state.SubKeyPath -replace 'HKLM:\\', ''
+    $splitPath = $subKeyPath -split '\\'
+    $userObjectId = $splitPath[6]
+    $appId = $splitPath[7]
+
+    # Get the username
+    $userName = Get-UsernameFromObjectID -ObjectID $userObjectId
+
+    # Get the LastHashValue
+    $lastHashValue = Get-LastHashValue -userObjectId $userObjectId -appId $appId
+
+    if ($lastHashValue) {
+        # Remove the registry keys including the GRS keys using LastHashValue
+        Remove-FailedAppRegistryKeys -userObjectId $userObjectId -appId $appId -lastHashValue $lastHashValue
+    }
+    else {
+        Remove-FailedAppRegistryKeys -userObjectId $userObjectId -appId $appId
     }
 }
- 
-# If we found anything to delete restart IME
-$Count = $GRSPath.Count + $RegPath.Count
-If ($Count -gt 0) {
-    Write-Host "$Count keys removed, restarting IME"
-    Get-Service -DisplayName "Microsoft Intune Management Extension" | Restart-Service -Force -PassThru
-    Clear-Variable -Name Count
-    Clear-Variable -Name GRSPath
-    Clear-Variable -Name Regpath
- 
+
+# If any failures were found, restart the Intune Management Extension
+if ($failedStates) {
+    Write-Host "Detected $($failedStates.Count) failures."
+    Write-Host "Restarting Intune Management Extension service..."
+    Restart-Service -Name 'IntuneManagementExtension' -Force -PassThru
 }
-else {
-    Write-Host "No failures detected. Not restarting IME."
- 
-}
- 
+
+if ($failedStates.Count -eq 0) {
+    Write-Host "No failures detected." -ForegroundColor Green
+} 
+
+
 Stop-Transcript
- 
