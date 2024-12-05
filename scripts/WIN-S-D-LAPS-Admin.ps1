@@ -16,6 +16,9 @@ if(Get-LocalUser $UserName -ErrorAction SilentlyContinue){
     New-LocalUser -Name $UserName -Description $Description -Password $Password -ErrorAction Stop
 }
 
+# make sure user is enabled
+Enable-LocalUser -Name $UserName
+
 
 # adding user to admin group
 
