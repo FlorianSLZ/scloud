@@ -1,0 +1,27 @@
+{
+    "description":  "The new Teams Client",
+    "installCommandLine":  "Deploy-Application.exe -DeploymentType \"Install\" -DeployMode \"Silent\"",
+    "InstallFile":  "Deploy-Application.exe",
+    "Version":  "latest",
+    "Type": "custom",
+    "minimumSupportedWindowsRelease":  "W10_21H2",
+    "rules":  {
+        "ruleType": "detection",
+        "displayName": null,
+        "enforceSignatureCheck": false,
+        "runAs32Bit": false,
+        "runAsAccount": null,
+        "scriptContent": "detection.ps1",
+        "operationType": "notConfigured",
+        "operator": "notConfigured",
+        "comparisonValue": null
+    },
+    "uninstallCommandLine":  "Deploy-Application.exe -DeploymentType \"Uninstall\" -DeployMode \"Silent\"",
+    "publisher":  "Microsoft",
+    "installExperience":  {
+                              "deviceRestartBehavior":  "suppress",
+                              "runAsAccount":  "system"
+                          },
+    "applicableArchitectures":  "x64",
+    "displayName":  "Microsoft Teams (new)"
+}
