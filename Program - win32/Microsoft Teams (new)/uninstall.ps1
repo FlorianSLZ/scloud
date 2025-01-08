@@ -10,7 +10,7 @@ Start-Transcript -Path $LogPath -Force
 # New Teams Uninstallation
 ###########################################################
 Write-Host "Installing new Teams"
-Start-Process -FilePath "teamsbootstrapper.exe" -ArgumentList "-x" -NoNewWindow -Wait
+Start-Process -FilePath ".\teamsbootstrapper.exe" -ArgumentList "-x" -NoNewWindow -Wait
 
 # Stop transcript logging
 Stop-Transcript
