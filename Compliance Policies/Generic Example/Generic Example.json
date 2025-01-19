@@ -1,0 +1,32 @@
+{
+    "Rules": [
+        {
+           "SettingName": "Check1",
+           "Operator": "IsEquals",
+           "DataType": "Boolean",
+           "Operand": "true",
+           "MoreInfoUrl": "https://scloud.work/custom-compliance-windows-intune",
+           "RemediationStrings": [
+              {
+                 "Language": "en_US",
+                 "Title": "Check1 is not compliant, instead it is {ActualValue}.",
+                 "Description": "Make sure you enable XYZ or contact your support organisation."
+              }
+           ]
+        },
+         {
+            "SettingName": "Check2",
+            "Operator": "IsEquals",
+            "DataType": "Int64",
+            "Operand": "1",
+            "MoreInfoUrl": "https://scloud.work/custom-compliance-windows-intune",
+            "RemediationStrings": [
+               {
+                  "Language": "en_US",
+                  "Title": "Check2 is not compliant, instead it is {ActualValue}.",
+                  "Description": "Make sure you enable XYZ or contact your support organisation."
+                }
+            ]
+         }
+     ]
+ }
