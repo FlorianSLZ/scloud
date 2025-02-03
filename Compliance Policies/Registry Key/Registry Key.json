@@ -1,0 +1,18 @@
+{
+   "Rules": [
+       {
+          "SettingName": "RegistryCheck",
+          "Operator":"IsEquals",
+          "DataType":"Int64",
+          "Operand":1,
+          "MoreInfoUrl": "https://scloud.work/registry-check",
+          "RemediationStrings": [
+             {
+                "Language": "en_US",
+                "Title": "RegistryCheck is not compliant, instead of 1 it is {ActualValue}.",
+                "Description": "Contact your support organisation."
+             }
+          ]
+       }
+   ]
+}

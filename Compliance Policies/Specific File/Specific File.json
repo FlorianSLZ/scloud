@@ -1,0 +1,18 @@
+{
+   "Rules": [
+       {
+          "SettingName": "FileCheck",
+          "Operator": "IsEquals",
+          "DataType": "Boolean",
+          "Operand": "true",
+          "MoreInfoUrl": "https://scloud.work/file-check",
+          "RemediationStrings": [
+             {
+                "Language": "en_US",
+                "Title": "FileCheck is not compliant, instead it is {ActualValue}.",
+                "Description": "Ensure the required file is present or contact your support organisation."
+             }
+          ]
+       }
+   ]
+}

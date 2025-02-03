@@ -1,0 +1,18 @@
+{
+   "Rules": [
+       {
+          "SettingName": "WindowsUpdateService",
+          "Operator": "IsEquals",
+          "DataType": "Boolean",
+          "Operand": "true",
+          "MoreInfoUrl": "https://scloud.work/service-check",
+          "RemediationStrings": [
+             {
+                "Language": "en_US",
+                "Title": "The WindowsUpdateService is not running",
+                "Description": "Restart your computer and if the error persists, contact your support organisation."
+             }
+          ]
+       }
+   ]
+}
