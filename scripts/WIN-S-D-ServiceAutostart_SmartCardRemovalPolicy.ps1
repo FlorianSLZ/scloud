@@ -9,11 +9,20 @@ if (Get-Service -Name $ServiceName -ErrorAction SilentlyContinue) {
     try {
         Set-Service -Name $ServiceName -StartupType Automatic -ErrorAction Stop
         Write-Output "Successfully set $ServiceName to Automatic startup."
+
+        # Start service if not running
+        if ($Service.Status -ne 'Running') {
+            Start-Service -Name $ServiceName -ErrorAction Stop
+            Write-Output "Successfully started $ServiceName."
+        } else {
+            Write-Output "$ServiceName is already running."
+        }
+
     } catch {
-        Write-Output "Failed to set $ServiceName to Automatic startup. Error: $_"
+        Write-Error "Error while configuring $ServiceName : $_"
     }
 } else {
-    Write-Output "Service $ServiceName not found."
+    Write-Warning "Service $ServiceName not found."
 }
 
 # Stop transcript
