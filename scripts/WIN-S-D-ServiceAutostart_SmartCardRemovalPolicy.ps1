@@ -25,5 +25,4 @@ if (Get-Service -Name $ServiceName -ErrorAction SilentlyContinue) {
     Write-Warning "Service $ServiceName not found."
 }
 
-# Stop transcript
 Stop-Transcript
