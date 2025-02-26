@@ -20,7 +20,7 @@
 </p>
 <p align="center">
     <a href="https://raw.githubusercontent.com/FlorianSLZ/scloud/master/LICENSE" alt="GitHub License">
-        <img src="https://img.shields.io/github/license/FlorianSLZ/Set-GroupByPrimaryUser.svg" />
+        <img src="https://img.shields.io/github/license/FlorianSLZ/scloud.svg" />
     </a>
 </p>
 
@@ -54,7 +54,7 @@ The **Set-GroupByPrimaryUser** script is a PowerShell tool designed to automatic
 For best experience before running the script, install the required **Microsoft Graph module**:
 
 ```powershell
-Install-Script Set-GroupByPrimaryUser 
+Install-Script -Name Set-GroupByPrimaryUser
 ```
 
 ## Usage
@@ -132,10 +132,3 @@ This command **syncs only Mac and iOS devices that are company-owned**:
 Set-GroupByPrimaryUser.ps1 -UserGroupObjectID "11111111-1111-1111-1111-111111111111" -DeviceGroupObjectID "22222222-2222-2222-2222-222222222222" -OSFilter "MacMDM", "iOS" -OwnershipFilter "Company"
 ```
 
-## Notes
-
-- The script **requires Microsoft Graph authentication** to access Entra ID data.
-- Run PowerShell with **administrative privileges** for best results.
-- The device group description is updated after every run with the **device count and timestamp**.
-
-This script **automates device group synchronization** based on **primary user relationships**, making it a **powerful tool for Entra ID & Intune management**. 🚀
