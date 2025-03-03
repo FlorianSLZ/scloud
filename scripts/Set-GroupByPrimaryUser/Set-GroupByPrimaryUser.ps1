@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.0
+.VERSION 1.1
 .GUID b00d1997-e5da-4af1-86f0-92120c168436
 .AUTHOR Florian Salzmann
 .COMPANYNAME scloud.work
@@ -14,6 +14,7 @@
 .EXTERNALSCRIPTDEPENDENCIES 
 .RELEASENOTES
     2025-02-26, 1.0:    Original published version.
+    2025-02-26, 1.1:    Added noRemove switch to prevent device removal.
 
 #> 
 
@@ -44,7 +45,6 @@ param (
     [string]$OwnershipFilter,
 
     [parameter(Mandatory = $false, HelpMessage = "If set, no devices will be removed from the group")]
-    [ValidateSet("Company", "Personal")]
     [switch]$noRemove
 )
 
