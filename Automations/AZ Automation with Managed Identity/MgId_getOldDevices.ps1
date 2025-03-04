@@ -1,7 +1,5 @@
-# Connect to Microsoft Graph within Azure Automation (Microsoft Graph PowerShell v1)
-Connect-AzAccount -Identity
-$token = Get-AzAccessToken -ResourceUrl "https://graph.microsoft.com"
-Connect-MgGraph -AccessToken $token.Token
+# Connect to Microsoft Graph within Azure Automation (Microsoft Graph PowerShell v2)
+Connect-MgGraph -Identity
 
 # Define device age to include
 $inactiveDays = "180"
