@@ -13,14 +13,14 @@
 .REQUIREDSCRIPTS 
 .EXTERNALSCRIPTDEPENDENCIES 
 .RELEASENOTES
-    2024-08-09, 1.0:    Original published version.
-    2024-08-13, 1.1:    New icon, always in front. 
-    2024-08-14, 1.2:    Removed OSDCloud dependency.
-    2024-08-14, 1.3:    -UseBasicParsing added to Invoke-WebRequest.
-    2024-08-14, 1.4:    Removed "Topmost" to allow better troubleshooting.
-    2024-08-15, 1.5:    Optimized online script handling.
-    2024-08-15, 1.6:    Added support for http and ftp.
-    2025-03-14, 1.7:    Added optional LogoURL parameter.
+    2024-08-09, 1.0:    Original published version
+    2024-08-13, 1.1:    New icon, always in front
+    2024-08-14, 1.2:    Removed OSDCloud dependency
+    2024-08-14, 1.3:    -UseBasicParsing added to Invoke-WebRequest
+    2024-08-14, 1.4:    Removed "Topmost" to allow better troubleshooting
+    2024-08-15, 1.5:    Optimized online script handling
+    2024-08-15, 1.6:    Added support for http and ftp
+    2025-03-14, 1.7:    Added optional LogoURL parameter
 
 #> 
 
