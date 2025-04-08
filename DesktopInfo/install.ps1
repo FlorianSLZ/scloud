@@ -1,4 +1,5 @@
 $PackageName = "DesktopInfo"
+$Version = 1
 $Description = "Zeigt den Hostname auf dem Desktop, unabhängig vom Hintergrund."
 $Prg_path = "$Env:Programfiles\DesktopInfo"
 
@@ -64,5 +65,14 @@ $settings= New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoin
 $null=Register-ScheduledTask -TaskName $schtaskName -Trigger $trigger -Action $action -Principal $principal -Settings $settings -Description $schtaskDescription -Force
 
 Start-ScheduledTask -TaskName $schtaskName
+
+$Path = "HKLM:\SOFTWARE\scloud\$PackageName"
+$Key = "Version" 
+$KeyFormat = "dword"
+$Value = "$Version"
+
+if(!(Test-Path $Path)){New-Item -Path $Path -Force}
+if(!$Key){Set-Item -Path $Path -Value $Value
+}else{Set-ItemProperty -Path $Path -Name $Key -Value $Value -Type $KeyFormat}
 
 Stop-Transcript
