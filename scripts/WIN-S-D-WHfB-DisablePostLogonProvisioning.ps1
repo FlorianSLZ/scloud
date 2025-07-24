@@ -1,5 +1,5 @@
 $ScriptName = "WIN-S-D-ServiceAutostart_SmartCardRemovalPolicy"
-Start-Transcript -Path "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$ScriptName.log" -ForceStop-Transcript
+Start-Transcript -Path "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$ScriptName.log" -Force
 
 $Path = "HKLM:\SOFTWARE\Policies\Microsoft\PassportForWork"
 $Key = "Enabled"
