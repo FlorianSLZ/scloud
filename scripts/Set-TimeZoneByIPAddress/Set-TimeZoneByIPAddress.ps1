@@ -1,3 +1,7 @@
+$PackageName = "Set-TimeZoneByIPAddress"
+Start-Transcript -Path "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$PackageName-script.log" -Force -Append
+
+
 try {
     Write-Output "Fetching IANA time zone from ipinfo.io..."
     $ianaTz = (Invoke-RestMethod -Uri "http://ipinfo.io/json").timezone
@@ -22,7 +26,7 @@ try {
         throw "No mapping found for IANA time zone: $ianaTz"
     }
 
-    $windowsTZ = $mapping.other
+    $windowsTZ = $mapping.other[0]
     Write-Output "Mapped to Windows Time Zone: $windowsTZ"
 
     try {
@@ -36,3 +40,6 @@ try {
 } catch {
     Write-Error "Failed to set Windows time zone: $_"
 }
+
+
+Stop-Transcript
