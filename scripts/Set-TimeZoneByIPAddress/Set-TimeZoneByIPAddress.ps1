@@ -7,7 +7,7 @@ try {
     Write-Output "Detected IANA Time Zone: $ianaTz"
 
     Write-Output "Downloading custom XML mapping..."
-    $xmlUrl = "https://raw.githubusercontent.com/FlorianSLZ/scloud/refs/heads/main/random-snipets/windowsZones.xml"
+    $xmlUrl = "https://raw.githubusercontent.com/FlorianSLZ/scloud/refs/heads/main/scripts/Set-TimeZoneByIPAddress/windowsZones.xml"
     [xml]$windowsZones = Invoke-RestMethod -Uri $xmlUrl
     if (-not $windowsZones) {
         throw "Failed to download or parse the XML mapping file."
