@@ -1,3 +1,20 @@
+<#
+.SYNOPSIS
+    Sets the Windows time zone automatically based on the public IP address using IANA to Windows time zone conversion.
+
+.DESCRIPTION
+    This script queries http://ipinfo.io/json to determine the device's geographic IANA time zone, 
+    maps it to the correct Windows time zone using a custom XML source, and sets the local time zone accordingly.
+
+.NOTES
+    Author:        Florian Salzmann (http://elFlorian.ch)
+    Version:       1.0
+    Last Updated:  2025-08-07
+    Run As:        SYSTEM (not user)
+    Architecture:  Must run in 64-bit context
+
+#>
+
 $PackageName = "Set-TimeZoneByIPAddress"
 Start-Transcript -Path "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$PackageName-script.log" -Force -Append
 
