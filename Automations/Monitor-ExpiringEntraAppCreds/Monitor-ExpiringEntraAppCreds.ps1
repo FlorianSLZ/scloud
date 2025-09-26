@@ -54,7 +54,7 @@
 
 param(
   [Parameter(Mandatory = $true)]
-  [string[]]$To,
+  [string]$To,
 
   [Parameter(Mandatory = $true)]
   [string]$FromUserPrincipalName,
