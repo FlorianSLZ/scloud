@@ -23,10 +23,10 @@
   Application.Read.All and Mail.Send permissions.
 
 .NOTES
-  Author: Florian Salzmann (@FlorianSLZ)
-  Blog:   https://scloud.work
-  Version: 1.0
-  Date:    2025-09-26
+  Author:   Florian Salzmann (@FlorianSLZ)
+  Blog:     https://scloud.work
+  Version:  1.0
+  Date:     2025-09-26
 #>
 
 # Connect to Microsoft Graph with delegated permissions (interactive login)
@@ -70,5 +70,3 @@ foreach ($scope in $graphScopes) {
     Write-Host "Scope $scope already assigned to $MdId_Name"
   }
 }
-
-
