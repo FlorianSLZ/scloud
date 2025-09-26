@@ -97,7 +97,7 @@ $edge = $now.AddDays($DaysAhead)
 Write-Output "[$(Get-Date -Format o)] Window: now=$($now.UtcDateTime.ToString('u')) edge=$($edge.UtcDateTime.ToString('u')) (DaysAhead=$DaysAhead)."
 
 # Pull all applications with needed fields
-$appsUrl = "https://graph.microsoft.com/v1.0/applications`?$select=id,appId,displayName,passwordCredentials,keyCredentials&`$top=999"
+$appsUrl = "https://graph.microsoft.com/v1.0/applications`?`$select=id,appId,displayName,passwordCredentials,keyCredentials&`$top=999"
 Write-Output "[$(Get-Date -Format o)] Retrieving applications..."
 $apps = Invoke-GraphGetAll -Url $appsUrl
 Write-Output "[$(Get-Date -Format o)] Applications fetched: $($apps.Count)"
