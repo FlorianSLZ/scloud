@@ -14,7 +14,12 @@
 .REQUIREMENTS
   - Microsoft.Graph.Authentication and Microsoft.Graph.Applications modules installed.
   - You must be a Directory Admin (or have equivalent rights to assign app roles).
+  - Consent is required at the tenant level after assignment.
 
+.STEPS
+  1. Run the script interactively with an account that has the necessary rights.
+  2. Enter the display name of your Managed Identity when prompted.
+  3. The script will check and assign the required Graph permissions if missing.
 
 .EXAMPLE
   .\Grant-MI-GraphPermissions.ps1
