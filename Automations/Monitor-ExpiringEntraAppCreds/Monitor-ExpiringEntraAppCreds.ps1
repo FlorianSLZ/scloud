@@ -48,10 +48,9 @@
 .NOTES
   Author: Florian Salzmann (@FlorianSLZ)
   Blog:   https://scloud.work
-  Version: 1.1
+  Version: 1.2 (logging)
   Date:    2025-09-26
 #>
-
 
 param(
   [Parameter(Mandatory = $true)]
@@ -66,36 +65,53 @@ param(
   [bool]$SaveToSentItems = $true
 )
 
-# Connect with User/Delegated
-# Connect-MgGraph -Scopes "Application.Read.All","Mail.Send"
+# --- Timing ---
+$sw = [System.Diagnostics.Stopwatch]::StartNew()
 
 # Connect with Managed Identity
+Write-Output "[$(Get-Date -Format o)] Connecting to Microsoft Graph (Managed Identity)..."
 Connect-MgGraph -Identity -NoWelcome
+Write-Output "[$(Get-Date -Format o)] Connected."
 
-# Helper: page all results
+# Helper: page all results (with minimal paging logs)
 function Invoke-GraphGetAll {
   param([Parameter(Mandatory=$true)][string]$Url)
   $all = @()
   $next = $Url
+  $page = 0
   do {
+    $page++
+    Write-Output "[$(Get-Date -Format o)] Fetching page $page : $next"
     $r = Invoke-MgGraphRequest -Method GET -Uri $next
+    $count = @($r.value).Count
+    Write-Output "[$(Get-Date -Format o)] Page $page returned $count item(s)."
     if ($r.value) { $all += $r.value }
     $next = $r.'@odata.nextLink'
   } while ($next)
+  Write-Output "[$(Get-Date -Format o)] Completed paging. Total items: $($all.Count)"
   $all
 }
 
 $now  = [DateTimeOffset]::UtcNow
 $edge = $now.AddDays($DaysAhead)
+Write-Output "[$(Get-Date -Format o)] Window: now=$($now.UtcDateTime.ToString('u')) edge=$($edge.UtcDateTime.ToString('u')) (DaysAhead=$DaysAhead)."
 
 # Pull all applications with needed fields
 $appsUrl = "https://graph.microsoft.com/v1.0/applications`?$select=id,appId,displayName,passwordCredentials,keyCredentials&`$top=999"
+Write-Output "[$(Get-Date -Format o)] Retrieving applications..."
 $apps = Invoke-GraphGetAll -Url $appsUrl
+Write-Output "[$(Get-Date -Format o)] Applications fetched: $($apps.Count)"
 
 # Collect expiring/expired credentials
 $findings = New-Object System.Collections.Generic.List[object]
+$processed = 0
 
 foreach ($app in $apps) {
+  $processed++
+  if (($processed % 250) -eq 0) {
+    Write-Output "[$(Get-Date -Format o)] Processed $processed / $($apps.Count) applications..."
+  }
+
   # Secrets
   foreach ($s in ($app.passwordCredentials | ForEach-Object { $_ })) {
     if ($s -and $s.endDateTime) {
@@ -134,6 +150,12 @@ foreach ($app in $apps) {
   }
 }
 
+Write-Output "[$(Get-Date -Format o)] Credential scan complete."
+Write-Output "[$(Get-Date -Format o)] Findings total: $($findings.Count)"
+$expiredCount  = ($findings | Where-Object { $_.Status -eq "Expired" }).Count
+$expiringCount = ($findings | Where-Object { $_.Status -eq "Expiring" }).Count
+Write-Output "[$(Get-Date -Format o)] Breakdown: Expired=$expiredCount, Expiring=$expiringCount"
+
 # Build HTML table (no attachment)
 $style = @"
 <style>
@@ -161,9 +183,6 @@ $style
     $cls = if ($_.Status -eq "Expired") { "expired" } else { "expiring" }
     "<tr class='$cls'><td>$($_.ApplicationName)</td><td>$($_.ApplicationId)</td><td>$($_.ObjectId)</td><td>$($_.CredentialType)</td><td>$($_.KeyId)</td><td>$($_.EndUtc)</td><td align='right'>$($_.DaysLeft)</td><td><span class='badge'>$($_.Status)</span></td></tr>"
   }) -join "`n"
-
-  $expiredCount  = ($sorted | Where-Object {$_.Status -eq "Expired"}).Count
-  $expiringCount = ($sorted | Where-Object {$_.Status -eq "Expiring"}).Count
 
   $htmlBody = @"
 $style
@@ -200,6 +219,11 @@ foreach ($addr in $To) {
 }
 
 $subject = "[Entra] App credentials $($findings.Count) expiring in next $DaysAhead days"
+Write-Output "[$(Get-Date -Format o)] Preparing email."
+Write-Output "[$(Get-Date -Format o)] From: $FromUserPrincipalName"
+Write-Output "[$(Get-Date -Format o)] To:   $($To -join ', ')"
+Write-Output "[$(Get-Date -Format o)] Subj: $subject"
+
 $mailBody = @{
   message = @{
     subject     = $subject
@@ -211,5 +235,7 @@ $mailBody = @{
 
 $sendUrl = "https://graph.microsoft.com/v1.0/users/$([uri]::EscapeDataString($FromUserPrincipalName))/sendMail"
 Invoke-MgGraphRequest -Method POST -Uri $sendUrl -Body ($mailBody | ConvertTo-Json -Depth 10)
+Write-Output "[$(Get-Date -Format o)] Email sent."
 
-"Sent report to: $($To -join ', ') | Findings: $($findings.Count)"
+$sw.Stop()
+Write-Output "[$(Get-Date -Format o)] DONE. Findings=$($findings.Count) | Expired=$expiredCount | Expiring=$expiringCount | Runtime=$($sw.Elapsed.ToString())"
