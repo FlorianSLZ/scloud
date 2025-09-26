@@ -41,7 +41,7 @@
   Boolean flag to determine if the sent email should be stored in Sent Items. Default: $true.
 
 .EXAMPLE
-  .\Runbook.ps1 -To "itops@contoso.com","secops@contoso.com" `
+  .\Monitor-ExpiringEntraAppCreds.ps1 -To "itops@contoso.com","secops@contoso.com" `
                 -FromUserPrincipalName "reports@contoso.com" `
                 -DaysAhead 45
 
