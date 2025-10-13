@@ -3,7 +3,7 @@
   Detection script for low disk space before Windows 11 upgrade.
 
 .DESCRIPTION
-  Checks if drive C: has at least 40 GB of free space.
+  Checks if drive C: has at least 30 GB of free space.
   If not, it calculates the combined size of the Downloads folder and Recycle Bin.
   If these together exceed 500 MB, the remediation will be triggered to help the user clean up.
 
@@ -16,7 +16,7 @@
 #>
 
 
-$MinGBFree    = 40
+$MinGBFree    = 30
 $MinReclaimMB = 500
 
 # Free space on C:
