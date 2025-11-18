@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  (c) 2006 Microsoft Corporation  -->
+<policyDefinitionResources xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
+  <displayName>enter display name here</displayName>
+  <description>enter description here</description>
+  <resources>
+    <stringTable>
+      <string id="DriveMapping">Network Drive Mappings</string>
+      <string id="ReconnectNetworkDrivesWarning">Display a notification if a mapped drive fails to re-connect</string>
+      <string id="ReconnectNetworkDrivesWarning_Help">This policy makes sure a notification will be prompted to your end users if a drive fails to connect
+
+If you enable or don't configure this setting a drive reconnection notification will be shown to the user 
+
+If you disable this policy setting, the notification will not be displayed.</string>
+      <string id="Drive_D">Drive D</string>
+      <string id="Drive_D_Help">Maps drive D: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_E">Drive E</string>
+      <string id="Drive_E_Help">Maps drive E: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_F">Drive F</string>
+      <string id="Drive_F_Help">Maps drive F: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_G">Drive G</string>
+      <string id="Drive_G_Help">Maps drive G: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_H">Drive H</string>
+      <string id="Drive_H_Help">Maps drive H: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_I">Drive I</string>
+      <string id="Drive_I_Help">Maps drive I: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_J">Drive J</string>
+      <string id="Drive_J_Help">Maps drive J: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_K">Drive K</string>
+      <string id="Drive_K_Help">Maps drive K: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_L">Drive L</string>
+      <string id="Drive_L_Help">Maps drive L: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_M">Drive M</string>
+      <string id="Drive_M_Help">Maps drive M: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_N">Drive N</string>
+      <string id="Drive_N_Help">Maps drive N: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_O">Drive O</string>
+      <string id="Drive_O_Help">Maps drive O: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_P">Drive P</string>
+      <string id="Drive_P_Help">Maps drive P: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_Q">Drive Q</string>
+      <string id="Drive_Q_Help">Maps drive Q: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_R">Drive R</string>
+      <string id="Drive_R_Help">Maps drive R: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_S">Drive S</string>
+      <string id="Drive_S_Help">Maps drive S: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_T">Drive T</string>
+      <string id="Drive_T_Help">Maps drive T: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_U">Drive U</string>
+      <string id="Drive_U_Help">Maps drive U: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_V">Drive V</string>
+      <string id="Drive_V_Help">Maps drive V: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_W">Drive W</string>
+      <string id="Drive_W_Help">Maps drive W: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_X">Drive X</string>
+      <string id="Drive_X_Help">Maps drive X: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_Y">Drive Y</string>
+      <string id="Drive_Y_Help">Maps drive Y: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      <string id="Drive_Z">Drive Z</string>
+      <string id="Drive_Z_Help">Maps drive Z: to a network share (UNC path).
+
+Please enable this policy and fill in a remote UNC path. As example \\remoteserver\Share
+
+Disable this policy if you want to remove the drive mapping.</string>
+      </stringTable>
+     <presentationTable>
+      <presentation id="Drive_D">
+        <textBox refId="Drive_D_RemotePath">
+          <label>Drive D Remote Path:</label>
+        </textBox>
+	</presentation>
+      <presentation id="Drive_E">
+        <textBox refId="Drive_E_RemotePath">
+          <label>Drive E Remote Path:</label>
+        </textBox>
+	</presentation>
+      <presentation id="Drive_F">
+        <textBox refId="Drive_F_RemotePath">
+          <label>Drive F Remote Path:</label>
+        </textBox>
+      </presentation>
+      <presentation id="Drive_G">
+        <textBox refId="Drive_G_RemotePath">
+          <label>Drive G Remote Path:</label>
+        </textBox>
+     </presentation>
+      <presentation id="Drive_H">
+        <textBox refId="Drive_H_RemotePath">
+          <label>Drive H Remote Path:</label>
+        </textBox>
+	      </presentation>
+      <presentation id="Drive_I">
+        <textBox refId="Drive_I_RemotePath">
+          <label>Drive I Remote Path:</label>
+        </textBox>
+	     </presentation>
+      <presentation id="Drive_J">
+        <textBox refId="Drive_J_RemotePath">
+          <label>Drive J Remote Path:</label>
+        </textBox>
+	  </presentation>
+      <presentation id="Drive_K">
+        <textBox refId="Drive_K_RemotePath">
+          <label>Drive K Remote Path:</label>
+        </textBox>
+      </presentation>
+       <presentation id="Drive_L">
+        <textBox refId="Drive_L_RemotePath">
+          <label>Drive L Remote Path:</label>
+        </textBox>
+	   </presentation>
+      <presentation id="Drive_M">
+        <textBox refId="Drive_M_RemotePath">
+          <label>Drive M Remote Path:</label>
+        </textBox>
+      </presentation>
+      <presentation id="Drive_N">
+        <textBox refId="Drive_N_RemotePath">
+          <label>Drive N Remote Path:</label>
+        </textBox>
+      </presentation>
+      <presentation id="Drive_O">
+        <textBox refId="Drive_O_RemotePath">
+          <label>Drive O Remote Path:</label>
+        </textBox>
+	    </presentation>
+      <presentation id="Drive_P">
+        <textBox refId="Drive_P_RemotePath">
+          <label>Drive P Remote Path:</label>
+        </textBox>
+     </presentation>
+      <presentation id="Drive_Q">
+        <textBox refId="Drive_Q_RemotePath">
+          <label>Drive Q Remote Path:</label>
+        </textBox>
+      </presentation>
+      <presentation id="Drive_R">
+        <textBox refId="Drive_R_RemotePath">
+          <label>Drive R Remote Path:</label>
+        </textBox>
+      </presentation>
+      <presentation id="Drive_S">
+        <textBox refId="Drive_S_RemotePath">
+          <label>Drive S Remote Path:</label>
+        </textBox>
+      </presentation>
+      <presentation id="Drive_T">
+        <textBox refId="Drive_T_RemotePath">
+          <label>Drive T Remote Path:</label>
+        </textBox>
+      </presentation>
+      <presentation id="Drive_U">
+        <textBox refId="Drive_U_RemotePath">
+          <label>Drive U Remote Path:</label>
+        </textBox>
+      </presentation>
+      <presentation id="Drive_V">
+        <textBox refId="Drive_V_RemotePath">
+          <label>Drive V Remote Path:</label>
+        </textBox>
+      </presentation>
+      <presentation id="Drive_W">
+        <textBox refId="Drive_W_RemotePath">
+          <label>Drive W Remote Path:</label>
+        </textBox>
+      </presentation>
+      <presentation id="Drive_X">
+        <textBox refId="Drive_X_RemotePath">
+          <label>Drive X Remote Path:</label>
+        </textBox>
+      </presentation>
+      <presentation id="Drive_Y">
+        <textBox refId="Drive_Y_RemotePath">
+          <label>Drive Y Remote Path:</label>
+        </textBox>
+      </presentation>
+      <presentation id="Drive_Z">
+        <textBox refId="Drive_Z_RemotePath">
+          <label>Drive Z Remote Path:</label>
+        </textBox>
+      </presentation>
+    </presentationTable>
+  </resources>
+</policyDefinitionResources>
