@@ -32,11 +32,34 @@ function Get-RegValue {
     }
 }
 
+
+# Check if Secure Boot UEFI database contains the 2023 certificate
+try {
+    $db = Get-SecureBootUEFI -Name db
+    $dbString = [System.Text.Encoding]::ASCII.GetString($db.Bytes)
+} catch {
+    Write-Output "Error: Unable to read Secure Boot UEFI DB. Device may not support Secure Boot or access is blocked."
+}
+
+# Match for the new certificate
+$match = $dbString -match 'Windows UEFI CA 2023'
+
+if ($match) {
+    Write-Output "Compliant: Windows UEFI CA 2023 is present in the Secure Boot database."
+    exit 0
+} else {
+    Write-Output "Non-Compliant: Windows UEFI CA 2023 not found in the Secure Boot database."
+}
+
+
+
 $uefiStatus  = Get-RegValue -Path $servicingPath -Name "UEFICA2023Status"
 $uefiError   = Get-RegValue -Path $servicingPath -Name "UEFICA2023Error"
 $uefiCapable = Get-RegValue -Path $servicingPath -Name "WindowsUEFICA2023Capable"
 
 $updated = $false
+
+
 
 if (
     ($uefiStatus -eq "Updated" -or $uefiCapable -eq 2) -and
