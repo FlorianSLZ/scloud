@@ -8,7 +8,7 @@
 .TAGS PowerShell Intune Diagnostics LogAnalyzer Autopilot
 .LICENSEURI https://github.com/FlorianSLZ/scloud/blob/main/LICENSE
 .PROJECTURI https://github.com/FlorianSLZ/scloud/tree/main/scripts/Intune-Diag
-.ICONURI https://scloud.work/wp-content/uploads/Intune-Diag.webp 
+.ICONURI https://scloud.work/wp-content/uploads/Intune-Diag.png
 .EXTERNALMODULEDEPENDENCIES 
 .REQUIREDSCRIPTS 
 .EXTERNALSCRIPTDEPENDENCIES 
