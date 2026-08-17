@@ -40,6 +40,11 @@ Quickly troubleshoot Intune issues with an intuitive UI and built-in ZIP extract
 ✅ **PowerShell-based** – Lightweight and efficient for IT Pros  
 ✅ **Intune-focused** – Designed specifically for troubleshooting Intune Management Extension (IME) based on the awesome **Get-IntuneManagementExtensionDiagnostics** from Petri Paavola
 
+## 📖 Full Documentation & Blogpost
+
+All steps are explained in detail in this blog post:  
+👉 [https://scloud.work/en/intune-diagnostic-tool/](https://scloud.work/en/intune-diagnostic-tool/)
+
 ## 📥 Installation
 Install Intune-Diag directly from the PowerShell Gallery:
 

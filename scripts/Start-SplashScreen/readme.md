@@ -40,6 +40,11 @@ The **Start-SplashScreen** script is a PowerShell tool designed to provide a use
 - **Customizable Appearance**: Background and text colors can be customized via parameters.
 - **Countdown Timer**: Displays a countdown before automatically closing the splash screen after all processes have finished.
 
+## 📖 Full Documentation & Blogpost
+
+All steps are explained in detail in this blog post:  
+👉 [https://scloud.work/en/splash-screen-for-windows-start-splashscreen/](https://scloud.work/en/splash-screen-for-windows-start-splashscreen/)
+
 ## Requirements
 
 - Windows operating system.
