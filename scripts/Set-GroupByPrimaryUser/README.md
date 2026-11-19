@@ -1,134 +1,86 @@
 <p align="center">
-    <a href="https://scloud.work" alt="Florian Salzmann | scloud"></a>
-            <img src="https://scloud.work/images/logo/Set-GroupByPrimaryUser.webp" width="75" height="75" /></a>
-</p>
-<p align="center">
-    <a href="https://www.linkedin.com/in/fsalzmann/">
-        <img alt="Made by" src="https://img.shields.io/static/v1?label=made%20by&message=Florian%20Salzmann&color=04D361">
-    </a>
-    <a href="https://x.com/FlorianSLZ" alt="X / Twitter">
-    	<img src="https://img.shields.io/twitter/follow/FlorianSLZ.svg?style=social"/>
-    </a>
-</p>
-<p align="center">
-    <a href="https://www.powershellgallery.com/packages/Set-GroupByPrimaryUser/" alt="PowerShell Gallery Version">
-        <img src="https://img.shields.io/powershellgallery/v/Set-GroupByPrimaryUser.svg" />
-    </a>
-    <a href="https://www.powershellgallery.com/packages/Set-GroupByPrimaryUser/" alt="PS Gallery Downloads">
-        <img src="https://img.shields.io/powershellgallery/dt/Set-GroupByPrimaryUser.svg" />
-    </a>
-</p>
-<p align="center">
-    <a href="https://raw.githubusercontent.com/FlorianSLZ/scloud/master/LICENSE" alt="GitHub License">
-        <img src="https://img.shields.io/github/license/FlorianSLZ/scloud.svg" />
-    </a>
+  <a href="https://scloud.work/en/" title="scloud.work - Intune & Microsoft blog by Florian Salzmann">
+    <img src="https://scloud.work/images/logo/terminal-logo-scloud.webp" alt="scloud logo" height="75" />
+  </a>
 </p>
 
 <p align="center">
-	<a href='https://ko-fi.com/G2G211KJI9' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi1.png?v=3' border='0' alt='Buy Me a Coffee' /></a>
+  <img src="https://scloud.work/images/logo/Set-GroupByPrimaryUser.webp" alt="Set-GroupByPrimaryUser logo" width="75" height="75" />
 </p>
 
-# Set-GroupByPrimaryUser
+<p align="center">
+  <a href="https://www.powershellgallery.com/packages/Set-GroupByPrimaryUser/"><img alt="PowerShell Gallery Version" src="https://img.shields.io/powershellgallery/v/Set-GroupByPrimaryUser.svg"></a>
+  <a href="https://www.powershellgallery.com/packages/Set-GroupByPrimaryUser/"><img alt="PowerShell Gallery Downloads" src="https://img.shields.io/powershellgallery/dt/Set-GroupByPrimaryUser.svg"></a>
+</p>
 
-The **Set-GroupByPrimaryUser** script is a PowerShell tool designed to automatically synchronize devices in an **Entra ID security group** based on the **primary users** from a specified user group. This ensures that devices are dynamically added or removed based on ownership and operating system filters.
+<p align="center">
+  <a href="https://www.linkedin.com/in/fsalzmann/"><img alt="Made by Florian Salzmann" src="https://img.shields.io/static/v1?label=made%20by&message=Florian%20Salzmann&color=04D361"></a>
+  <a href="https://scloud.work/en/"><img alt="Blog scloud.work" src="https://img.shields.io/static/v1?label=blog&message=scloud.work&color=0A66C2"></a>
+  <a href="https://github.com/FlorianSLZ/scloud/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/FlorianSLZ/scloud.svg"></a>
+</p>
 
-## Features
+# Set-GroupByPrimaryUser: Sync Entra ID Device Groups by Primary User
 
-- **Automatic Device Group Management**:  
-  - Adds **new** devices owned by users in the source group.  
-  - Optionally prevents removal of devices from the target group (`-NoRemove` switch).  
+> Set-GroupByPrimaryUser is a PowerShell script that fills an Entra ID device group with the devices of a user group's primary users, using Microsoft Graph and Intune.
 
-- **OS & Ownership Filtering**:  
-  - Optionally filter devices based on **operating system** (`Windows`, `MacMDM`, `iOS`, `Android`, `Linux`).  
-  - Filter by **device ownership** (`Company` or `Personal`).  
+## Overview
+
+Set-GroupByPrimaryUser synchronizes an Entra ID device group with the primary users of a source user group. It adds the devices of those users to the target group, removes devices that no longer belong (unless `-NoRemove` is set) and updates the group description with the device count. You can filter by operating system and by device ownership. It is a PowerShell script that uses the Microsoft Graph PowerShell SDK and is published on the PowerShell Gallery.
+
+## What's included
+
+| File | Description |
+|------|-------------|
+| `Set-GroupByPrimaryUser.ps1` | The sync script (published to the PowerShell Gallery) |
+| `LICENSE` | License of the tool |
 
 ## Requirements
 
-- **Windows OS**  
-- **PowerShell 7.x** (recommended)  
-- **Microsoft Graph PowerShell SDK** (`Microsoft.Graph`)  
-- **Entra ID Global Administrator or Intune Administrator permissions**  
+- PowerShell 7.x (recommended)
+- Microsoft Graph PowerShell SDK (`Microsoft.Graph`)
+- Permissions in Entra ID / Intune to read users and devices and to manage group members (the original guide lists Global Administrator or Intune Administrator)
 
-## Installation
+## Usage
 
-For best experience before running the script, install the required **Microsoft Graph module**:
+Install the script from the PowerShell Gallery:
 
 ```powershell
 Install-Script -Name Set-GroupByPrimaryUser
 ```
 
-## Usage
-
-### Basic Execution
-Run the script to sync devices from a **user group** to a **device group**:
+Basic run, syncing the devices of all users in the source group into the target device group:
 
 ```powershell
 Set-GroupByPrimaryUser -UserGroupObjectID "<UserGroupID>" -DeviceGroupObjectID "<DeviceGroupID>"
 ```
 
-### Filtering by OS Type
-Sync **only Windows** devices:
+More examples:
 
 ```powershell
+# Only Windows devices
 Set-GroupByPrimaryUser -UserGroupObjectID "<UserGroupID>" -DeviceGroupObjectID "<DeviceGroupID>" -OSFilter "Windows"
+
+# Company-owned Mac and iOS devices
+Set-GroupByPrimaryUser -UserGroupObjectID "<UserGroupID>" -DeviceGroupObjectID "<DeviceGroupID>" -OSFilter "MacMDM", "iOS" -OwnershipFilter "Company"
+
+# Never remove devices from the target group
+Set-GroupByPrimaryUser -UserGroupObjectID "<UserGroupID>" -DeviceGroupObjectID "<DeviceGroupID>" -NoRemove
 ```
 
-Sync **Mac and iOS** devices:
+### Parameters
 
-```powershell
-.\Set-GroupByPrimaryUser.ps1 -UserGroupObjectID "<UserGroupID>" -DeviceGroupObjectID "<DeviceGroupID>" -OSFilter "MacMDM", "iOS"
-```
+| Parameter | Required | Type | Description |
+|-----------|----------|------|-------------|
+| `-UserGroupObjectID` | Yes | `String` | Object ID of the user group to sync from |
+| `-DeviceGroupObjectID` | Yes | `String` | Object ID of the device group to sync to |
+| `-OSFilter` | No | `String[]` | Filter by OS: `Windows`, `MacMDM`, `iOS`, `Android`, `Linux` (default: all) |
+| `-OwnershipFilter` | No | `String` | Filter by ownership: `Company` or `Personal` (default: all) |
+| `-NoRemove` | No | `Switch` | Do not remove devices from the target group |
 
-### Filtering by Ownership Type
-Sync **only company-owned devices**:
+## Blog post
 
-```powershell
-.\Set-GroupByPrimaryUser.ps1 -UserGroupObjectID "<UserGroupID>" -DeviceGroupObjectID "<DeviceGroupID>" -OwnershipFilter "Company"
-```
+📖 More guides on the blog: [scloud.work](https://scloud.work/en/)
 
-Sync **personal Windows devices only**:
+---
 
-```powershell
-.\Set-GroupByPrimaryUser.ps1 -UserGroupObjectID "<UserGroupID>" -DeviceGroupObjectID "<DeviceGroupID>" -OSFilter "Windows" -OwnershipFilter "Personal"
-```
-
-### Prevent Device Removal (`-NoRemove`)
-By default, the script removes devices that no longer belong in the target group. To prevent this, use the `-NoRemove` switch:
-
-```powershell
-.\Set-GroupByPrimaryUser.ps1 -UserGroupObjectID "<UserGroupID>" -DeviceGroupObjectID "<DeviceGroupID>" -NoRemove
-```
-
-## Parameters
-
-| Parameter         | Required | Type     | Description |
-|------------------|----------|----------|-------------|
-| `-UserGroupObjectID` | ✅ Yes | `String` | Entra ID **Object ID** of the **user group** to sync from. |
-| `-DeviceGroupObjectID` | ✅ Yes | `String` | Entra ID **Object ID** of the **device group** to sync to. |
-| `-OSFilter` | ❌ No | `String[]` | Filter devices by OS (`Windows`, `MacMDM`, `iOS`, `Android`, `Linux`). **Defaults to all OS types**. |
-| `-OwnershipFilter` | ❌ No | `String` | Filter by **device ownership** (`Company`, `Personal`). **Defaults to all ownership types**. |
-| `-NoRemove` | ❌ No | `Switch` | If set, **devices will not be removed** from the target group. |
-
-## Example Scenarios
-
-### Scenario 1: Sync All Devices (No Removal)
-This command **syncs all devices** for users in the specified **user group** into the target **device group**, **without removing** any existing devices:
-
-```powershell
-Set-GroupByPrimaryUser.ps1 -UserGroupObjectID "11111111-1111-1111-1111-111111111111" -DeviceGroupObjectID "22222222-2222-2222-2222-222222222222" -NoRemove
-```
-
-### Scenario 2: Sync Windows Devices Only
-This command **syncs only Windows devices**, ignoring other OS types:
-
-```powershell
-Set-GroupByPrimaryUser.ps1 -UserGroupObjectID "11111111-1111-1111-1111-111111111111" -DeviceGroupObjectID "22222222-2222-2222-2222-222222222222" -OSFilter "Windows"
-```
-
-### Scenario 3: Sync Company-Owned Mac & iOS Devices
-This command **syncs only Mac and iOS devices that are company-owned**:
-
-```powershell
-Set-GroupByPrimaryUser.ps1 -UserGroupObjectID "11111111-1111-1111-1111-111111111111" -DeviceGroupObjectID "22222222-2222-2222-2222-222222222222" -OSFilter "MacMDM", "iOS" -OwnershipFilter "Company"
-```
-
+**More from me:** [scloud.work](https://scloud.work/en/) · [LinkedIn - Florian Salzmann](https://www.linkedin.com/in/fsalzmann/) · [GitHub repo](https://github.com/FlorianSLZ/scloud)

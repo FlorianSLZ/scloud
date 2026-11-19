@@ -1,79 +1,60 @@
 <p align="center">
-    <a href="https://scloud.work" alt="Florian Salzmann | scloud"></a>
-            <img src="https://scloud.work/images/logo/Start-SplashScreen.webp" width="75" height="75" /></a>
-</p>
-<p align="center">
-    <a href="https://www.linkedin.com/in/fsalzmann/">
-        <img alt="Made by" src="https://img.shields.io/static/v1?label=made%20by&message=Florian%20Salzmann&color=04D361">
-    </a>
-    <a href="https://x.com/FlorianSLZ" alt="X / Twitter">
-    	<img src="https://img.shields.io/twitter/follow/FlorianSLZ.svg?style=social"/>
-    </a>
-</p>
-<p align="center">
-    <a href="https://www.powershellgallery.com/packages/Start-SplashScreen/" alt="PowerShell Gallery Version">
-        <img src="https://img.shields.io/powershellgallery/v/Start-SplashScreen.svg" />
-    </a>
-    <a href="https://www.powershellgallery.com/packages/Start-SplashScreen/" alt="PS Gallery Downloads">
-        <img src="https://img.shields.io/powershellgallery/dt/Start-SplashScreen.svg" />
-    </a>
-</p>
-<p align="center">
-    <a href="https://raw.githubusercontent.com/FlorianSLZ/scloud/master/LICENSE" alt="GitHub License">
-        <img src="https://img.shields.io/github/license/FlorianSLZ/Start-SplashScreen.svg" />
-    </a>
+  <a href="https://scloud.work/en/" title="scloud.work - Intune & Microsoft blog by Florian Salzmann">
+    <img src="https://scloud.work/images/logo/terminal-logo-scloud.webp" alt="scloud logo" height="75" />
+  </a>
 </p>
 
 <p align="center">
-	<a href='https://ko-fi.com/G2G211KJI9' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi1.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+  <img src="https://scloud.work/images/logo/Start-SplashScreen.webp" alt="Start-SplashScreen logo" width="75" height="75" />
 </p>
 
-# Start-SplashScreen 
+<p align="center">
+  <a href="https://www.powershellgallery.com/packages/Start-SplashScreen/"><img alt="PowerShell Gallery Version" src="https://img.shields.io/powershellgallery/v/Start-SplashScreen.svg"></a>
+  <a href="https://www.powershellgallery.com/packages/Start-SplashScreen/"><img alt="PowerShell Gallery Downloads" src="https://img.shields.io/powershellgallery/dt/Start-SplashScreen.svg"></a>
+</p>
 
-The **Start-SplashScreen** script is a PowerShell tool designed to provide a user-friendly graphical interface for executing a series of scripts. The interface displays progress updates, status indicators, and an optional countdown timer before closing. It also offers the ability to toggle the visibility of the PowerShell console, allowing for troubleshooting or additional actions.
+<p align="center">
+  <a href="https://www.linkedin.com/in/fsalzmann/"><img alt="Made by Florian Salzmann" src="https://img.shields.io/static/v1?label=made%20by&message=Florian%20Salzmann&color=04D361"></a>
+  <a href="https://scloud.work/en/"><img alt="Blog scloud.work" src="https://img.shields.io/static/v1?label=blog&message=scloud.work&color=0A66C2"></a>
+  <a href="https://github.com/FlorianSLZ/scloud/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/FlorianSLZ/scloud.svg"></a>
+</p>
 
-## Features 
+# Start-SplashScreen: PowerShell Splash Screen for Windows Autopilot and OOBE
 
-- **Graphical Interface**: Displays a splash screen with a customizable title, messages, and status indicators.
-- **Process Execution**: Executes a list of specified scripts or commands, displaying their progress on the splash screen.
-- **Console Visibility Control**: Includes buttons to show or hide the PowerShell console window.
-- **Customizable Appearance**: Background and text colors can be customized via parameters.
-- **Countdown Timer**: Displays a countdown before automatically closing the splash screen after all processes have finished.
+> Start-SplashScreen is a PowerShell script that shows a progress splash screen while scripts run during Windows deployment, Autopilot or Intune provisioning.
 
-## 📖 Full Documentation & Blogpost
+## Overview
 
-All steps are explained in detail in this blog post:  
-👉 [https://scloud.work/en/splash-screen-for-windows-start-splashscreen/](https://scloud.work/en/splash-screen-for-windows-start-splashscreen/)
+Start-SplashScreen shows a graphical splash screen while a list of scripts or commands runs, for example during Windows Autopilot, OOBE or OSDCloud deployments. It displays a header, the name of the running step, a status indicator and an optional countdown before it closes. Buttons let you show or hide the underlying PowerShell console for troubleshooting. It is a PowerShell script published on the PowerShell Gallery.
+
+Features:
+
+- Customizable title, messages, colors and optional logo (`-LogoURL`)
+- Runs a list of PowerShell commands or script URLs (http, https, ftp) and reports progress
+- Show/hide button for the PowerShell console
+- Countdown before the window closes automatically
+
+## What's included
+
+| File | Description |
+|------|-------------|
+| `Start-SplashScreen.ps1` | The splash screen script (published to the PowerShell Gallery) |
+| `LICENSE` | License of the tool |
 
 ## Requirements
 
-- Windows operating system.
-- PowerShell 5.1 or later.
-
-## Installation
-
-```powershell
-Install-Module -Name IntuneBulkMaster 
-```
+- Windows
+- PowerShell 5.1 or later
 
 ## Usage
 
+Install the script from the PowerShell Gallery:
+
 ```powershell
-.\Start-SplashScreen.ps1 -Processes $ProcessesArray 
-
-.\Start-SplashScreen.ps1 -Processes $ProcessesArray -MessageHeader "Custom Header" -MessageText "Initializing..." -MessageStatus "Loading..." -MessageFinished "Done!" -ClosingTimer 10 -ColorBackground "#FFFFFF" -ColorText "#000000"
-
+Install-Script -Name Start-SplashScreen
 ```
 
-## Parameters
-- Processes (Required): An array of processes to run, specified by name and command or URL.
-- MessageHeader (Optional): Main message on the Splash Screen. Default: "Windows Preparation".
-- MessageText (Optional): Initial message on the Splash Screen. Default: "Initiate Installation".
-- MessageStatus (Optional): Initial status indicator on the Splash Screen. Default: "...".
-- MessageFinished (Optional): Final message before the Splash Screen closes. Default: "All processes finished. This window will automatically close in".
-- ClosingTimer (Optional): Time in seconds until the Splash Screen closes after finishing. Default: 5.
-- ColorBackground (Optional): Background color of the Splash Screen. Default: "#CCf4f4f4".
-- ColorText (Optional): Text color on the Splash Screen. Default: "#161616".
+Define the steps to run and start the splash screen:
 
 ```powershell
 $ProcessesArray = @(
@@ -83,5 +64,32 @@ $ProcessesArray = @(
 
 .\Start-SplashScreen.ps1 -Processes $ProcessesArray -MessageHeader "Setup in Progress" -MessageFinished "Installation Complete!" -ClosingTimer 10
 ```
-In this example, the splash screen displays a header "Setup in Progress" while executing two processes. The screen will close automatically after 10 seconds once the processes are complete.
 
+The splash screen shows the header "Setup in Progress" while it runs both steps and closes 10 seconds after they finish.
+
+### Parameters
+
+| Parameter | Required | Default | Description |
+|-----------|----------|---------|-------------|
+| `-Processes` | Yes | - | Array of steps, each with a `Name` and a `Script` (command or URL) |
+| `-MessageHeader` | No | `Windows Preparation` | Main message |
+| `-MessageText` | No | `Initiate Installation` | Initial message where the step names appear |
+| `-MessageStatus` | No | `...` | Initial status indicator |
+| `-MessageFinished` | No | `All processes finished. This window closes automatically.` | Message shown before closing |
+| `-ClosingTimer` | No | `5` | Seconds until the window closes after finishing |
+| `-ColorBackground` | No | `#f4f4f4` | Background color, e.g. `#CCf4f4f4` for 80% transparency |
+| `-ColorText` | No | `#161616` | Text color |
+| `-LogoURL` | No | empty | Optional logo URL |
+
+## Blog post
+
+📖 Full guide: [Splash Screen for Windows with Start-SplashScreen](https://scloud.work/en/splash-screen-for-windows-start-splashscreen/)
+
+## Related
+
+- [OSDCloud](https://github.com/FlorianSLZ/scloud/tree/main/OSDCloud) - Windows deployment with OSDCloud
+- [Windows Autopilot](https://github.com/FlorianSLZ/scloud/tree/main/Windows%20Autopilot) - Autopilot registration and helper scripts
+
+---
+
+**More from me:** [scloud.work](https://scloud.work/en/) · [LinkedIn - Florian Salzmann](https://www.linkedin.com/in/fsalzmann/) · [GitHub repo](https://github.com/FlorianSLZ/scloud)

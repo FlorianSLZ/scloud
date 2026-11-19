@@ -1,47 +1,53 @@
 <p align="center">
-    <a href="https://scloud.work" alt="Florian Salzmann | scloud"></a>
-            <img src="https://scloud.work/images/logo/terminal-logo-scloud.webp" height="75" /></a>
-</p>
-<p align="center">
-    <a href="https://www.linkedin.com/in/fsalzmann/">
-        <img alt="Made by" src="https://img.shields.io/static/v1?label=made%20by&message=Florian%20Salzmann&color=04D361">
-    </a>
-    <a href="https://x.com/FlorianSLZ" alt="X / Twitter">
-    	<img src="https://img.shields.io/twitter/follow/FlorianSLZ.svg?style=social"/>
-    </a>
+  <a href="https://scloud.work/en/" title="scloud.work - Intune & Microsoft blog by Florian Salzmann">
+    <img src="https://scloud.work/images/logo/terminal-logo-scloud.webp" alt="scloud logo" height="75" />
+  </a>
 </p>
 
 <p align="center">
-    <a href="https://raw.githubusercontent.com/FlorianSLZ/scloud/master/LICENSE" alt="GitHub License">
-        <img src="https://img.shields.io/github/license/FlorianSLZ/scloud.svg" />
-    </a>
+  <a href="https://www.linkedin.com/in/fsalzmann/"><img alt="Made by Florian Salzmann" src="https://img.shields.io/static/v1?label=made%20by&message=Florian%20Salzmann&color=04D361"></a>
+  <a href="https://scloud.work/en/"><img alt="Blog scloud.work" src="https://img.shields.io/static/v1?label=blog&message=scloud.work&color=0A66C2"></a>
+  <a href="https://github.com/FlorianSLZ/scloud/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/FlorianSLZ/scloud.svg"></a>
 </p>
 
-<p align="center">
-    <a href='https://ko-fi.com/G2G211KJI9' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi1.png?v=3' border='0' alt='Buy Me a Glass of wine' /></a>
-</p>
+# Set the Time Zone by IP Address in Intune Autopilot
 
-# Set Time Zone by IP Address (Intune Autopilot)
+> A PowerShell script that automatically sets the Windows time zone from the public IP address during Microsoft Intune Autopilot enrollment, without Azure Maps.
 
-This PowerShell script automatically sets the correct Windows time zone during **Intune Autopilot** enrollment.  
-It uses the free IPInfo legacy API to detect the device's IANA time zone and maps it to the correct Windows time zone format.  
+## Overview
 
-No Azure Maps account or additional services are required.
+This PowerShell script sets the correct Windows time zone during Microsoft Intune Autopilot enrollment, based on the device's public IP address. It queries the free IPInfo legacy API for the IANA time zone and maps it to the Windows time zone. No Azure Maps account or other service is required. It must run as SYSTEM in a 64-bit context, as an Intune platform script or as a Win32 app.
 
-## How it works
-1. Retrieves the IANA time zone via `http://ipinfo.io/json`
-2. Downloads the official Microsoft `windowsZones.xml` mapping
-3. Converts the IANA time zone to the Windows time zone
-4. Applies the time zone using `Set-TimeZone`
+How it works:
 
-## Deployment
-You can deploy the script via:
-- **Intune platform script**  
-- **Win32 app** for more control and logging  
+1. Gets the IANA time zone from `http://ipinfo.io/json`.
+2. Downloads the `windowsZones.xml` mapping from this folder.
+3. Converts the IANA time zone to the Windows time zone.
+4. Applies it with `Set-TimeZone`.
 
-For a complete step-by-step guide, see my blog post:  
-[Automatically Set the Time Zone in Intune Autopilot without Azure Maps](https://scloud.work/automatically-set-the-time-zone-in-intune-autopilot)
+## What's included
+
+| File | Description |
+|------|-------------|
+| `Set-TimeZoneByIPAddress.ps1` | Detects the time zone via IP and sets it; logs to the Intune Management Extension log folder |
+| `windowsZones.xml` | IANA to Windows time zone mapping used by the script |
+
+## Usage
+
+1. Deploy `Set-TimeZoneByIPAddress.ps1` as an Intune platform script, or package it as a Win32 app for more control and logging.
+2. Run it in the system context (not the user context) and in a 64-bit PowerShell.
+3. Check the log at `C:\ProgramData\Microsoft\IntuneManagementExtension\Logs\Set-TimeZoneByIPAddress-script.log`.
+
+Note: the IPInfo legacy API may be deprecated in the future. At the time of writing, no end-of-life date was announced.
+
+## Blog post
+
+📖 Full guide: [Automatically set the time zone in Intune Autopilot](https://scloud.work/en/automatically-set-the-time-zone-in-intune-autopilot/)
+
+## Related
+
+- [Windows Autopilot](https://github.com/FlorianSLZ/scloud/tree/main/Windows%20Autopilot) - more Autopilot helper scripts
 
 ---
 
-**Note:** The IPInfo legacy API may be deprecated in the future, but at the time of writing, no end-of-life date is announced.
+**More from me:** [scloud.work](https://scloud.work/en/) · [LinkedIn - Florian Salzmann](https://www.linkedin.com/in/fsalzmann/) · [GitHub repo](https://github.com/FlorianSLZ/scloud)
